@@ -32,7 +32,6 @@ setuptools.setup(
         'Operating System :: OS Independent'],
     python_requires='>=3.6',
     install_requires=[
-        'click>=8.0.3',
         'pyyaml>=5.3.1',
         'pycodestyle>=2.8.0',
         'netCDF4>=1.5.7',
