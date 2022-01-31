@@ -1,13 +1,14 @@
+
 # Evaluation and Verification of the Analysis (EVA)
 
 
-## Installation
+### Installation
 
 The eva package can be installed using pip:
 
 	pip install --prefix=/path/to/install/ .
 
-## Usage
+### Usage
 
 eva uses a strict dictionary only API. This ensures flexible use for different applications. The most straightforward use is achieved by choosing the Class containing the diagnostic and passing a yaml configuration file:
 
