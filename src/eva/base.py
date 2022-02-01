@@ -8,8 +8,10 @@
 
 # imports
 from abc import ABC, abstractmethod
-import click
+import argparse
 import importlib
+import os
+import sys
 import yaml
 
 # local imports
@@ -109,19 +111,63 @@ def create_and_run(eva_class_name, config, logger=None):
 # --------------------------------------------------------------------------------------------------
 
 
-@click.command()
-@click.argument('eva_class_name')
-@click.argument('config')
-def main(eva_class_name, config):
+def loop_and_create_and_run(config):
 
-    """
-    Arguments:\n
-      EVA_CLASS_NAME: The name of the class (diagnostic) to be instantiated.\n
-      CONFIG: Path to a Yaml file containing the configuration for the diagnostic.
-    """
-    click.echo(eva_class_name)
+    # Create dictionary from the input file
+    with open(config, 'r') as ymlfile:
+        app_dict = yaml.safe_load(ymlfile)
 
-    create_and_run(eva_class_name, config)
+    # Get the list of applications
+    try:
+        apps = app_dict['applications']
+    except Exception:
+        print('ABORT: When running standalone the input config must contain \'applications\' as ' +
+              'a list')
+        sys.exit("ABORT")
+
+    # Loop over the applications and run
+    for app in apps:
+        app_name = app['application name']
+        create_and_run(app_name, app)
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def main():
+
+    # Arguments
+    # ---------
+    parser = argparse.ArgumentParser()
+    parser.add_argument('args', nargs='+', type=str, help='Application name [optional] followed ' +
+                        'by the configuration file [madatory]. E.g. eva ObsCorrelationScatter ' +
+                        'conf.yaml')
+
+
+    args = parser.parse_args()
+    args_list = args.args
+
+    # Make sure only 1 or 2 arguments are present
+    assert len(args_list) <= 2, "The maximum number of arguments is two."
+
+    # Check the file exists
+    # ---------------------
+    if len(args_list) == 2:
+        application = args_list[0]
+        config_in = args_list[1]
+    else:
+        application = None
+        config_in = args_list[0]
+
+    assert os.path.exists(config_in), "File " + config_in + "not found"
+
+    # Run application or determine application(s) to run from config.
+    if application is not None:
+        # User specifies e.g. eva ObsCorrelationScatter ObsCorrelationScatterDriver.yaml
+        create_and_run(application, config_in)
+    else:
+        # User specifies e.g. eva ObsCorrelationScatter ObsCorrelationScatterDriver.yaml
+        loop_and_create_and_run(config_in)
 
 
 # --------------------------------------------------------------------------------------------------
