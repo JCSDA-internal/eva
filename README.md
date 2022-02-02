@@ -1,6 +1,10 @@
-
 # Evaluation and Verification of the Analysis (EVA)
 
+### Continuous integration:
+
+| Test      | Status  |
+| --------- | --------|
+| Python coding norms | ![Status](https://github.com/danholdaway/eva/actions/workflows/codestyle.yml/badge.svg) |
 
 ### Installation
 

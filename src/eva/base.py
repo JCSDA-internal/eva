@@ -143,7 +143,6 @@ def main():
                         'by the configuration file [madatory]. E.g. eva ObsCorrelationScatter ' +
                         'conf.yaml')
 
-
     args = parser.parse_args()
     args_list = args.args
 
