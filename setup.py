@@ -32,7 +32,7 @@ setuptools.setup(
         'Operating System :: OS Independent'],
     python_requires='>=3.6',
     install_requires=[
-        'pyyaml>=5.3.1',
+        'pyyaml>=5.4',
         'pycodestyle>=2.8.0',
         'netCDF4>=1.5.7',
         'matplotlib>=3.4.3',
