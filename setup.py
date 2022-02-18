@@ -45,7 +45,7 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts': [
-            'eva = eva.base:main',
+            'eva = eva.eva_base:main',
         ],
     },
     )

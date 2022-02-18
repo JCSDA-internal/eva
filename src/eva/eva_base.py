@@ -15,6 +15,7 @@ import sys
 import yaml
 
 # local imports
+from eva.eva_path import return_eva_path
 from eva.utilities.logger import Logger
 from eva.utilities.utils import camelcase_to_underscore
 
@@ -76,59 +77,67 @@ class Factory():
     def create_object(self, eva_class_name, config, logger):
 
         # Convert capitilized string to one with underscores
+        # --------------------------------------------------
         eva_module_name = camelcase_to_underscore(eva_class_name)
 
+        # Check user provided class name against valid tasks
+        # --------------------------------------------------
+        # List of diagnostics in directory
+        valid_diagnostics = os.listdir(os.path.join(return_eva_path(), 'diagnostics'))
+        # Remove files like __*
+        valid_diagnostics = [ vd for vd in valid_diagnostics if '__' not in vd ]
+        # Remove trailing .py
+        valid_diagnostics = [vd.replace(".py", "") for vd in valid_diagnostics]
+        # Abort if not found
+        if (eva_module_name not in valid_diagnostics):
+            logger.abort('No module found that matches the class name ' + eva_class_name + '. ' +
+                         'Expecting to find a class called in ' + eva_class_name + 'in a file ' +
+                         'called ' + os.path.join(return_eva_path(), 'diagnostics', eva_module_name))
+
         # Import class based on user selected task
-        eva_class = getattr(importlib.import_module("eva."+eva_module_name), eva_class_name)
+        # ----------------------------------------
+        try:
+            eva_class = getattr(importlib.import_module("eva.diagnostics."+eva_module_name),
+                                eva_class_name)
+        except Exception:
+            logger.abort('Expecting to find a class called in ' + eva_class_name + 'in a file ' +
+                         'called ' + os.path.join(return_eva_path(), 'diagnostics',
+                         eva_module_name) + ' but something went wrong attempting to import it.')
 
         # Return implementation of the class (calls base class constructor that is above)
+        # -------------------------------------------------------------------------------
         return eva_class(eva_class_name, config, logger)
 
 
 # --------------------------------------------------------------------------------------------------
 
 
-def create_and_run(eva_class_name, config, logger=None):
+def eva(eva_config, logger):
 
-    '''
-    Given a class name and a config this method will create an object of the class name and execute
-    the diagnostic defined therein. The config will determine how the diagnostic behaves. The
-    config can be passed in using a path to the Yaml file or an already parsed dictionary.
-
-    Args:
-        eva_class_name : (str) Name of the class to be instantiated
-        config : (str or dictionary) configuation that will guide the diagnostic
-    '''
-
-    # Create the diagnostic object
-    creator = Factory()
-    eva_object = creator.create_object(eva_class_name, config, logger)
-
-    # Execute the diagnostic
-    eva_object.execute()
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-def loop_and_create_and_run(config):
-
-    # Create dictionary from the input file
-    with open(config, 'r') as ymlfile:
-        app_dict = yaml.safe_load(ymlfile)
+    # Convert incoming config (either dictionary or file) to dictionary
+    if eva_config is dict:
+        eva_dict = eva_config
+    else:
+        # Create dictionary from the input file
+        with open(eva_config, 'r') as eva_config_opened:
+            eva_dict = yaml.safe_load(eva_config_opened)
 
     # Get the list of applications
     try:
-        apps = app_dict['applications']
+        diagnostic_configs = eva_dict['diagnostics']
     except Exception:
-        print('ABORT: When running standalone the input config must contain \'applications\' as ' +
-              'a list')
-        sys.exit("ABORT")
+        logger.abort('eva configuration must contain \'diagnostics\' and it should provide a ' +
+                     'list of diagnostics to be run.')
 
     # Loop over the applications and run
-    for app in apps:
-        app_name = app['application name']
-        create_and_run(app_name, app)
+    for diagnostic_config in diagnostic_configs:
+
+        # Extract name for this diagnostic
+        eva_class_name = diagnostic_config['diagnostic name']
+
+        # Create the diagnostic object
+        creator = Factory()
+        eva_object = creator.create_object(eva_class_name, diagnostic_config, logger)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -139,34 +148,20 @@ def main():
     # Arguments
     # ---------
     parser = argparse.ArgumentParser()
-    parser.add_argument('args', nargs='+', type=str, help='Application name [optional] followed ' +
-                        'by the configuration file [madatory]. E.g. eva ObsCorrelationScatter ' +
-                        'conf.yaml')
+    parser.add_argument('config_file', type=str, help='Configuration YAML file for driving ' +
+                        'the diagnostic. See documentation/examples for how to configure the YAML.')
 
+    # Create temporary logger
+    logger = Logger('EvaSetup')
+
+    # Get the configuation file
     args = parser.parse_args()
-    args_list = args.args
+    config_file = args.config_file
 
-    # Make sure only 1 or 2 arguments are present
-    assert len(args_list) <= 2, "The maximum number of arguments is two."
+    assert os.path.exists(config_file), "File " + config_file + " not found"
 
-    # Check the file exists
-    # ---------------------
-    if len(args_list) == 2:
-        application = args_list[0]
-        config_in = args_list[1]
-    else:
-        application = None
-        config_in = args_list[0]
-
-    assert os.path.exists(config_in), "File " + config_in + "not found"
-
-    # Run application or determine application(s) to run from config.
-    if application is not None:
-        # User specifies e.g. eva ObsCorrelationScatter ObsCorrelationScatterDriver.yaml
-        create_and_run(application, config_in)
-    else:
-        # User specifies e.g. eva ObsCorrelationScatter ObsCorrelationScatterDriver.yaml
-        loop_and_create_and_run(config_in)
+    # Run the diagnostic(s)
+    eva(config_file, logger)
 
 
 # --------------------------------------------------------------------------------------------------
