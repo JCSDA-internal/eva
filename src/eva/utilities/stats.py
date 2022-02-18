@@ -3,89 +3,12 @@
 stats.py contains statistics utility functions
 '''
 
-__all__ = ['mstats', 'lregress', 'ttest', 'get_weights', 'get_weighted_mean',
+__all__ = ['lregress', 'ttest', 'get_weights', 'get_weighted_mean',
            'get_linear_regression', 'bootstrap']
 
 import numpy as _np
 from scipy.stats import t as _t
 from sklearn.linear_model import LinearRegression
-
-
-def mstats(x, verbose=True):
-    '''
-    Function that computes and displays
-    various statistics of a variable.
-    A better alternative is `scipy.stats.describe()`
-    Args:
-        x : (numpy array) numpy variable whose statistics are to
-            be computed and displayed
-        verbose : (boolean, default=True) Prints statistics if True
-    Returns:
-        OUT : (object) returns if verbose=False
-    '''
-
-    OUT = type('', (), {})
-
-    OUT.MatrixSize = _np.shape(x)
-    OUT.NElements = _np.prod(OUT.MatrixSize)
-    OUT.Nnans = _np.sum(_np.isnan(x))
-    OUT.NAnalyzedElements = OUT.NElements - OUT.Nnans
-
-    datatype = x.dtype
-
-    xf = x.flatten()
-    xf = xf[~_np.isnan(xf)]
-    absxf = _np.abs(xf)
-
-    OUT.Mean = _np.mean(xf)
-    OUT.Max = _np.max(xf)
-    OUT.Min = _np.min(xf)
-    OUT.Median = _np.median(xf)
-    OUT.StDev = _np.std(xf, ddof=1)
-    OUT.MeanAbs = _np.mean(absxf)
-    OUT.MinAbs = _np.min(absxf[absxf > 0.0])
-    OUT.FracZero = len(xf[xf == 0.0]) / OUT.NAnalyzedElements
-    OUT.FracNan = OUT.Nnans / OUT.NElements
-
-    if verbose:
-        print('================= m s t a t s ==================')
-        print('        MatrixSize: %s' % (str(OUT.MatrixSize)))
-        print('         NElements: %d' % (OUT.NElements))
-        print(' NAnalyzedElements: %d' % (OUT.NAnalyzedElements))
-        if datatype in ['int', 'int8', 'int16', 'int32', 'int64',
-                        'uint8', 'uint16', 'uint32', 'uint64',
-                        'float', 'float16', 'float32', 'float64']:
-            print('              Mean: %f' % (OUT.Mean))
-            print('               Max: %f' % (OUT.Max))
-            print('               Min: %f' % (OUT.Min))
-            print('            Median: %f' % (OUT.Median))
-            print('             StDev: %f' % (OUT.StDev))
-            print('           MeanAbs: %f' % (OUT.MeanAbs))
-            print('            MinAbs: %f' % (OUT.MinAbs))
-        if datatype in ['complex', 'complex64', 'complex128']:
-            print('              Mean: %f + %fi' % (OUT.Mean.real,
-                                                    OUT.Mean.imag))
-            print('               Max: %f + %fi' % (OUT.Max.real,
-                                                    OUT.Max.imag))
-            print('               Min: %f + %fi' % (OUT.Min.real,
-                                                    OUT.Min.imag))
-            print('            Median: %f + %fi' %
-                  (OUT.Median.real, OUT.Median.imag))
-            print('             StDev: %f + %fi' %
-                  (OUT.StDev.real, OUT.StDev.imag))
-            print('           MeanAbs: %f + %fi' %
-                  (OUT.MeanAbs.real, OUT.MeanAbs.imag))
-            print('            MinAbs: %f + %fi' %
-                  (OUT.MinAbs.real, OUT.MinAbs.imag))
-        print('          FracZero: %f' % (OUT.FracZero))
-        print('           FracNaN: %f' % (OUT.FracNan))
-        print('================================================')
-
-        return
-
-    else:
-
-        return OUT
 
 
 def lregress(x, y, ci=95.0):
