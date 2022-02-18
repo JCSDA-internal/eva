@@ -90,14 +90,14 @@ class EvaFactory():
         # List of diagnostics in directory
         valid_diagnostics = os.listdir(os.path.join(return_eva_path(), 'diagnostics'))
         # Remove files like __*
-        valid_diagnostics = [ vd for vd in valid_diagnostics if '__' not in vd ]
+        valid_diagnostics = [vd for vd in valid_diagnostics if '__' not in vd]
         # Remove trailing .py
         valid_diagnostics = [vd.replace(".py", "") for vd in valid_diagnostics]
         # Abort if not found
         if (eva_module_name not in valid_diagnostics):
             logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
-                         'called ' + os.path.join(return_eva_path(), 'diagnostics',
-                         eva_module_name) + '.py but no such file was found.')
+                         'called ' + os.path.join(return_eva_path(), 'diagnostics', eva_module_name)
+                         + '.py but no such file was found.')
 
         # Import class based on user selected task
         # ----------------------------------------
@@ -106,8 +106,8 @@ class EvaFactory():
                                 eva_class_name)
         except Exception as e:
             logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
-                         'called ' + os.path.join(return_eva_path(), 'diagnostics',
-                         eva_module_name) + '.py but no such class was found or an error occurred.')
+                         'called ' + os.path.join(return_eva_path(), 'diagnostics', eva_module_name)
+                         + '.py but no such class was found or an error occurred.')
 
         # Return implementation of the class (calls base class constructor that is above)
         # -------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ class EvaFactory():
 # --------------------------------------------------------------------------------------------------
 
 
-def eva(eva_config, eva_logger = None):
+def eva(eva_config, eva_logger=None):
 
     # Create temporary logger
     logger = Logger('EvaSetup')
