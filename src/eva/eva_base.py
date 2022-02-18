@@ -133,7 +133,7 @@ def eva(eva_config, eva_logger=None):
     # Get the list of applications
     try:
         diagnostic_configs = eva_dict['diagnostics']
-    except Exception KeyError:
+    except KeyError:
         logger.abort('eva configuration must contain \'diagnostics\' and it should provide a ' +
                      'list of diagnostics to be run.')
 
