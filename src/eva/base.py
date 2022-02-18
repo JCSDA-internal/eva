@@ -79,7 +79,8 @@ class Factory():
         eva_module_name = camelcase_to_underscore(eva_class_name)
 
         # Import class based on user selected task
-        eva_class = getattr(importlib.import_module("eva.diagnostics."+eva_module_name), eva_class_name)
+        eva_class = getattr(importlib.import_module("eva.diagnostics."+eva_module_name),
+                            eva_class_name)
 
         # Return implementation of the class (calls base class constructor that is above)
         return eva_class(eva_class_name, config, logger)
