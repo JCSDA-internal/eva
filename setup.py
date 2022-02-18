@@ -37,6 +37,12 @@ setuptools.setup(
         'netCDF4>=1.5.7',
         'matplotlib>=3.4.3',
     ],
+    package_data={
+        '': [
+               'tests/config/*',
+               'tests/data/*',
+             ],
+    },
     entry_points={
         'console_scripts': [
             'eva = eva.base:main',
