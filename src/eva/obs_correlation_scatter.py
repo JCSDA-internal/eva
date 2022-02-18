@@ -13,7 +13,7 @@ from eva.base import Base
 from eva.utilities import ioda_definitions
 from eva.utilities import ioda_netcdf_api
 from eva.plot_tools.figure import CreatePlot, CreateFigure
-from eva.plot_tools.plots import Scatter
+from eva.plot_tools.plots import Scatter, LinePlot
 
 import netCDF4
 import numpy as np
