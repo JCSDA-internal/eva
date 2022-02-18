@@ -256,7 +256,7 @@ def bootstrap(insample, level=.95, estimator='mean', nrepl=10000):
         Lower and upper bounds of confidence intervals
     """
     if any(_np.isnan(insample)):
-        print('{:s}').format('bootstrap_ci.py: NaN detected. Dropping NaN(s) input prior to bootstrap...')
+        print('bootstrap_ci.py: NaN detected. Dropping NaN(s) input prior to bootstrap...')
         sample = insample[~_np.isnan(insample)]
     else:
         sample = insample
