@@ -1,9 +1,8 @@
 # This work developed by NOAA/NWS/EMC under the Apache 2.0 license.
-   
 import numpy as np
 
 __all__ = ['Scatter', 'Histogram', 'LinePlot' 'VerticalLine',
-           'HorizontalLine', 'BarPlot' 'HorizontalBar', 
+           'HorizontalLine', 'BarPlot' 'HorizontalBar',
            'MapScatter', 'MapGridded', 'MapContour']
 
 
