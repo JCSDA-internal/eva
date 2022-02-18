@@ -37,7 +37,7 @@ setuptools.setup(
         'netCDF4>=1.5.7',
         'matplotlib>=3.4.3',
         'cartopy>=0.20.2',
-        'scikit-learn>1.0.2'
+        'scikit-learn>=1.0.2'
     ],
     package_data={
         '': [
