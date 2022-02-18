@@ -191,7 +191,7 @@ class ObsCorrelationScatter(Base):
                             plotmin = data_min - (0.1 * data_diff)
                             plotmax = data_max + (0.1 * data_diff)
                             # add a 1:1 line layer
-                            line = LinePlot([plotmin,plotmax], [plotmin,plotmax])
+                            line = LinePlot([plotmin, plotmax], [plotmin, plotmax])
                             line.color = 'black'
                             # set up the plot
                             plot = CreatePlot(plot_layers=[line, scatter])
