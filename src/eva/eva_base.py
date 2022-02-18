@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# (C) Copyright 2021-2022 NOAA/NWS/EMC
+#
 # (C) Copyright 2021-2022 United States Government as represented by the Administrator of the
 # National Aeronautics and Space Administration. All Rights Reserved.
 #
@@ -41,21 +43,21 @@ class Config(dict):
 # --------------------------------------------------------------------------------------------------
 
 
-class Base(ABC):
+class EvaBase(ABC):
 
     # Base class constructor
-    def __init__(self, eva_class_name, config, logger):
+    def __init__(self, eva_class_name, config, eva_logger):
 
-        print("\nInitializing eva with the following parameters:")
-        print("  Diagnostic:    ", eva_class_name)
-        print("  Configuration: ", config)
-
-        # Create message logger
-        # ---------------------
-        if logger is None:
+        # Replace logger
+        # --------------
+        if eva_logger is None:
             self.logger = Logger(eva_class_name)
         else:
-            self.logger = logger
+            self.logger = eva_logger
+
+        self.logger.info("  Initializing eva with the following parameters:")
+        self.logger.info("  Diagnostic:    " + eva_class_name)
+        self.logger.info(" ")
 
         # Create a configuration object
         # -----------------------------
@@ -72,9 +74,12 @@ class Base(ABC):
 # --------------------------------------------------------------------------------------------------
 
 
-class Factory():
+class EvaFactory():
 
-    def create_object(self, eva_class_name, config, logger):
+    def create_eva_object(self, eva_class_name, config, eva_logger):
+
+        # Create temporary logger
+        logger = Logger('EvaFactory')
 
         # Convert capitilized string to one with underscores
         # --------------------------------------------------
@@ -90,29 +95,32 @@ class Factory():
         valid_diagnostics = [vd.replace(".py", "") for vd in valid_diagnostics]
         # Abort if not found
         if (eva_module_name not in valid_diagnostics):
-            logger.abort('No module found that matches the class name ' + eva_class_name + '. ' +
-                         'Expecting to find a class called in ' + eva_class_name + 'in a file ' +
-                         'called ' + os.path.join(return_eva_path(), 'diagnostics', eva_module_name))
+            logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
+                         'called ' + os.path.join(return_eva_path(), 'diagnostics',
+                         eva_module_name) + '.py but no such file was found.')
 
         # Import class based on user selected task
         # ----------------------------------------
         try:
             eva_class = getattr(importlib.import_module("eva.diagnostics."+eva_module_name),
                                 eva_class_name)
-        except Exception:
-            logger.abort('Expecting to find a class called in ' + eva_class_name + 'in a file ' +
+        except Exception as e:
+            logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
                          'called ' + os.path.join(return_eva_path(), 'diagnostics',
-                         eva_module_name) + ' but something went wrong attempting to import it.')
+                         eva_module_name) + '.py but no such class was found or an error occurred.')
 
         # Return implementation of the class (calls base class constructor that is above)
         # -------------------------------------------------------------------------------
-        return eva_class(eva_class_name, config, logger)
+        return eva_class(eva_class_name, config, eva_logger)
 
 
 # --------------------------------------------------------------------------------------------------
 
 
-def eva(eva_config, logger):
+def eva(eva_config, eva_logger = None):
+
+    # Create temporary logger
+    logger = Logger('EvaSetup')
 
     # Convert incoming config (either dictionary or file) to dictionary
     if eva_config is dict:
@@ -136,8 +144,11 @@ def eva(eva_config, logger):
         eva_class_name = diagnostic_config['diagnostic name']
 
         # Create the diagnostic object
-        creator = Factory()
-        eva_object = creator.create_object(eva_class_name, diagnostic_config, logger)
+        creator = EvaFactory()
+        eva_object = creator.create_eva_object(eva_class_name, diagnostic_config, eva_logger)
+
+        # Run the diagnostic
+        eva_object.execute()
 
 
 # --------------------------------------------------------------------------------------------------
@@ -151,9 +162,6 @@ def main():
     parser.add_argument('config_file', type=str, help='Configuration YAML file for driving ' +
                         'the diagnostic. See documentation/examples for how to configure the YAML.')
 
-    # Create temporary logger
-    logger = Logger('EvaSetup')
-
     # Get the configuation file
     args = parser.parse_args()
     config_file = args.config_file
@@ -161,7 +169,7 @@ def main():
     assert os.path.exists(config_file), "File " + config_file + " not found"
 
     # Run the diagnostic(s)
-    eva(config_file, logger)
+    eva(config_file)
 
 
 # --------------------------------------------------------------------------------------------------

@@ -1,3 +1,5 @@
+# (C) Copyright 2021-2022 NOAA/NWS/EMC
+#
 # (C) Copyright 2021-2022 United States Government as represented by the Administrator of the
 # National Aeronautics and Space Administration. All Rights Reserved.
 #
@@ -8,7 +10,7 @@
 # --------------------------------------------------------------------------------------------------
 
 
-from eva.base import Base
+from eva.eva_base import EvaBase
 from eva.utilities import ioda_definitions
 from eva.utilities import ioda_netcdf_api
 from eva.plot_tools.scatter_correlation import scatter_correlation_plot
@@ -23,7 +25,7 @@ import os
 
 # TODO: needs to be ioda-erized and r2d2-erized
 
-class ObsCorrelationScatter(Base):
+class ObsCorrelationScatter(EvaBase):
 
     def execute(self):
 
