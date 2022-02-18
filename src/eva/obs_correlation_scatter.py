@@ -184,6 +184,7 @@ class ObsCorrelationScatter(Base):
                             # set up the scatter layer
                             scatter = Scatter(data_ref, data_exp)
                             scatter.markersize = marker_size
+                            scatter.color = 'blue'
                             data_min = min(min(data_ref), min(data_exp))
                             data_max = max(max(data_ref), max(data_exp))
                             data_diff = data_max - data_min
@@ -200,7 +201,7 @@ class ObsCorrelationScatter(Base):
                             plot.add_xlabel(ref_metric_long_name)
                             plot.add_ylabel(exp_metric_long_name)
                             # create the figure
-                            fig = CreateFigure()
+                            fig = CreateFigure(figsize=(8, 8))
                             fig.plot_list = [plot]
                             fig.create_figure()
                             fig.save_figure(output_file)
