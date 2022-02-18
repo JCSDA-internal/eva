@@ -24,6 +24,12 @@ class CreateFigure:
         self.sharey = sharey
         self.plot_list = []
 
+    def save_figure(self, filepath, **kwargs):
+        """
+        Method to save figure to file
+        """
+        self.fig.savefig(filepath, **kwargs)
+
     def create_figure(self):
         """
         Driver method to create figure and subplots.
