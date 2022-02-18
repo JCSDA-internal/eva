@@ -187,11 +187,16 @@ class ObsCorrelationScatter(Base):
                             data_min = min(min(data_ref), min(data_exp))
                             data_max = max(max(data_ref), max(data_exp))
                             data_diff = data_max - data_min
-                            scatter.vmin = data_min - (0.1 * data_diff)
-                            scatter.vmax = data_max + (0.1 * data_diff)
+                            plotmin = data_min - (0.1 * data_diff)
+                            plotmax = data_max + (0.1 * data_diff)
+                            # add a 1:1 line layer
+                            line = LinePlot([plotmin,plotmax], [plotmin,plotmax])
+                            line.color = 'black'
                             # set up the plot
-                            plot = CreatePlot(plot_layers=[scatter])
+                            plot = CreatePlot(plot_layers=[line, scatter])
                             plot.add_title(plot_title)
+                            plot.set_xlim([plotmin, plotmax])
+                            plot.set_ylim([plotmin, plotmax])
                             plot.add_xlabel(ref_metric_long_name)
                             plot.add_ylabel(exp_metric_long_name)
                             # create the figure
@@ -199,7 +204,6 @@ class ObsCorrelationScatter(Base):
                             fig.plot_list = [plot]
                             fig.create_figure()
                             fig.save_figure(output_file)
-                            
 
             # Close files
             fh_exp.close()
