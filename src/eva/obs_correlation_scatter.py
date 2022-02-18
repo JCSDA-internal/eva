@@ -198,12 +198,8 @@ class ObsCorrelationScatter(Base):
                             fig = CreateFigure()
                             fig.plot_list = [plot]
                             fig.create_figure()
-                            fig.
+                            fig.save_figure(output_file)
                             
-                            
-#                             scatter_correlation_plot(data_ref, data_exp, ref_metric_long_name,
-#                                                      exp_metric_long_name, plot_title, output_file,
-#                                                      marker_size=marker_size)
 
             # Close files
             fh_exp.close()
