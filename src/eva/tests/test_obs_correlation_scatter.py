@@ -9,7 +9,8 @@ PYTEST_ENVVARS = {
     'EVA_TESTS_DIR': str(EVA_TESTS_DIR)
 }
 
-OBS_CORRELATION_SCATTER_YAML = os.path.join(EVA_TESTS_DIR, 'config/ObsCorrelationScatterDriver.yaml')
+OBS_CORRELATION_SCATTER_YAML = os.path.join(
+    EVA_TESTS_DIR, 'config/ObsCorrelationScatterDriver.yaml')
 
 
 def test_obs_correlation_scatter():
@@ -22,6 +23,3 @@ def test_obs_correlation_scatter():
             base.loop_and_create_and_run(OBS_CORRELATION_SCATTER_YAML)
     except Exception as e:
         raise ValueError(f'Unexpected error encountered: {e}')
-        
-    
-    
