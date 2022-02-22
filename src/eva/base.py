@@ -63,11 +63,8 @@ class Config(dict):
         else:
             config = load_yaml_file(dict_or_yaml)
 
-        pretty_config = json.dumps(config, indent=4)
-        
         # Initialize the parent class with the config
         super().__init__(config)
-
 
 
 # --------------------------------------------------------------------------------------------------
@@ -134,8 +131,6 @@ def create_and_run(eva_class_name, config, logger=None):
     creator = Factory()
     eva_object = creator.create_object(eva_class_name, config, logger)
 
-    print(f'eva_object: {eva_object}')
-
     # Execute the diagnostic
     eva_object.execute()
 
@@ -144,7 +139,6 @@ def create_and_run(eva_class_name, config, logger=None):
 
 
 def loop_and_create_and_run(config):
-
 
     # Create dictionary from the input file
     app_dict = load_yaml_file(config)
