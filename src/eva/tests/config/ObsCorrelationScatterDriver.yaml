@@ -1,5 +1,5 @@
-applications:
-  - application name: ObsCorrelationScatter
+diagnostics:
+  - diagnostic name: ObsCorrelationScatter
     comparisons:
     - - hofx
       - GsiHofXBc
@@ -16,7 +16,7 @@ applications:
     output path: ./
     platforms:
     - amsua_n19
-  - application name: ObsCorrelationScatter
+  - diagnostic name: ObsCorrelationScatter
     comparisons:
     - - hofx
       - GsiHofXBc

@@ -1,7 +1,7 @@
 import os
 import pathlib
 import pytest
-from eva import base
+from eva import eva_base
 from unittest.mock import patch
 
 EVA_TESTS_DIR = pathlib.Path(__file__).parent.resolve()
@@ -20,6 +20,6 @@ def test_obs_correlation_scatter():
     # src/eva/tests/config/ObsCorrelationScatterDriver.yaml
     try:
         with patch.dict(os.environ, PYTEST_ENVVARS):
-            base.loop_and_create_and_run(OBS_CORRELATION_SCATTER_YAML)
+            eva_base.eva(OBS_CORRELATION_SCATTER_YAML)
     except Exception as e:
         raise ValueError(f'Unexpected error encountered: {e}')

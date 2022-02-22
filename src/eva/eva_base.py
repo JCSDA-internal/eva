@@ -12,7 +12,9 @@
 from abc import ABC, abstractmethod
 import argparse
 import importlib
+import json
 import os
+import re
 import sys
 import yaml
 
@@ -23,6 +25,30 @@ from eva.utilities.utils import camelcase_to_underscore
 
 
 # --------------------------------------------------------------------------------------------------
+def envvar_constructor(loader, node):
+    # method to help substitute parent directory for a yaml env var
+    return os.path.expandvars(node.value)
+
+
+def load_yaml_file(yaml_file):
+    # this yaml load function will allow a user to specify an environment
+    # variable to substitute in a yaml file if the tag '!ENVVAR' exists
+    # this will help developers create absolute system paths that are related
+    # to the install path of the eva package.
+
+    loader = yaml.SafeLoader
+    loader.add_implicit_resolver(
+        '!ENVVAR',
+        re.compile(r'.*\$\{([^}^{]+)\}.*'),
+        None
+    )
+
+    loader.add_constructor('!ENVVAR', envvar_constructor)
+    yaml_dict = None
+    with open(yaml_file, 'r') as ymlfile:
+        yaml_dict = yaml.load(ymlfile, Loader=loader)
+
+    return yaml_dict
 
 
 class Config(dict):
@@ -33,8 +59,7 @@ class Config(dict):
         if type(dict_or_yaml) is dict:
             config = dict_or_yaml
         else:
-            with open(dict_or_yaml, 'r') as ymlfile:
-                config = yaml.safe_load(ymlfile)
+            config = load_yaml_file(dict_or_yaml)
 
         # Initialize the parent class with the config
         super().__init__(config)
@@ -127,8 +152,7 @@ def eva(eva_config, eva_logger=None):
         eva_dict = eva_config
     else:
         # Create dictionary from the input file
-        with open(eva_config, 'r') as eva_config_opened:
-            eva_dict = yaml.safe_load(eva_config_opened)
+        eva_dict = load_yaml_file(eva_config)
 
     # Get the list of applications
     try:
