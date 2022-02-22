@@ -552,7 +552,9 @@ class CreatePlot():
         kwargs.setdefault('fraction', fraction)
 
         if not cbar_location:
-            cbar_location = [0.14, -0.1, 0.8, 0.04] if kwargs['orientation'] == 'horizontal' else [1.02, 0.12, 0.04, 0.8]
+            h_loc = [0.14, -0.1, 0.8, 0.04]
+            v_loc = [1.02, 0.12, 0.04, 0.8]
+            cbar_location = h_loc if kwargs['orientation'] == 'horizontal' else v_loc
 
         self.colorbar = {
             'label': label,
