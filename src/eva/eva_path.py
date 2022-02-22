@@ -14,7 +14,7 @@ import os
 # --------------------------------------------------------------------------------------------------
 
 
-def return_tests_path():
+def return_eva_path():
     return os.path.split(__file__)[0]
 
 

@@ -145,8 +145,8 @@ class CreateFigure:
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             c=plotobj.data, s=plotobj.markersize,
                             **inputs, transform=self.projection.projection)
-#         if plotobj.colorbar:
-#             self.cs = cs
+        if plotobj.colorbar:
+            self.cs = cs
 
     def _map_gridded(self, plotobj, ax):
 
@@ -158,8 +158,8 @@ class CreateFigure:
                            plotobj.data, **inputs,
                            transform=self.projection.projection)
 
-#         if plotobj.colorbar:
-#             self.cs = cs
+        if plotobj.colorbar:
+            self.cs = cs
 
     def _map_contour(self, plotobj, ax):
 
@@ -174,8 +174,8 @@ class CreateFigure:
         if plotobj.clabel:
             plt.clabel(cs, levels=plotobj.levels, use_clabeltext=True)
 
-#         if plotobj.colorbar:
-#             self.cs = cs
+        if plotobj.colorbar:
+            self.cs = cs
 
     def _density_scatter(self, plotobj, ax):
         """
@@ -317,36 +317,26 @@ class CreateFigure:
 
     def _plot_colorbar(self, ax, colorbar):
         """
-        Add colorbar on specified ax.
+        Add colorbar on specified ax or for total figure.
         """
-        from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
         if hasattr(self, 'cs'):
-            # If multiple cbars is True, plot on each ax
-            if colorbar['multi_cbars']:
-                cb = self.fig.colorbar(self.cs, ax=ax,
-                                       orientation=colorbar['orientation'],
-                                       **colorbar['kwargs'])
-            # Else, add a cax to figure
+            if colorbar['single_cbar']:
+                # IMPORTANT NOTICE ####
+                # If using single colorbar option, this method grabs the color
+                # series from the subplot that is in last row and column. It
+                # is important to note that if comparing multiple subplots with
+                # the same colorbar, the vmin and vmax should all be the same to
+                # avoid comparison errors.
+                if ax.is_last_row() and ax.is_last_col():
+                    cbar_ax = self.fig.add_axes(colorbar['cbar_loc'])
+                    cb = self.fig.colorbar(self.cs, cax=cbar_ax, **colorbar['kwargs'])
+
             else:
-                if colorbar['orientation'] == 'horizontal':
-                    axins = inset_axes(ax,
-                                       width="95%",
-                                       height="5%",
-                                       loc='lower center',
-                                       borderpad=-8)
-                else:
-                    axins = inset_axes(ax,
-                                       width="2.5%",
-                                       height="95%",
-                                       loc='right',
-                                       borderpad=-4)
-
-                cb = self.fig.colorbar(self.cs, cax=axins,
-                                       orientation=colorbar['orientation'],
+                cb = self.fig.colorbar(self.cs, ax=ax,
                                        **colorbar['kwargs'])
-
-        cb.set_label(colorbar['label'], fontsize=colorbar['fontsize'])
+            # Add labels
+            cb.set_label(colorbar['label'], fontsize=colorbar['fontsize'])
 
     def _plot_stats(self, ax, stats):
         """
@@ -550,15 +540,27 @@ class CreatePlot():
             **kwargs
         }
 
-    def add_colorbar(self, label=None, label_fontsize=12,
-                     multi_cbars=True, orientation='horizontal',
-                     **kwargs):
+    def add_colorbar(self, label=None, fontsize=12, single_cbar=False,
+                     cbar_location=None, **kwargs):
+
+        kwargs.setdefault('orientation', 'horizontal')
+
+        pad = 0.15 if kwargs['orientation'] == 'horizontal' else 0.1
+        fraction = 0.065 if kwargs['orientation'] == 'horizontal' else 0.085
+
+        kwargs.setdefault('pad', pad)
+        kwargs.setdefault('fraction', fraction)
+
+        if not cbar_location:
+            h_loc = [0.14, -0.1, 0.8, 0.04]
+            v_loc = [1.02, 0.12, 0.04, 0.8]
+            cbar_location = h_loc if kwargs['orientation'] == 'horizontal' else v_loc
 
         self.colorbar = {
             'label': label,
-            'fontsize': label_fontsize,
-            'multi_cbars': multi_cbars,
-            'orientation': orientation,
+            'fontsize': fontsize,
+            'single_cbar': single_cbar,
+            'cbar_loc': cbar_location,
             'kwargs': kwargs
         }
 
