@@ -51,11 +51,6 @@ def load_yaml_file(yaml_file):
 class Config(dict):
 
     def __init__(self, dict_or_yaml):
-        
-
-        print("\nInitializing eva with the following parameters:")
-        print("  Diagnostic:    ", eva_class_name)
-        print("  Configuration: ", config)
 
         # Program can recieve a dictionary or a yaml file
         if type(dict_or_yaml) is dict:
@@ -74,6 +69,10 @@ class Base(ABC):
 
     # Base class constructor
     def __init__(self, eva_class_name, config, logger):
+
+        print("\nInitializing eva with the following parameters:")
+        print("  Diagnostic:    ", eva_class_name)
+        print("  Configuration: ", config)
 
         # Create message logger
         # ---------------------
@@ -142,6 +141,7 @@ def loop_and_create_and_run(config):
 
     # Create dictionary from the input file
     app_dict = load_yaml_file(config)
+    print(f'app_dict: {app_dict}')
 
     # Get the list of applications
     try:
