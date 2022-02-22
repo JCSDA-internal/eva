@@ -10,7 +10,9 @@
 from abc import ABC, abstractmethod
 import argparse
 import importlib
+import json
 import os
+import re
 import sys
 import yaml
 
@@ -20,21 +22,52 @@ from eva.utilities.utils import camelcase_to_underscore
 
 
 # --------------------------------------------------------------------------------------------------
+def envvar_constructor(loader, node):
+    # method to help substitute parent directory for a yaml env var
+    return os.path.expandvars(node.value)
+
+
+def load_yaml_file(yaml_file):
+    # this yaml load function will allow a user to specify an environment
+    # variable to substitute in a yaml file if the tag '!ENVVAR' exists
+    # this will help developers create absolute system paths that are related
+    # to the install path of the eva package.
+
+    loader = yaml.SafeLoader
+    loader.add_implicit_resolver(
+        '!ENVVAR',
+        re.compile(r'.*\$\{([^}^{]+)\}.*'),
+        None
+    )
+
+    loader.add_constructor('!ENVVAR', envvar_constructor)
+    yaml_dict = None
+    with open(yaml_file, 'r') as ymlfile:
+        yaml_dict = yaml.load(ymlfile, Loader=loader)
+
+    return yaml_dict
 
 
 class Config(dict):
 
     def __init__(self, dict_or_yaml):
+        
+
+        print("\nInitializing eva with the following parameters:")
+        print("  Diagnostic:    ", eva_class_name)
+        print("  Configuration: ", config)
 
         # Program can recieve a dictionary or a yaml file
         if type(dict_or_yaml) is dict:
             config = dict_or_yaml
         else:
-            with open(dict_or_yaml, 'r') as ymlfile:
-                config = yaml.safe_load(ymlfile)
+            config = load_yaml_file(dict_or_yaml)
 
+        pretty_config = json.dumps(config, indent=4)
+        
         # Initialize the parent class with the config
         super().__init__(config)
+
 
 
 # --------------------------------------------------------------------------------------------------
@@ -44,10 +77,6 @@ class Base(ABC):
 
     # Base class constructor
     def __init__(self, eva_class_name, config, logger):
-
-        print("\nInitializing eva with the following parameters:")
-        print("  Diagnostic:    ", eva_class_name)
-        print("  Configuration: ", config)
 
         # Create message logger
         # ---------------------
@@ -105,6 +134,8 @@ def create_and_run(eva_class_name, config, logger=None):
     creator = Factory()
     eva_object = creator.create_object(eva_class_name, config, logger)
 
+    print(f'eva_object: {eva_object}')
+
     # Execute the diagnostic
     eva_object.execute()
 
@@ -114,9 +145,9 @@ def create_and_run(eva_class_name, config, logger=None):
 
 def loop_and_create_and_run(config):
 
+
     # Create dictionary from the input file
-    with open(config, 'r') as ymlfile:
-        app_dict = yaml.safe_load(ymlfile)
+    app_dict = load_yaml_file(config)
 
     # Get the list of applications
     try:
