@@ -321,8 +321,13 @@ class CreateFigure:
         """
 
         if hasattr(self, 'cs'):
-
             if colorbar['single_cbar']:
+                # IMPORTANT NOTICE ####
+                # If using single colorbar option, this method grabs the color
+                # series from the subplot that is in last row and column. It
+                # is important to note that if comparing multiple subplots with
+                # the same colorbar, the vmin and vmax should all be the same to
+                # avoid comparison errors.
                 if ax.is_last_row() and ax.is_last_col():
                     cbar_ax = self.fig.add_axes(colorbar['cbar_loc'])
                     cb = self.fig.colorbar(self.cs, cax=cbar_ax, **colorbar['kwargs'])
