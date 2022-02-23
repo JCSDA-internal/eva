@@ -21,17 +21,17 @@ def load_yaml_file(yaml_file, logger):
         logger = Logger('EvaSetup')
 
     try:
-            loader = yaml.SafeLoader
-            loader.add_implicit_resolver(
-                '!ENVVAR',
-                re.compile(r'.*\$\{([^}^{]+)\}.*'),
-                None
-            )
+        loader = yaml.SafeLoader
+        loader.add_implicit_resolver(
+            '!ENVVAR',
+            re.compile(r'.*\$\{([^}^{]+)\}.*'),
+            None
+        )
 
-            loader.add_constructor('!ENVVAR', envvar_constructor)
-            eva_dict = None
-            with open(yaml_file, 'r') as ymlfile:
-                yaml_dict = yaml.load(ymlfile, Loader=loader)
+        loader.add_constructor('!ENVVAR', envvar_constructor)
+        yaml_dict = None
+        with open(yaml_file, 'r') as ymlfile:
+            yaml_dict = yaml.load(ymlfile, Loader=loader)
 
     except Exception as e:
         logger.trace('Eva diagnostics is expecting a valid yaml file, but it encountered ' +
