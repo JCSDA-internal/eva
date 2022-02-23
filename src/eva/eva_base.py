@@ -23,18 +23,33 @@ from eva.utilities.utils import camelcase_to_underscore
 
 
 # --------------------------------------------------------------------------------------------------
+def load_yaml_file(eva_config, logger):
+    # utility function to help load a yaml file into a dict.
+
+    if logger is None:
+        logger = Logger('EvaSetup')
+
+    try:
+        with open(eva_config, 'r') as eva_config_opened:
+            eva_dict = yaml.safe_load(eva_config_opened)
+    except Exception as e:
+        logger.abort('Eva diagnostics is expecting a valid yaml file, but it encountered ' +
+                     f'errors when attempting to load: {eva_config}, error: {e}')
+
+    return eva_dict
 
 
 class Config(dict):
 
     def __init__(self, dict_or_yaml):
 
+        logger = Logger('EvaSetup')
+
         # Program can recieve a dictionary or a yaml file
-        if type(dict_or_yaml) is dict:
+        if isinstance(dict_or_yaml, dict):
             config = dict_or_yaml
         else:
-            with open(dict_or_yaml, 'r') as ymlfile:
-                config = yaml.safe_load(ymlfile)
+            config = load_yaml_file(dict_or_yaml, logger)
 
         # Initialize the parent class with the config
         super().__init__(config)
@@ -123,12 +138,11 @@ def eva(eva_config, eva_logger=None):
     logger = Logger('EvaSetup')
 
     # Convert incoming config (either dictionary or file) to dictionary
-    if eva_config is dict:
+    if isinstance(eva_config, dict):
         eva_dict = eva_config
     else:
         # Create dictionary from the input file
-        with open(eva_config, 'r') as eva_config_opened:
-            eva_dict = yaml.safe_load(eva_config_opened)
+        eva_dict = load_yaml_file(eva_config, logger)
 
     # Get the list of applications
     try:
