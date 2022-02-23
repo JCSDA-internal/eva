@@ -1,3 +1,5 @@
+# (C) Copyright 2021-2022 NOAA/NWS/EMC
+#
 # (C) Copyright 2021-2022 United States Government as represented by the Administrator of the
 # National Aeronautics and Space Administration. All Rights Reserved.
 #
@@ -8,10 +10,11 @@
 # --------------------------------------------------------------------------------------------------
 
 
-from eva.base import Base
+from eva.eva_base import EvaBase
 from eva.utilities import ioda_definitions
 from eva.utilities import ioda_netcdf_api
-from eva.plot_tools.scatter_correlation import scatter_correlation_plot
+from eva.plot_tools.figure import CreatePlot, CreateFigure
+from eva.plot_tools.plots import Scatter, LinePlot
 
 import netCDF4
 import numpy as np
@@ -23,7 +26,7 @@ import os
 
 # TODO: needs to be ioda-erized and r2d2-erized
 
-class ObsCorrelationScatter(Base):
+class ObsCorrelationScatter(EvaBase):
 
     def execute(self):
 
@@ -179,9 +182,30 @@ class ObsCorrelationScatter(Base):
                             plot_title = platform_long_name + ' | ' + variable_name_no_
 
                             # Create the plot
-                            scatter_correlation_plot(data_ref, data_exp, ref_metric_long_name,
-                                                     exp_metric_long_name, plot_title, output_file,
-                                                     marker_size=marker_size)
+                            # set up the scatter layer
+                            scatter = Scatter(data_ref, data_exp)
+                            scatter.markersize = marker_size
+                            scatter.color = 'blue'
+                            data_min = min(min(data_ref), min(data_exp))
+                            data_max = max(max(data_ref), max(data_exp))
+                            data_diff = data_max - data_min
+                            plotmin = data_min - (0.1 * data_diff)
+                            plotmax = data_max + (0.1 * data_diff)
+                            # add a 1:1 line layer
+                            line = LinePlot([plotmin, plotmax], [plotmin, plotmax])
+                            line.color = 'black'
+                            # set up the plot
+                            plot = CreatePlot(plot_layers=[line, scatter])
+                            plot.add_title(plot_title)
+                            plot.set_xlim([plotmin, plotmax])
+                            plot.set_ylim([plotmin, plotmax])
+                            plot.add_xlabel(ref_metric_long_name)
+                            plot.add_ylabel(exp_metric_long_name)
+                            # create the figure
+                            fig = CreateFigure(figsize=(8, 8))
+                            fig.plot_list = [plot]
+                            fig.create_figure()
+                            fig.save_figure(output_file)
 
             # Close files
             fh_exp.close()

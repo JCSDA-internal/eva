@@ -1,0 +1,35 @@
+diagnostics:
+  - diagnostic name: ObsCorrelationScatter
+    comparisons:
+    - - hofx
+      - GsiHofXBc
+    - - hofx
+      - ObsValue
+    - - GsiHofXBc
+      - ObsValue
+    - - omb
+      - GsiombBc
+    figure file type: png
+    ioda experiment files: !ENVVAR ${EVA_TESTS_DIR}/data/amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
+    ioda reference files: !ENVVAR ${EVA_TESTS_DIR}/data/amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
+    marker size: 2
+    output path: ./
+    platforms:
+    - amsua_n19
+  - diagnostic name: ObsCorrelationScatter
+    comparisons:
+    - - hofx
+      - GsiHofXBc
+    - - hofx
+      - ObsValue
+    - - GsiHofXBc
+      - ObsValue
+    - - omb
+      - GsiombBc
+    figure file type: png
+    ioda experiment files: !ENVVAR ${EVA_TESTS_DIR}/data/aircraft.hofx.2020-12-14T21:00:00Z.nc4
+    ioda reference files: !ENVVAR ${EVA_TESTS_DIR}/data/aircraft.hofx.2020-12-14T21:00:00Z.nc4
+    marker size: 2
+    output path: ./
+    platforms:
+    - aircraft

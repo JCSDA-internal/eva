@@ -8,6 +8,7 @@
 
 
 import os
+import sys
 
 
 # --------------------------------------------------------------------------------------------------
@@ -42,8 +43,8 @@ class Logger:
 
     def send_message(self, level, message):
 
-        if self.loggerdict[level]:
-            print(level+" "+self.task_name+": "+message)
+        if level.upper() == 'ABORT' or self.loggerdict[level]:
+            print(level+' '+self.task_name+': '+message)
 
     # ----------------------------------------------------------------------------------------------
 
