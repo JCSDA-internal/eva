@@ -12,9 +12,7 @@
 from abc import ABC, abstractmethod
 import argparse
 import importlib
-import json
 import os
-import re
 import sys
 import yaml
 
@@ -25,41 +23,33 @@ from eva.utilities.utils import camelcase_to_underscore
 
 
 # --------------------------------------------------------------------------------------------------
-def envvar_constructor(loader, node):
-    # method to help substitute parent directory for a yaml env var
-    return os.path.expandvars(node.value)
+def load_yaml_file(eva_config, logger):
+    # utility function to help load a yaml file into a dict.
 
+    if logger is None:
+        logger = Logger('EvaSetup')
 
-def load_yaml_file(yaml_file):
-    # this yaml load function will allow a user to specify an environment
-    # variable to substitute in a yaml file if the tag '!ENVVAR' exists
-    # this will help developers create absolute system paths that are related
-    # to the install path of the eva package.
+    try:
+        with open(eva_config, 'r') as eva_config_opened:
+            eva_dict = yaml.safe_load(eva_config_opened)
+    except Exception as e:
+        logger.abort('Eva diagnostics is expecting a valid yaml file, but it encountered ' +
+                     f'errors when attempting to load: {eva_config}, error: {e}')
 
-    loader = yaml.SafeLoader
-    loader.add_implicit_resolver(
-        '!ENVVAR',
-        re.compile(r'.*\$\{([^}^{]+)\}.*'),
-        None
-    )
-
-    loader.add_constructor('!ENVVAR', envvar_constructor)
-    yaml_dict = None
-    with open(yaml_file, 'r') as ymlfile:
-        yaml_dict = yaml.load(ymlfile, Loader=loader)
-
-    return yaml_dict
+    return eva_dict
 
 
 class Config(dict):
 
     def __init__(self, dict_or_yaml):
 
+        logger = Logger('EvaSetup')
+
         # Program can recieve a dictionary or a yaml file
-        if type(dict_or_yaml) is dict:
+        if isinstance(dict_or_yaml, dict):
             config = dict_or_yaml
         else:
-            config = load_yaml_file(dict_or_yaml)
+            config = load_yaml_file(dict_or_yaml, logger)
 
         # Initialize the parent class with the config
         super().__init__(config)
@@ -148,11 +138,11 @@ def eva(eva_config, eva_logger=None):
     logger = Logger('EvaSetup')
 
     # Convert incoming config (either dictionary or file) to dictionary
-    if eva_config is dict:
+    if isinstance(eva_config, dict):
         eva_dict = eva_config
     else:
         # Create dictionary from the input file
-        eva_dict = load_yaml_file(eva_config)
+        eva_dict = load_yaml_file(eva_config, logger)
 
     # Get the list of applications
     try:
