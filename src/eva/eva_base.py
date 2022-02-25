@@ -161,8 +161,9 @@ def eva(eva_config, eva_logger=None):
         try:
             eva_class_name = diagnostic_config['diagnostic name']
         except Exception as e:
-            raise KeyError('\'diagnostic name\' key not found. \'diagnostic_config\': ' +
-                           f'{diagnostic_config}')
+            msg = '\'diagnostic name\' key not found. \'diagnostic_config\': ' \
+                  f'{diagnostic_config}, error: {e}' 
+            raise KeyError(msg)
 
         # Create the diagnostic object
         creator = EvaFactory()
