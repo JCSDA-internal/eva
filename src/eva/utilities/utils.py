@@ -7,7 +7,6 @@
 
 # --------------------------------------------------------------------------------------------------
 
-
 def camelcase_to_underscore(CamelCaseString):
 
     # Convert a string that looks like e.g. ThisIsAString to this_is_a_string
@@ -15,6 +14,17 @@ def camelcase_to_underscore(CamelCaseString):
 
     # Create empty output string
     underscore_string = ''
+
+    if not isinstance(CamelCaseString, str):
+        msg = f'\'diagnostic name\': {CamelCaseString} - should be a str type. ' \
+              f'Was actually a type: {type(CamelCaseString)}'
+        raise TypeError(msg)
+
+    # limit string to lower case or uppercase letters
+    if not CamelCaseString.isalpha():
+        msg = 'Only a-z A-Z characters allowed in module name. ' \
+              f'Module name was: {CamelCaseString}, should be \'CamelCaseString\'.'
+        raise ValueError(msg)
 
     # Loop over the elements in the string
     for element in CamelCaseString:
