@@ -151,11 +151,19 @@ def eva(eva_config, eva_logger=None):
         logger.abort('eva configuration must contain \'diagnostics\' and it should provide a ' +
                      'list of diagnostics to be run.')
 
+    if not isinstance(diagnostic_configs, list):
+        raise TypeError(f'diagnostics should be a list, it was type: {type(diagnostic_configs)}')
+
     # Loop over the applications and run
     for diagnostic_config in diagnostic_configs:
 
         # Extract name for this diagnostic
-        eva_class_name = diagnostic_config['diagnostic name']
+        try:
+            eva_class_name = diagnostic_config['diagnostic name']
+        except Exception as e:
+            msg = '\'diagnostic name\' key not found. \'diagnostic_config\': ' \
+                  f'{diagnostic_config}, error: {e}'
+            raise KeyError(msg)
 
         # Create the diagnostic object
         creator = EvaFactory()

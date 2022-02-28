@@ -20,6 +20,8 @@ OBS_CORRELATION_SCATTER_YAML = os.path.join(
 # redirect load_yaml_file from eva_base to helpers
 eva_base.load_yaml_file = helpers.load_yaml_file
 
+logger = Logger('UnitTests')
+
 
 def test_obs_correlation_scatter():
     # unit test meant to assure that the loop_and_create_and_run
@@ -31,3 +33,71 @@ def test_obs_correlation_scatter():
             eva_base.eva(OBS_CORRELATION_SCATTER_YAML)
     except Exception as e:
         raise ValueError(f'Unexpected error encountered: {e}')
+
+
+def test_obs_correlation_scatter__bad_config_type():
+
+    with pytest.raises(TypeError):
+        eva_base.eva([])
+
+    with pytest.raises(TypeError):
+        eva_base.eva(1234)
+
+    with pytest.raises(TypeError):
+        eva_base.eva(eva_base)
+
+    with pytest.raises(TypeError):
+        eva_base.eva('foo')
+
+
+def test_obs_correlation_scatter__bad_config_dict():
+
+    with pytest.raises(TypeError):
+        test_config = {'diagnostics': 'bar'}
+        logger.info(f'Testing eva_base.eva with config: {test_config}')
+        eva_base.eva(test_config)
+
+    with pytest.raises(TypeError):
+        test_config = {'diagnostics': {'diagnostic name': []}}
+        logger.info(f'Testing eva_base.eva with config: {test_config}')
+        eva_base.eva(test_config)
+
+    with pytest.raises(SystemExit):
+        eva_base.eva({'foo': 'bar'})
+
+    with pytest.raises(KeyError):
+        test_config = {'diagnostics': [{'foo': 'bar'}]}
+        logger.info(f'Testing eva_base.eva with config: {test_config}')
+        eva_base.eva(test_config)
+
+    with pytest.raises(TypeError):
+        test_config = {'diagnostics': [{'diagnostic name': 1234}]}
+        logger.info(f'Testing eva_base.eva with config: {test_config}')
+        eva_base.eva(test_config)
+
+    with pytest.raises(TypeError):
+        test_config = {'diagnostics': [{'diagnostic name': {}}]}
+        logger.info(f'Testing eva_base.eva with config: {test_config}')
+        eva_base.eva(test_config)
+
+    with pytest.raises(TypeError):
+        test_config = {'diagnostics': [{'diagnostic name': []}]}
+        logger.info(f'Testing eva_base.eva with config: {test_config}')
+        eva_base.eva(test_config)
+
+    with pytest.raises(ValueError):
+        test_config = {'diagnostics': [{'diagnostic name': '1234'}]}
+        logger.info(f'Testing eva_base.eva with config: {test_config}')
+        eva_base.eva(test_config)
+
+    all_printable_chars = [chr(i) for i in range(128)]
+    for char in all_printable_chars:
+        if char.isalpha():
+            continue
+
+        name_str = 'foo' + char
+
+        with pytest.raises(ValueError):
+            test_config = {'diagnostics': [{'diagnostic name': name_str}]}
+            logger.info(f'Testing eva_base.eva with config: {test_config}')
+            eva_base.eva(test_config)
