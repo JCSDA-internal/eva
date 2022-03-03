@@ -1,6 +1,7 @@
 - Getting started
 
   - [Installing Eva](installing_eva.md)
+  - [Using Eva](using_eva.md)
 
 - Eva infrastructure
 
