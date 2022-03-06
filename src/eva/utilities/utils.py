@@ -55,19 +55,40 @@ def get_schema(YamlFile, configDict={}, logger=None):
     from eva.utilities.logger import Logger
     if logger is None:
         logger = Logger('EvaSchema')
-    
+
     # read schema from YAML file
     fullConfig = load_yaml_file(YamlFile, logger)
 
     # update full config dict based on input configDict
     for key, value in configDict.items():
-    	if key in fullConfig:
+        if key in fullConfig:
+            logger.trace(f'{key}:{value}')
             fullConfig[key] = value
-        except KeyError:
-            msg = f'{key} not in default schema. Not a valid entry.'
+        else:
+            msg = f"'{key}' not in default schema. Not a valid entry."
             raise ValueError(msg)
 
     return fullConfig
 
-# --------------------------------------------------------------------------------------------------    
+# --------------------------------------------------------------------------------------------------
+
+def update_object(myObj, configDict, logger=None):
+    # update input object myObj attributes based on a dictionary
+    # and return a new, updated myObj
+    from eva.utilities.logger import Logger
+    if logger is None:
+        logger = Logger('EvaUpdateObject')
+
+    # loop through input dictionary, update input object key values
+    for key, value in configDict.items():
+        if key in dir(myObj):
+            logger.trace(f"Updating '{key}'")
+        else:
+            logger.trace(f"Adding '{key}'")
+        setattr(myObj, key, value)
+
+    return myObj
+
+# --------------------------------------------------------------------------------------------------
+
 
