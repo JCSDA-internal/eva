@@ -46,3 +46,28 @@ def camelcase_to_underscore(CamelCaseString):
 
 
 # --------------------------------------------------------------------------------------------------
+
+def get_schema(YamlFile, configDict={}, logger=None):
+    # read YamlFile into a dictionary containing a configuration,
+    # and overwrite the default configuration with the input configDict
+
+    from eva.eva_base import load_yaml_file
+    from eva.utilities.logger import Logger
+    if logger is None:
+        logger = Logger('EvaSchema')
+    
+    # read schema from YAML file
+    fullConfig = load_yaml_file(YamlFile, logger)
+
+    # update full config dict based on input configDict
+    for key, value in configDict.items():
+    	if key in fullConfig:
+            fullConfig[key] = value
+        except KeyError:
+            msg = f'{key} not in default schema. Not a valid entry.'
+            raise ValueError(msg)
+
+    return fullConfig
+
+# --------------------------------------------------------------------------------------------------    
+
