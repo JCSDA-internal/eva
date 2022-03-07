@@ -5,6 +5,7 @@ import os
 
 class Scatter():
 
+
     def __init__(self, config, dataobj):
         # prepare data based on config
         varnames = config['comparison']
@@ -22,4 +23,3 @@ class Scatter():
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, dataobj.logger)
-

@@ -75,6 +75,7 @@ def get_schema(YamlFile, configDict={}, logger=None):
 
 # --------------------------------------------------------------------------------------------------
 
+
 def update_object(myObj, configDict, logger=None):
     # update input object myObj attributes based on a dictionary
     # and return a new, updated myObj
@@ -93,5 +94,3 @@ def update_object(myObj, configDict, logger=None):
     return myObj
 
 # --------------------------------------------------------------------------------------------------
-
-

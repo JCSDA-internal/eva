@@ -111,7 +111,9 @@ class EvaFactory():
         # Abort if not found
         if (eva_module_name not in valid_module):
             logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
-                         'called ' + os.path.join(return_eva_path(), eva_group_name, eva_module_name)
+                         'called ' + os.path.join(return_eva_path(),
+                                                  eva_group_name,
+                                                  eva_module_name)
                          + '.py but no such file was found.')
 
         # Import class based on user selected task
@@ -121,7 +123,9 @@ class EvaFactory():
                                 eva_class_name)
         except Exception as e:
             logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
-                         'called ' + os.path.join(return_eva_path(), eva_group_name, eva_module_name)
+                         'called ' + os.path.join(return_eva_path(),
+                                                  eva_group_name,
+                                                  eva_module_name)
                          + '.py but no such class was found or an error occurred.')
 
         # Return implementation of the class (calls base class constructor that is above)
@@ -172,17 +176,22 @@ def eva(eva_config, eva_logger=None):
 
         # Create the data object
         creator = EvaFactory()
-        eva_data_object = creator.create_eva_object(eva_data_class_name, 'data', diagnostic_config, eva_logger)
+        eva_data_object = creator.create_eva_object(eva_data_class_name,
+                                                    'data',
+                                                    diagnostic_config,
+                                                    eva_logger)
 
         # Prepare diagnostic data
         eva_data_object.execute()
 
         # Create the figure object
-        eva_figure_object = creator.create_eva_object('FigureDriver', 'plot_tools', diagnostic_config, eva_logger)
+        eva_figure_object = creator.create_eva_object('FigureDriver',
+                                                      'plot_tools',
+                                                      diagnostic_config,
+                                                      eva_logger)
 
         # Generate figure(s)
         eva_figure_object.execute(eva_data_object)
-
 
 
 # --------------------------------------------------------------------------------------------------

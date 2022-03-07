@@ -66,7 +66,6 @@ class FigureDriver(EvaBase):
                 # make just one figure per configuration
                 self.make_figure(figure_conf, plots, dataobj)
 
-
     def make_figure(self, figure_conf, plots, dataobj):
 
         # Grab some figure configuration
@@ -105,7 +104,6 @@ class FigureDriver(EvaBase):
         saveargs = self.get_saveargs(figure_conf)
         fig.save_figure(output_file, **saveargs)
 
-
     def get_saveargs(self, figure_conf):
         out_conf = figure_conf
         delvars = ['layout', 'figure file type', 'output path', 'figure size', 'title']
@@ -114,12 +112,9 @@ class FigureDriver(EvaBase):
             del out_conf[d]
         return out_conf
 
-
     def get_output_file(self, figure_conf):
         file_type = figure_conf.get("figure file type", "png")
         file_path = figure_conf.get("output path", "./")
         output_name = figure_conf.get("output name", "")
         output_file = os.path.join(file_path, f"{output_name}.{file_type}")
         return output_file
-
-
