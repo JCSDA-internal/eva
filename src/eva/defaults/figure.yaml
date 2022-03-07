@@ -4,5 +4,6 @@ figure file type: png
 output path: ./
 output name: 'myfig'
 figure size: [8,8]
-tight layout: true
+bbox_inches: 'tight'
+pad_inches: 0.1
 title:

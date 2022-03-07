@@ -56,12 +56,15 @@ def get_schema(YamlFile, configDict={}, logger=None):
     if logger is None:
         logger = Logger('EvaSchema')
 
+    # ignore some fields
+    skipvars = ['type', 'comparison']
+
     # read schema from YAML file
     fullConfig = load_yaml_file(YamlFile, logger)
 
     # update full config dict based on input configDict
     for key, value in configDict.items():
-        if key in fullConfig:
+        if key in fullConfig or skipvars:
             logger.trace(f'{key}:{value}')
             fullConfig[key] = value
         else:

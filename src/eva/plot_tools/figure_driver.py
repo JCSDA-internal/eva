@@ -13,7 +13,8 @@
 
 from eva.eva_base import EvaBase
 from eva.eva_path import return_eva_path
-from eva.utilities.utils import get_schema
+from eva.utilities.utils import get_schema, camelcase_to_underscore
+from eva.plot_tools.figure import CreatePlot, CreateFigure
 import importlib
 import os
 
@@ -82,7 +83,31 @@ class FigureDriver(EvaBase):
                 eva_class_name = layer.get("type")
                 eva_module_name = camelcase_to_underscore(eva_class_name)
                 full_module = "eva.diagnostics."+eva_module_name
-                layer_class = getattr(importlib.import_module(full_module, eva_class_name))
+                layer_class = getattr(importlib.import_module(full_module), eva_class_name)
+                # use the translator class to go from eva to declarative plotting
+                layer_list.append(layer_class(layer, dataobj).plotobj)
+            # create a subplot based on specified layers
+            plotobj = CreatePlot(plot_layers=layer_list)
+            # make changes to subplot based on YAML configuration
+            for key, value in plot.items():
+                if key not in ['layers']:
+                    getattr(plotobj, key)(value)
+            plot_list.append(plotobj)
+        # create figure
+        fig = CreateFigure(figsize=tuple(figure_conf['figure size']))
+        fig.plot_list = plot_list
+        fig.create_figure()
+        saveargs = self.get_saveargs(figure_conf)
+        fig.save_figure(output_file, **saveargs)
+
+
+    def get_saveargs(self, figure_conf):
+        out_conf = figure_conf
+        delvars = ['layout', 'figure file type', 'output path', 'figure size', 'title']
+        out_conf['format'] = figure_conf['figure file type']
+        for d in delvars:
+            del out_conf[d]
+        return out_conf
 
 
     def get_output_file(self, figure_conf):
