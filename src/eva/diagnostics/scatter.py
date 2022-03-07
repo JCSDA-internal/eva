@@ -8,8 +8,8 @@ class Scatter():
     def __init__(self, config, dataobj):
         # prepare data based on config
         varnames = config['comparison']
-        xdata = dataobj.data[varnames[0]]
-        ydata = dataobj.data[varnames[1]]
+        xdata = dataobj.data[varnames[0]].to_numpy()
+        ydata = dataobj.data[varnames[1]].to_numpy()
         # create declarative plotting Scatter object
         self.plotobj = eva.plot_tools.plots.Scatter(xdata, ydata)
         # get defaults from schema
@@ -18,7 +18,7 @@ class Scatter():
                                                'defaults',
                                                'scatter.yaml'))
         config = get_schema(layer_schema, config, dataobj.logger)
-        delvars = ['comparison', 'type', 'schema', 'density', 'linear_regression']
+        delvars = ['comparison', 'type', 'schema']
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, dataobj.logger)
