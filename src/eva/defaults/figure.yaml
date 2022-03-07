@@ -2,6 +2,7 @@
 layout: [1,1]
 figure file type: png
 output path: ./
-output name: ''
+output name: 'myfig'
 figure size: [8,8]
 tight layout: true
+title:

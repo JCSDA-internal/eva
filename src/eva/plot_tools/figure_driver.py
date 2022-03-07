@@ -14,6 +14,7 @@
 from eva.eva_base import EvaBase
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema
+import importlib
 import os
 
 # --------------------------------------------------------------------------------------------------
@@ -55,15 +56,40 @@ class FigureDriver(EvaBase):
             # list of plots/subplots
             plots = graphic.get("plots")
 
-
-            # pass configurations and make graphic
+            # pass configurations and make graphic(s)
             # -------------------
-            #self.make_figure(figure_conf, plots, batch_fig)
+            if batch_fig:
+                # make batch figures for each variable
+                print('Nothing for now on batch_fig=True')
+            else:
+                # make just one figure per configuration
+                self.make_figure(figure_conf, plots, dataobj)
 
 
+    def make_figure(self, figure_conf, plots, dataobj):
 
-#    def make_figure(self, figure_conf, plots, batch_fig=False):
-#        figure_layout = figure_conf.get("layout")
-#        file_type = figure_conf.get("figure file type", "png")
-#
+        # Grab some figure configuration
+        # -------------------
+        figure_layout = figure_conf.get("layout")
+        file_type = figure_conf.get("figure file type", "png")
+        output_file = self.get_output_file(figure_conf)
+
+        # Set up layers and plots
+        plot_list = []
+        for plot in plots:
+            layer_list = []
+            for layer in plot.get("layers"):
+                eva_class_name = layer.get("type")
+                eva_module_name = camelcase_to_underscore(eva_class_name)
+                full_module = "eva.diagnostics."+eva_module_name
+                layer_class = getattr(importlib.import_module(full_module, eva_class_name))
+
+
+    def get_output_file(self, figure_conf):
+        file_type = figure_conf.get("figure file type", "png")
+        file_path = figure_conf.get("output path", "./")
+        output_name = figure_conf.get("output name", "")
+        output_file = os.path.join(file_path, f"{output_name}.{file_type}")
+        return output_file
+
 

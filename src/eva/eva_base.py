@@ -181,7 +181,7 @@ def eva(eva_config, eva_logger=None):
         eva_figure_object = creator.create_eva_object('FigureDriver', 'plot_tools', diagnostic_config, eva_logger)
 
         # Generate figure(s)
-        eva_figure_object.execute(eva_data_object.data)
+        eva_figure_object.execute(eva_data_object)
 
 
 
