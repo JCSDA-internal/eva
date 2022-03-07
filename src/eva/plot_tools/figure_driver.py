@@ -12,59 +12,58 @@
 
 
 from eva.eva_base import EvaBase
+from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema
-from eva import repo_directory
 import os
 
 # --------------------------------------------------------------------------------------------------
 
 
-class DiagnosticDriver(EvaBase):
+class FigureDriver(EvaBase):
 
-    def execute(self):
+    def execute(self, dataobj):
 
         # Make copy of config
         # -------------------
         config = self.config
 
-        # Get list of diagnostics from configuration
+        # Get list of graphics from configuration
         # -------------------
-        diagnostics = config.get("diagnostics")
+        graphics = config.get("graphics")
 
-        # Loop through specified diagnostics
+        # Loop through specified graphics
         # -------------------
-        for diagnostic in diagnostics:
+        for graphic in graphics:
 
-            # Parse configuration for this diagnostic
+            # Parse configuration for this graphic
             # -------------------
 
             # batch_fig = True, loop through all data
             # batch_fig = False, user must specify each plot/panel
-            batch_fig = diagnostic.get("batch figure", False)
+            batch_fig = graphic.get("batch figure", False)
 
             # figure configuration
-            figure_conf = diagnostic.get("figure")
+            figure_conf = graphic.get("figure")
 
             # update figure conf based on schema
             fig_schema = figure_conf.get("schema",
-                                         os.path.join(repo_directory,
+                                         os.path.join(return_eva_path(),
                                                       'defaults',
                                                       'figure.yaml'))
             figure_conf = get_schema(fig_schema, figure_conf, self.logger)
 
             # list of plots/subplots
-            plots = diagnostic.get("plots")
+            plots = graphic.get("plots")
 
-            # pass configurations and make diagnostic
+
+            # pass configurations and make graphic
             # -------------------
-            self.make_figure(figure_conf, plots, batch_fig)
+            #self.make_figure(figure_conf, plots, batch_fig)
 
 
 
-    def make_figure(self, figure_conf, plots, batch_fig=False):
-
-
-            figure_layout = figure_conf.get("layout")
-            file_type = figure_conf.get("figure file type", "png")
-
+#    def make_figure(self, figure_conf, plots, batch_fig=False):
+#        figure_layout = figure_conf.get("layout")
+#        file_type = figure_conf.get("figure file type", "png")
+#
 
