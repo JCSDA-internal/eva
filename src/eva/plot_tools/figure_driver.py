@@ -98,7 +98,9 @@ class FigureDriver(EvaBase):
                         getattr(plotobj, key)(value)
             plot_list.append(plotobj)
         # create figure
-        fig = CreateFigure(figsize=tuple(figure_conf['figure size']))
+        fig = CreateFigure(nrows=figure_conf['layout'][0],
+                           ncols=figure_conf['layout'][1],
+                           figsize=tuple(figure_conf['figure size']))
         fig.plot_list = plot_list
         fig.create_figure()
         saveargs = self.get_saveargs(figure_conf)
