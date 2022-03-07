@@ -1,0 +1,7 @@
+# figure default schema
+layout: [1,1]
+figure file type: png
+output path: ./
+output name: ''
+figure size: [8,8]
+tight layout: true
