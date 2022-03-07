@@ -12,6 +12,9 @@ diagnostics:
           set_ylim: [-1,6]
           add_xlabel: 'My X Label'
           add_ylabel: 'My Y Label'
+          add_grid:
+          add_legend:
+            loc: 'upper left'
           layers:
           - type: Scatter
             comparison:
@@ -19,8 +22,10 @@ diagnostics:
              - y
             markersize: 50
             color: 'red'
+            label: 'Big dots'
           - type: Scatter
             comparison:
              - x
              - y
             markersize: 5
+            label: 'Smaller dots'

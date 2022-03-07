@@ -91,7 +91,12 @@ class FigureDriver(EvaBase):
             # make changes to subplot based on YAML configuration
             for key, value in plot.items():
                 if key not in ['layers']:
-                    getattr(plotobj, key)(value)
+                    if isinstance(value, dict):
+                        getattr(plotobj, key)(**value)
+                    elif value is None:
+                        getattr(plotobj, key)()
+                    else:
+                        getattr(plotobj, key)(value)
             plot_list.append(plotobj)
         # create figure
         fig = CreateFigure(figsize=tuple(figure_conf['figure size']))
