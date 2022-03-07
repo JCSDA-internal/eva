@@ -230,7 +230,7 @@ class CreateFigure:
             y_pred, r_sq, intercept, slope = get_linear_regression(plotobj.x,
                                                                    plotobj.y)
             label = f"y = {slope:.4f}x + {intercept:.4f}\nR\u00b2 : {r_sq:.4f}"
-            ax.plot(plotobj.x, y_pred, **plotobj.linear_regression)
+            ax.plot(plotobj.x, y_pred, label=label, **plotobj.linear_regression)
 
     def _lineplot(self, plotobj, ax):
         """
