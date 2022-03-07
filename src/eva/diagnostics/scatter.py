@@ -3,8 +3,8 @@ from eva.utilities.utils import get_schema, update_object
 import eva.plot_tools.plots
 import os
 
-class Scatter():
 
+class Scatter():
 
     def __init__(self, config, dataobj):
         # prepare data based on config
