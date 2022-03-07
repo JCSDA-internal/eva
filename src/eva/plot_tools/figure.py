@@ -331,12 +331,12 @@ class CreateFigure:
                 if ax.is_last_row() and ax.is_last_col():
                     cbar_ax = self.fig.add_axes(colorbar['cbar_loc'])
                     cb = self.fig.colorbar(self.cs, cax=cbar_ax, **colorbar['kwargs'])
+                    cb.set_label(colorbar['label'], fontsize=colorbar['fontsize'])
 
             else:
                 cb = self.fig.colorbar(self.cs, ax=ax,
                                        **colorbar['kwargs'])
-            # Add labels
-            cb.set_label(colorbar['label'], fontsize=colorbar['fontsize'])
+                cb.set_label(colorbar['label'], fontsize=colorbar['fontsize'])
 
     def _plot_stats(self, ax, stats):
         """
