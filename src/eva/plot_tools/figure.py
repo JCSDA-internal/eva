@@ -93,8 +93,6 @@ class CreateFigure:
             if self.sharey:
                 self._sharey(ax)
 
-        gs.tight_layout(self.fig)
-
     def add_suptitle(self, text, **kwargs):
         """
         Add super title to figure. Useful for subplots.

@@ -103,6 +103,8 @@ class FigureDriver(EvaBase):
                            figsize=tuple(figure_conf['figure size']))
         fig.plot_list = plot_list
         fig.create_figure()
+        if 'title' in figure_conf:
+            fig.add_suptitle(figure_conf['title'])
         saveargs = self.get_saveargs(figure_conf)
         fig.save_figure(output_file, **saveargs)
 
