@@ -1,0 +1,9 @@
+# figure default schema
+layout: [1,1]
+figure file type: png
+output path: ./
+output name: 'myfig'
+figure size: [8,8]
+bbox_inches: 'tight'
+pad_inches: 0.1
+title:

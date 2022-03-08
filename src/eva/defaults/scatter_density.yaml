@@ -1,0 +1,21 @@
+# Scatter class default schema
+markersize: 5
+color: 'darkgray'
+marker: 'o'
+vmin:
+vmax:
+alpha:
+linewidths: 1.5
+edgecolors:
+label: 'Points'
+density:
+  sort: true
+  cmap: 'nipy_spectral_r'
+  colorbar: true
+  bins: [100, 100]
+  interp: 'linear'
+  nsamples: true
+linear_regression:
+  color: 'black'
+  linewidth: 1
+  linestyle: '-'
