@@ -25,6 +25,7 @@ from eva.data.data_collections import DataCollections
 
 # --------------------------------------------------------------------------------------------------
 
+
 def load_yaml_file(eva_config, logger):
     # utility function to help load a yaml file into a dict.
 
@@ -40,7 +41,9 @@ def load_yaml_file(eva_config, logger):
 
     return eva_dict
 
+
 # --------------------------------------------------------------------------------------------------
+
 
 class Config(dict):
 
@@ -177,11 +180,9 @@ def eva(eva_config, eva_logger=None):
                   f'{diagnostic_data_config}, error: {e}'
             raise KeyError(msg)
 
-
         # Create the data collections
         # ---------------------------
         data_collections = DataCollections()
-
 
         # Create the data object
         creator = EvaFactory()
@@ -232,3 +233,4 @@ if __name__ == "__main__":
 
 
 # --------------------------------------------------------------------------------------------------
+ 

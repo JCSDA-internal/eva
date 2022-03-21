@@ -28,7 +28,6 @@ class DataCollections:
         # Create a logger
         self.logger = Logger('DataCollections')
 
-
     # ----------------------------------------------------------------------------------------------
 
     def add_collection(self, collection_name, collection):
@@ -43,8 +42,8 @@ class DataCollections:
     def get_variable_data(self, variable_name, collection_name=None):
 
         if collection_name is None and '::' not in variable_name:
-            self.logger.abort('In get_variable_data: if collection_name is not provided the ' \
-                              'variable name must contain the collection in the form: ' \
+            self.logger.abort('In get_variable_data: if collection_name is not provided the '
+                              'variable name must contain the collection in the form: '
                               'collection::variable')
 
         if collection_name is None:
@@ -55,4 +54,4 @@ class DataCollections:
 
         return self._collections[collection][variable].data
 
-    # ----------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------
