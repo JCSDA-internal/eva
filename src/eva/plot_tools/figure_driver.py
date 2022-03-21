@@ -23,7 +23,7 @@ import os
 
 class FigureDriver(EvaBase):
 
-    def execute(self, dataobj):
+    def execute(self, data_collections):
 
         # Make copy of config
         # -------------------
@@ -64,9 +64,9 @@ class FigureDriver(EvaBase):
                 print('Nothing for now on batch_fig=True')
             else:
                 # make just one figure per configuration
-                self.make_figure(figure_conf, plots, dataobj)
+                self.make_figure(figure_conf, plots, data_collections)
 
-    def make_figure(self, figure_conf, plots, dataobj):
+    def make_figure(self, figure_conf, plots, data_collections):
 
         # Grab some figure configuration
         # -------------------
@@ -84,7 +84,7 @@ class FigureDriver(EvaBase):
                 full_module = "eva.diagnostics."+eva_module_name
                 layer_class = getattr(importlib.import_module(full_module), eva_class_name)
                 # use the translator class to go from eva to declarative plotting
-                layer_list.append(layer_class(layer, dataobj).plotobj)
+                layer_list.append(layer_class(layer, self.logger, data_collections).plotobj)
             # create a subplot based on specified layers
             plotobj = CreatePlot(plot_layers=layer_list)
             # make changes to subplot based on YAML configuration

@@ -6,11 +6,11 @@ import os
 
 class Scatter():
 
-    def __init__(self, config, dataobj):
+    def __init__(self, config, logger, dataobj):
         # prepare data based on config
         varnames = config['comparison']
-        xdata = dataobj.data[varnames[0]].to_numpy()
-        ydata = dataobj.data[varnames[1]].to_numpy()
+        xdata = dataobj.get_variable_data(varnames[0])
+        ydata = dataobj.get_variable_data(varnames[1])
         # create declarative plotting Scatter object
         self.plotobj = eva.plot_tools.plots.Scatter(xdata, ydata)
         # get defaults from schema
@@ -18,8 +18,8 @@ class Scatter():
                                   os.path.join(return_eva_path(),
                                                'defaults',
                                                'scatter.yaml'))
-        config = get_schema(layer_schema, config, dataobj.logger)
+        config = get_schema(layer_schema, config, logger)
         delvars = ['comparison', 'type', 'schema']
         for d in delvars:
             config.pop(d, None)
-        self.plotobj = update_object(self.plotobj, config, dataobj.logger)
+        self.plotobj = update_object(self.plotobj, config, logger)

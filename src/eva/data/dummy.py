@@ -1,10 +1,16 @@
 from eva.eva_base import EvaBase
-import pandas as pd
+import xarray as xr
 
 
 class Dummy(EvaBase):
 
-    def execute(self):
-        data_dict = {'x': [1, 2, 3, 4, 5], 'y': [1, 2, 3, 4, 5]}
-        self.data = pd.DataFrame.from_dict(data_dict)
-        self.datavars = ['x', 'y']
+    def execute(self, data_collections):
+
+        x_dataArr = xr.DataArray([1, 2, 3, 4, 5])
+        y_dataArr = xr.DataArray([1, 2, 3, 4, 5])
+
+        xy_dataSet = xr.Dataset()
+        xy_dataSet['x'] = x_dataArr
+        xy_dataSet['y'] = y_dataArr
+
+        data_collections.add_collection('dummy', xy_dataSet)

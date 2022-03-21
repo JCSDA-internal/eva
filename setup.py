@@ -43,6 +43,7 @@ setuptools.setup(
         '': [
                'tests/config/*',
                'tests/data/*',
+               'defaults/*.yaml'
              ],
     },
     entry_points={
