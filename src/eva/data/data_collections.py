@@ -33,7 +33,8 @@ class DataCollections:
     def add_collection(self, collection_name, collection):
 
         # Collections should only be xarray datasets
-        assert isinstance(collection, xr.Dataset)
+        if not isinstance(collection, xr.Dataset):
+            self.logger.abort('In add_collection: the collection must be an xarray Dataset')
 
         self._collections[collection_name] = collection
 
