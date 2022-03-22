@@ -20,9 +20,12 @@ import yaml
 from eva.eva_path import return_eva_path
 from eva.utilities.logger import Logger
 from eva.utilities.utils import camelcase_to_underscore
+from eva.data.data_collections import DataCollections
 
 
 # --------------------------------------------------------------------------------------------------
+
+
 def load_yaml_file(eva_config, logger):
     # utility function to help load a yaml file into a dict.
 
@@ -37,6 +40,9 @@ def load_yaml_file(eva_config, logger):
                      f'errors when attempting to load: {eva_config}, error: {e}')
 
     return eva_dict
+
+
+# --------------------------------------------------------------------------------------------------
 
 
 class Config(dict):
@@ -79,7 +85,7 @@ class EvaBase(ABC):
         self.config = Config(config)
 
     @abstractmethod
-    def execute(self):
+    def execute(self, data_collections):
         '''
         Each class must implement this method and it is where it will do all of its work.
         '''
@@ -174,6 +180,10 @@ def eva(eva_config, eva_logger=None):
                   f'{diagnostic_data_config}, error: {e}'
             raise KeyError(msg)
 
+        # Create the data collections
+        # ---------------------------
+        data_collections = DataCollections()
+
         # Create the data object
         creator = EvaFactory()
         eva_data_object = creator.create_eva_object(eva_data_class_name,
@@ -182,7 +192,7 @@ def eva(eva_config, eva_logger=None):
                                                     eva_logger)
 
         # Prepare diagnostic data
-        eva_data_object.execute()
+        eva_data_object.execute(data_collections)
 
         # Create the figure object
         eva_figure_object = creator.create_eva_object('FigureDriver',
@@ -191,7 +201,7 @@ def eva(eva_config, eva_logger=None):
                                                       eva_logger)
 
         # Generate figure(s)
-        eva_figure_object.execute(eva_data_object)
+        eva_figure_object.execute(data_collections)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -223,3 +233,4 @@ if __name__ == "__main__":
 
 
 # --------------------------------------------------------------------------------------------------
+ 
