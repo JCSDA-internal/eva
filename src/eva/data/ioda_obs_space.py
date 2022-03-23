@@ -84,13 +84,12 @@ class IodaObsSpace(EvaBase):
                         # Assert that the collection contains at least one variable. If not it is
                         # likely some problem has occurred
                         if not ds.keys():
-                            self.logger.abort('Collection \'' +  dataset['name'] + ', group ' +
-                                               group + '\' in file ' + filename +
-                                               ' does not have any variables.')
+                            self.logger.abort('Collection \'' + dataset['name'] + ', group ' +
+                                              group + '\' in file ' + filename +
+                                              ' does not have any variables.')
 
                         # Add the dataset to the collections
                         data_collections.create_or_add_to_collection(collection_name, ds, 'nlocs')
-
 
             print(data_collections)
 
