@@ -30,13 +30,53 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
-    def add_collection(self, collection_name, collection):
+    def create_or_add_to_collection(self, collection_name, collection, concat_dimension=None):
 
         # Collections should only be xarray datasets
         if not isinstance(collection, xr.Dataset):
-            self.logger.abort('In add_collection: the collection must be an xarray Dataset')
+            self.logger.abort('In add_collection: collection must be an xarray.Dataset')
 
-        self._collections[collection_name] = collection
+        # Check that there is not an existing collection that is empty
+        if collection_name in self._collections:
+            if not list(self._collections[collection_name].keys()):
+                self.logger.abort('In create_or_add_to_collection the collection \'' +
+                                  collection_name + '\' is already in existence but appears to ' +
+                                  'be empty.')
+
+        # Create the collection or concatenate with existing collection
+        # If the collection does not already exist within the dictionary then the incoming
+        # collection is used to initialize that collection. If the collection already exists the
+        # below will abort, unless a concatenation dimension is offered and it is a valid dimension
+        # in the existing collection.
+        if collection_name not in self._collections:
+            self._collections[collection_name] = collection.copy(deep=False)
+        else:
+            if concat_dimension is None:
+                self.logger.abort('In create_or_add_to_collection the collection \'' +
+                                  collection_name + '\' being added already exists. Either ' +
+                                  'remove collection or provide a dimension along which to ' +
+                                  'concatenate.')
+            dims = list(self._collections[collection_name].dims)
+            if concat_dimension not in dims:
+                self.logger.abort('In create_or_add_to_collection the collection \'' +
+                                  collection_name + '\' does not have the dimension \'' +
+                                  concat_dimension + '\' that is requested as the dimension ' +
+                                  'along which to concatenate. Valid dimensions are ' +
+                                  f'{dims}')
+            self._collections[collection_name] = xr.concat([self._collections[collection_name],
+                                                           collection], dim=concat_dimension)
+
+    # ----------------------------------------------------------------------------------------------
+
+    def add_variable_to_collection(self, collection_name, variable_name, variable):
+
+        # TODO Dataset needs to be created
+
+        # Collections should only be xarray datasets
+        if not isinstance(variable, xr.DataArray):
+            self.logger.abort('In add_variable_to_collection: variable must be xarray.DataArray')
+
+        self._collections[collection_name][variable_name] = variable
 
     # ----------------------------------------------------------------------------------------------
 
@@ -55,4 +95,22 @@ class DataCollections:
 
         return self._collections[collection][variable].data
 
-    # ------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------
+
+    def __str__(self):
+
+        # Print a list of variables that are available in the collection
+        self.logger.info("Collections available: ", )
+        for collection_key in self._collections.keys():
+            self.logger.info('')
+            self.logger.info('Collection name: ' + collection_key)
+            variables = list(self._collections[collection_key].keys())
+            if variables:
+                self.logger.info(' Variables available in collection:')
+                for variable in variables:
+                    self.logger.info('  ' + collection_key + '::' + variable)
+            else:
+                self.logger.info(' No variables in this collection.')
+        return(' ')
+
+    # ----------------------------------------------------------------------------------------------

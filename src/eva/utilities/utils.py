@@ -4,8 +4,15 @@
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
+# --------------------------------------------------------------------------------------------------
+
+import yaml
+
+from eva.utilities.logger import Logger
+
 
 # --------------------------------------------------------------------------------------------------
+
 
 def camelcase_to_underscore(CamelCaseString):
 
@@ -47,12 +54,29 @@ def camelcase_to_underscore(CamelCaseString):
 
 # --------------------------------------------------------------------------------------------------
 
+
+def load_yaml_file(eva_config, logger):
+    # utility function to help load a yaml file into a dict.
+
+    if logger is None:
+        logger = Logger('LoadYamlFile')
+
+    try:
+        with open(eva_config, 'r') as eva_config_opened:
+            eva_dict = yaml.safe_load(eva_config_opened)
+    except Exception as e:
+        logger.abort('Eva diagnostics is expecting a valid yaml file, but it encountered ' +
+                     f'errors when attempting to load: {eva_config}, error: {e}')
+
+    return eva_dict
+
+
+# --------------------------------------------------------------------------------------------------
+
 def get_schema(YamlFile, configDict={}, logger=None):
     # read YamlFile into a dictionary containing a configuration,
     # and overwrite the default configuration with the input configDict
 
-    from eva.eva_base import load_yaml_file
-    from eva.utilities.logger import Logger
     if logger is None:
         logger = Logger('EvaSchema')
 
@@ -79,7 +103,7 @@ def get_schema(YamlFile, configDict={}, logger=None):
 def update_object(myObj, configDict, logger=None):
     # update input object myObj attributes based on a dictionary
     # and return a new, updated myObj
-    from eva.utilities.logger import Logger
+
     if logger is None:
         logger = Logger('EvaUpdateObject')
 
@@ -92,5 +116,6 @@ def update_object(myObj, configDict, logger=None):
         setattr(myObj, key, value)
 
     return myObj
+
 
 # --------------------------------------------------------------------------------------------------

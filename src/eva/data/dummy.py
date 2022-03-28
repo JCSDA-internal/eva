@@ -13,4 +13,4 @@ class Dummy(EvaBase):
         xy_dataSet['x'] = x_dataArr
         xy_dataSet['y'] = y_dataArr
 
-        data_collections.add_collection('dummy', xy_dataSet)
+        data_collections.create_or_add_to_collection('dummy', xy_dataSet)

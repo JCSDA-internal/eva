@@ -18,47 +18,10 @@ import yaml
 
 # local imports
 from eva.eva_path import return_eva_path
+from eva.utilities.config import Config
 from eva.utilities.logger import Logger
-from eva.utilities.utils import camelcase_to_underscore
+from eva.utilities.utils import camelcase_to_underscore, load_yaml_file
 from eva.data.data_collections import DataCollections
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-def load_yaml_file(eva_config, logger):
-    # utility function to help load a yaml file into a dict.
-
-    if logger is None:
-        logger = Logger('EvaSetup')
-
-    try:
-        with open(eva_config, 'r') as eva_config_opened:
-            eva_dict = yaml.safe_load(eva_config_opened)
-    except Exception as e:
-        logger.abort('Eva diagnostics is expecting a valid yaml file, but it encountered ' +
-                     f'errors when attempting to load: {eva_config}, error: {e}')
-
-    return eva_dict
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-class Config(dict):
-
-    def __init__(self, dict_or_yaml):
-
-        logger = Logger('EvaSetup')
-
-        # Program can recieve a dictionary or a yaml file
-        if isinstance(dict_or_yaml, dict):
-            config = dict_or_yaml
-        else:
-            config = load_yaml_file(dict_or_yaml, logger)
-
-        # Initialize the parent class with the config
-        super().__init__(config)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -82,7 +45,7 @@ class EvaBase(ABC):
 
         # Create a configuration object
         # -----------------------------
-        self.config = Config(config)
+        self.config = Config(config, self.logger)
 
     @abstractmethod
     def execute(self, data_collections):
@@ -188,7 +151,7 @@ def eva(eva_config, eva_logger=None):
         creator = EvaFactory()
         eva_data_object = creator.create_eva_object(eva_data_class_name,
                                                     'data',
-                                                    diagnostic_config,
+                                                    diagnostic_config['data'],
                                                     eva_logger)
 
         # Prepare diagnostic data
