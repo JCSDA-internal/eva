@@ -33,22 +33,12 @@ class IodaObsSpace(EvaBase):
             # Get the groups to be read
             groups = get(dataset, logger, 'groups')
 
-            # Assert the correct use of variables and channels
-            if ('variables' in dataset and 'channels' in dataset):
-                self.logger.abort('Dataset configuraiton for \'' + dataset['name'] + '\'' +
-                                  'contains both channels or variables, should be one or ' +
-                                  'the other. If channels present, variable is ' +
-                                  'brightness_temperature')
-
-            # Get channels or variables
-            if ('variables' in dataset):
-                variables = dataset['variables']
-            elif ('channels' in dataset):
+            # Get variables
+            variables = get(dataset, logger, 'variables')
+            if ('channels' in dataset):
                 channels = dataset['channels']
-                variables = ['brightness_temperature']  # If channels present variable is bt
-            else:
-                self.logger.abort('Dataset configuraiton for \'' + dataset['name'] + '\'' +
-                                  'contains neither channels or variables.')
+
+            # TODO: do we need to check that if channels selected variables is certain values?
 
             # Get metadata
             metadata_variables = dataset.get('metadata', [])
