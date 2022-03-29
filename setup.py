@@ -38,6 +38,7 @@ setuptools.setup(
         'matplotlib>=3.4.3',
         'cartopy==0.19.0.post1',
         'scikit-learn>=1.0.2',
+        'xarray>=0.11.3',
     ],
     package_data={
         '': [

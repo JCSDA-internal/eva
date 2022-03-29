@@ -6,6 +6,7 @@
 
 # --------------------------------------------------------------------------------------------------
 
+
 import yaml
 
 from eva.utilities.logger import Logger
@@ -73,6 +74,7 @@ def load_yaml_file(eva_config, logger):
 
 # --------------------------------------------------------------------------------------------------
 
+
 def get_schema(YamlFile, configDict={}, logger=None):
     # read YamlFile into a dictionary containing a configuration,
     # and overwrite the default configuration with the input configDict
@@ -97,6 +99,7 @@ def get_schema(YamlFile, configDict={}, logger=None):
 
     return fullConfig
 
+
 # --------------------------------------------------------------------------------------------------
 
 
@@ -116,6 +119,42 @@ def update_object(myObj, configDict, logger=None):
         setattr(myObj, key, value)
 
     return myObj
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def parse_channel_list(channels_str_or_list, logger):
+
+    # Check if the input is already a list
+    if isinstance(channels_str_or_list, list):
+
+        # Check if
+        if all(isinstance(x, int) for x in channels_str_or_list):
+            return channels_str_or_list
+        else:
+            logger.abort('In parse_channel_list the input is a list but not all elements are ' +
+                         'integers. Either use a string or pass a list of integers.')
+
+    elif isinstance(channels_str_or_list, str):
+
+        # Convert the string
+        channel_list = []
+        for x in channels_str_or_list.split(','):
+            if '-' in x:
+                lnum, rnum = x.split('-')
+                lnum, rnum = int(lnum), int(rnum)
+                channel_list.extend(range(lnum, rnum + 1))
+            else:
+                lnum = int(x)
+                channel_list.append(lnum)
+
+        return channel_list
+
+    else:
+
+        logger.abort('In parse_channel_list the input is neither a list of integers or a string ' +
+                     'that can be parsed into a list of integers.')
 
 
 # --------------------------------------------------------------------------------------------------

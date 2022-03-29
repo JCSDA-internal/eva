@@ -12,6 +12,7 @@ import xarray as xr
 
 from eva.eva_base import EvaBase
 from eva.utilities.config import get
+from eva.utilities.utils import parse_channel_list
 
 # --------------------------------------------------------------------------------------------------
 
@@ -35,10 +36,16 @@ class IodaObsSpace(EvaBase):
 
             # Get variables
             variables = get(dataset, logger, 'variables')
-            if ('channels' in dataset):
-                channels = dataset['channels']
 
-            # TODO: do we need to check that if channels selected variables is certain values?
+            # Get channels
+            channels_str_or_list = get(dataset, logger, 'channels', [])
+
+            # Convert channels to list
+            if channels_str_or_list is not []:
+                channels = parse_channel_list(channels_str_or_list, logger)
+
+            # Set number of channels
+            nchan = len(channels)
 
             # Get metadata
             metadata_variables = dataset.get('metadata', [])
@@ -64,23 +71,53 @@ class IodaObsSpace(EvaBase):
                 # Loop over filenames
                 for filename in filenames:
 
-                    # Open file and add collection
-                    with xr.open_dataset(filename, group=group) as ds:
+                    # Read header part of the file to get coordinates
+                    ds_header = xr.open_dataset(filename)
 
-                        # Drop data variables not in user requested variables
-                        vars_to_remove = list(set(list(ds.keys())) - set(variables_need))
-                        ds = ds.drop_vars(vars_to_remove)
+                    # Read the group
+                    ds = xr.open_dataset(filename, group=group)
 
-                        # Assert that the collection contains at least one variable. If not it is
-                        # likely some problem has occurred
-                        if not ds.keys():
-                            self.logger.abort('Collection \'' + dataset['name'] + ', group ' +
-                                              group + '\' in file ' + filename +
-                                              ' does not have any variables.')
+                    # Merge with header part
+                    ds = ds.merge(ds_header)
 
-                        # Add the dataset to the collections
-                        data_collections.create_or_add_to_collection(collection_name, ds, 'nlocs')
+                    # Close the header
+                    ds_header.close()
 
-            print(data_collections)
+                    # Drop data variables not in user requested variables
+                    vars_to_remove = list(set(list(ds.keys())) - set(variables_need))
+                    ds = ds.drop_vars(vars_to_remove)
 
-            exit()
+                    # Get channels
+                    if 'nchans' in list(ds.dims):
+                        nchan_in_file = ds.nchans.size
+
+                        # If user provided no channels then use all channels
+                        if nchan == 0:
+                            nchan_use = nchan_in_file
+                        else:
+                            nchan_use = nchan
+
+                        # Keep needed channels
+                        if nchan_use < nchan_in_file:
+                            ds = ds.sel(nchans=channels)
+
+                        # Add the list of channels to the dataset
+                        channel_data_array = xr.DataArray(channels, dims=['nchans'])
+
+                    # Assert that the collection contains at least one variable. If not it is likely
+                    # some problem has occurred
+                    if not ds.keys():
+                        self.logger.abort('Collection \'' + dataset['name'] + ', group ' + group +
+                                          '\' in file ' + filename +
+                                          ' does not have any variables.')
+
+                    # Add the dataset to the collections
+                    data_collections.create_or_add_to_collection(collection_name, ds, 'nlocs')
+
+                    # Close dataset
+                    ds.close()
+
+        # Print the contents of the collections for helping the user with making plots
+        print(data_collections)
+
+        exit()
