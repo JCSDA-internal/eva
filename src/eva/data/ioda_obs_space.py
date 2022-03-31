@@ -119,5 +119,3 @@ class IodaObsSpace(EvaBase):
 
         # Print the contents of the collections for helping the user with making plots
         print(data_collections)
-
-        exit()

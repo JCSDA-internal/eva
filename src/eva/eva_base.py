@@ -157,6 +157,15 @@ def eva(eva_config, eva_logger=None):
         # Prepare diagnostic data
         eva_data_object.execute(data_collections)
 
+        # Create the filters
+        if 'filters' in diagnostic_config:
+            eva_filter_object = creator.create_eva_object('FilterDriver',
+                                                          'filters',
+                                                          diagnostic_config['filters'],
+                                                          eva_logger)
+            eva_filter_object.execute(data_collections)
+
+
         # Create the figure object
         eva_figure_object = creator.create_eva_object('FigureDriver',
                                                       'plot_tools',
