@@ -21,10 +21,10 @@ import os
 # --------------------------------------------------------------------------------------------------
 
 
-class FilterDriver(EvaBase):
+class TransformDriver(EvaBase):
 
     def execute(self, data_collections):
 
-        print('In Filter Driver', self.config)
+        print('In Transform Driver', self.config)
 
         exit()
