@@ -66,7 +66,7 @@ class IodaObsSpace(EvaBase):
                     variables_need = metadata_variables
 
                 # Set the collection name
-                collection_name = dataset['name'] + '::' + group
+                collection_name = dataset['name']
 
                 # Loop over filenames
                 for filename in filenames:
@@ -86,6 +86,12 @@ class IodaObsSpace(EvaBase):
                     # Drop data variables not in user requested variables
                     vars_to_remove = list(set(list(ds.keys())) - set(variables_need))
                     ds = ds.drop_vars(vars_to_remove)
+
+                    # Rename variables with group
+                    rename_dict = {}
+                    for variable_need in variables_need:
+                        rename_dict[variable_need] = variable_need + '-' + group
+                    ds = ds.rename(rename_dict)
 
                     # Get channels
                     if 'nchans' in list(ds.dims):
