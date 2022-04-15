@@ -104,13 +104,7 @@ class DataCollections:
         for collection_key in self._collections.keys():
             self.logger.info('')
             self.logger.info('Collection name: ' + collection_key)
-            variables = list(self._collections[collection_key].keys())
-            if variables:
-                self.logger.info(' Variables available in collection:')
-                for variable in variables:
-                    self.logger.info('  ' + collection_key + '::' + variable)
-            else:
-                self.logger.info(' No variables in this collection.')
+            self.logger.info(f'{self._collections[collection_key]}')
         return(' ')
 
     # ----------------------------------------------------------------------------------------------

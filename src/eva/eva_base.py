@@ -161,7 +161,7 @@ def eva(eva_config, eva_logger=None):
         if 'transforms' in diagnostic_config:
             eva_transform_object = creator.create_eva_object('TransformDriver',
                                                              'transforms',
-                                                             diagnostic_config['transforms'],
+                                                             diagnostic_config,
                                                              eva_logger)
             eva_transform_object.execute(data_collections)
 

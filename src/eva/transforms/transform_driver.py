@@ -10,11 +10,9 @@
 
 # --------------------------------------------------------------------------------------------------
 
-
+from eva.utilities.config import get
 from eva.eva_base import EvaBase
-from eva.eva_path import return_eva_path
-from eva.utilities.utils import get_schema, camelcase_to_underscore
-from eva.plot_tools.figure import CreatePlot, CreateFigure
+
 import importlib
 import os
 
@@ -25,6 +23,23 @@ class TransformDriver(EvaBase):
 
     def execute(self, data_collections):
 
-        print('In Transform Driver', self.config)
+        # Get list of transform dictionaries
+        transforms = get(self.config, self.logger, 'transforms')
+
+        # Loop over transforms
+        for transform in transforms:
+
+            # Get the transform type
+            transform_type = get(transform, self.logger, 'transform')
+
+            # Replace spaces with underscore
+            transform_type = transform_type.replace(" ", "_")
+
+            # Instantiate the tranform object
+            transform_method = getattr(importlib.import_module("eva.transforms."+transform_type),
+                                       transform_type)
+
+            # Call the transform
+            transform_method(transform, data_collections)
 
         exit()
