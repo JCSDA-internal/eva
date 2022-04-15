@@ -165,7 +165,6 @@ def eva(eva_config, eva_logger=None):
                                                              eva_logger)
             eva_transform_object.execute(data_collections)
 
-
         # Create the figure object
         eva_figure_object = creator.create_eva_object('FigureDriver',
                                                       'plot_tools',

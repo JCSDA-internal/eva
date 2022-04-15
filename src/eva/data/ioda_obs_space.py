@@ -43,7 +43,6 @@ def subset_channels(ds, channels, add_channels_variable=False):
 
 class IodaObsSpace(EvaBase):
 
-
     # ----------------------------------------------------------------------------------------------
 
     def execute(self, data_collections):
@@ -133,7 +132,6 @@ class IodaObsSpace(EvaBase):
 
                 # Add the dataset to the collections
                 data_collections.create_or_add_to_collection(collection_name, ds_groups, 'nlocs')
-
 
         # Print the contents of the collections for helping the user with making plots
         print(data_collections)
