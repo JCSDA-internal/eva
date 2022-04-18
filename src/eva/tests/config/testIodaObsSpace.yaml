@@ -1,0 +1,106 @@
+diagnostics:
+- data:
+
+    # Data read
+    # ---------
+    type: IodaObsSpace
+    datasets:
+
+      - name: reference
+        filenames:
+          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+        groups:
+          - name: GsiHofXBc
+            variables: [air_temperature, eastward_wind]
+          - name: GsiEffectiveQC
+            variables: [air_temperature, eastward_wind]
+
+      - name: experiment
+        filenames:
+          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+        groups:
+          - name: hofx
+            variables: [air_temperature, eastward_wind]
+          - name: ObsValue
+            variables: [air_temperature, eastward_wind]
+          - name: EffectiveQC
+            variables: [air_temperature, eastward_wind]
+          - name: MetaData
+            variables: [air_pressure, dateTime, height, latitude, longitude, record_number,
+                        station_id]
+
+#      - name: reference_amsua
+#        filenames:
+#          - amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
+#          - amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
+#        channels: 2,3,14
+#        groups:
+#          - name: hofx
+#            variables: [brightness_temperature]
+#          - name: ObsValue
+#            variables: [brightness_temperature]
+#          - name: MetaData
+#            variables: [dateTime, height_above_mean_sea_level, latitude, longitude, record_number,
+#                        scan_position, sensor_azimuth_angle, sensor_view_angle, sensor_zenith_angle,
+#                        solar_azimuth_angle, solar_zenith_angle]
+
+
+
+  # Transforms
+  transforms:
+
+    - transform: arithmetic
+      arithmetic type: subtraction
+      collections: [reference]
+      variables: [air_temperature-*, eastward_wind-*]
+      new variable name: $(variable)-ObsValue-hofx
+      arithmetic variables: [$(collection)::$(variable)-ObsValue, $(collection)::$(variable)-GsiHofXBc]
+
+    - transform: arithmetic
+      arithmetic type: subtraction
+      collections: [experiment]
+      variables: [air_temperature-*, eastward_wind-*]
+      new variable name: $(variable)-ObsValue-hofx
+      arithmetic variables: [$(collection)::$(variable)-ObsValue, $(collection)::$(variable)-hofx]
+
+    - transform: accept or reject where
+      collections: [reference, experiment]
+      variables: [air_temperature, eastward_wind]
+      new variable name: $(variable)-passed
+      where:
+        - variables: [$(collection)::$(variable)-EffectiveQC]
+          accept or reject: accept
+          min value: 0
+          max value: 0
+
+  # Not working yet
+  graphics:
+    - batch figure: false
+      figure:
+        layout: [1,1]
+        title: 'Super Title'
+      plots:
+        - add_title: 'Scatter'
+          set_xlim: [-1,6]
+          set_ylim: [-1,6]
+          add_xlabel: 'My X Label'
+          add_ylabel: 'My Y Label'
+          add_grid:
+          add_legend:
+            loc: 'upper left'
+          layers:
+          - type: Scatter
+            comparison:
+             - dummy::x
+             - dummy::y
+            markersize: 50
+            color: 'red'
+            label: 'Big dots'
+          - type: Scatter
+            comparison:
+             - dummy::x
+             - dummy::y
+            markersize: 5
+            label: 'Smaller dots'

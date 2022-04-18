@@ -66,7 +66,7 @@ def get(dict, logger, key, default=None):
 
         else:
 
-            logger.abort("Configuration does not have the key")
+            logger.abort(f'Configuration does not have the key {key}')
 
     else:
 

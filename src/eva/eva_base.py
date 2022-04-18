@@ -157,6 +157,14 @@ def eva(eva_config, eva_logger=None):
         # Prepare diagnostic data
         eva_data_object.execute(data_collections)
 
+        # Create the transforms
+        if 'transforms' in diagnostic_config:
+            eva_transform_object = creator.create_eva_object('TransformDriver',
+                                                             'transforms',
+                                                             diagnostic_config,
+                                                             eva_logger)
+            eva_transform_object.execute(data_collections)
+
         # Create the figure object
         eva_figure_object = creator.create_eva_object('FigureDriver',
                                                       'plot_tools',
