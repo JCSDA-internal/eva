@@ -138,7 +138,7 @@ class CreateFigure:
                             transform=self.projection.projection)
         else:
             skipvars = ['plottype', 'longitude', 'latitude',
-                        'data', 'markersize']
+                        'data', 'markersize', 'colorbar']
             inputs = self._get_inputs_dict(skipvars, plotobj)
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             c=plotobj.data, s=plotobj.markersize,

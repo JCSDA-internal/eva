@@ -15,7 +15,6 @@ from eva.eva_base import EvaBase
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, camelcase_to_underscore
 from eva.plot_tools.figure import CreatePlot, CreateFigure
-from eva.plot_tools.maps import Domain, MapProjection
 import importlib
 import os
 
@@ -92,14 +91,14 @@ class FigureDriver(EvaBase):
             if 'mapping' in plot.keys():
                 mapoptions = plot.get('mapping')
                 # TODO make this configurable and not hard coded
-                proj = MapProjection()
-                domain = Domain()
+                proj = 'plcarr'
+                domain = 'global'
 
             # create a subplot based on specified layers
             plotobj = CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
             # make changes to subplot based on YAML configuration
             for key, value in plot.items():
-                if key not in ['layers']:
+                if key not in ['layers', 'mapping']:
                     if isinstance(value, dict):
                         getattr(plotobj, key)(**value)
                     elif value is None:
