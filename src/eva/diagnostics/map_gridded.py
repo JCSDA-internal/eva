@@ -1,5 +1,5 @@
 from eva.eva_path import return_eva_path
-from eva.utilities.utils import get_schema, update_object
+from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import eva.plot_tools.plots
 import os
 

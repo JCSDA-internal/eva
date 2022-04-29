@@ -15,6 +15,7 @@ from eva.eva_base import EvaBase
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, camelcase_to_underscore
 from eva.plot_tools.figure import CreatePlot, CreateFigure
+from eva.plot_tools.maps import Domain, MapProjection
 import importlib
 import os
 
@@ -85,8 +86,17 @@ class FigureDriver(EvaBase):
                 layer_class = getattr(importlib.import_module(full_module), eva_class_name)
                 # use the translator class to go from eva to declarative plotting
                 layer_list.append(layer_class(layer, self.logger, data_collections).plotobj)
+            # get mapping dictionary
+            proj = None
+            domain = None
+            if 'mapping' in plot.keys():
+                mapoptions = plot.get('mapping')
+                # TODO make this configurable and not hard coded
+                proj = MapProjection()
+                domain = Domain()
+
             # create a subplot based on specified layers
-            plotobj = CreatePlot(plot_layers=layer_list)
+            plotobj = CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
             # make changes to subplot based on YAML configuration
             for key, value in plot.items():
                 if key not in ['layers']:
