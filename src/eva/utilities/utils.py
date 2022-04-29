@@ -158,3 +158,13 @@ def parse_channel_list(channels_str_or_list, logger):
 
 
 # --------------------------------------------------------------------------------------------------
+def slice_var_from_str(config, datavar, logger):
+    if 'slices' in config.keys():
+        try:
+            datavar = eval("datavar"+config['x']['slices'])
+        except IndexError:
+            logger.send_message('ABORT', f"IndexError: {config['variable']}" +\
+                                         f" has dimensions {datavar.shape}" +\
+                                         f" and input slices string is {config['slices']}")
+    return datavar
+# --------------------------------------------------------------------------------------------------

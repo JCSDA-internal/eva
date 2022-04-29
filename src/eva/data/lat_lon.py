@@ -32,7 +32,6 @@ class LatLon(EvaBase):
 
             # open the input netCDF file
             ds = xr.open_dataset(filename)
-            print(ds.keys())
 
             # Drop data variables not in user requested variables
             vars_to_remove = list(set(list(ds.keys())) - set(variables))

@@ -17,15 +17,17 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - dummy::x
-             - dummy::y
+            x:
+              variable: dummy::x
+            y:
+              variable: dummy::y
             markersize: 50
             color: 'red'
             label: 'Big dots'
           - type: Scatter
-            comparison:
-             - dummy::x
-             - dummy::y
+            x:
+              variable: dummy::x
+            y:
+              variable: dummy::y
             markersize: 5
             label: 'Smaller dots'
