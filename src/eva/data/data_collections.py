@@ -13,6 +13,15 @@
 import xarray as xr
 
 from eva.utilities.logger import Logger
+from eva.utilities.utils import fontColors as fcol, string_does_not_contain
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+# Characters that are not permitted in collection, group and variable names.
+# Math chars not allowed in order to allow evaluation of the variables in the transforms
+disallowed_chars = '-+*/()'
 
 
 # --------------------------------------------------------------------------------------------------
@@ -66,45 +75,95 @@ class DataCollections:
             self._collections[collection_name] = xr.concat([self._collections[collection_name],
                                                            collection], dim=concat_dimension)
 
+        # Check that nothing violates the naming conventions
+        self.validate_names()
+
     # ----------------------------------------------------------------------------------------------
 
-    def add_variable_to_collection(self, collection_name, variable_name, variable):
+    def add_variable_to_collection(self, collection_name, group_name, variable_name, variable):
 
-        # TODO Dataset needs to be created
+        # Check that there is not an existing collection that is empty
+        if collection_name not in self._collections:
+            self.logger.abort(f'In add_variable_to_collection, trying to add variable ' +
+                              f'\'{variable_name}\' to collection \'{collection_name}\', but ' +
+                              'this collection does not exist.')
 
-        # Collections should only be xarray datasets
+        # Combine the group and variable name
+        group_variable_name = group_name + '::' + variable_name
+
+        # Assert that new variable is an xarray Dataarray
         if not isinstance(variable, xr.DataArray):
             self.logger.abort('In add_variable_to_collection: variable must be xarray.DataArray')
 
-        self._collections[collection_name][variable_name] = variable
+        # Add the variable to the collection
+        self._collections[collection_name][group_variable_name] = variable
+
+        # Check that nothing violates the naming conventions
+        self.validate_names()
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_variable_data(self, variable_name, collection_name=None):
+    def get_variable_data_array(self, collection_name, group_name, variable_name):
 
-        if collection_name is None and '::' not in variable_name:
-            self.logger.abort('In get_variable_data: if collection_name is not provided the '
-                              'variable name must contain the collection in the form: '
-                              'collection::variable')
+        group_variable_name = group_name + '::' + variable_name
 
-        if collection_name is None:
-            [collection, variable] = variable_name.split('::')
-        else:
-            variable = variable_name
-            collection = collection_name
-
-        return self._collections[collection][variable].data
+        return self._collections[collection_name][group_variable_name]
 
     # ----------------------------------------------------------------------------------------------
 
-    def __str__(self):
+    def get_variable_data(self, collection_name, group_name, variable_name):
+
+        variable_array = self.get_variable_data_array(collection_name, group_name, variable_name)
+
+        return variable_array.data
+
+    # ----------------------------------------------------------------------------------------------
+
+    def validate_names(self):
+
+        # This code checks that the naming conventions are compliant with what is expected
+
+        for collection_key in self._collections.keys():
+
+            # Assert that the collection name does not contain disallowed characters
+            if not string_does_not_contain(disallowed_chars, collection_key):
+                self.logger.abort(f'Collection contains the key \'{collection_key}\', which ' +
+                                  f'contains a characeter that is not permitted ' +
+                                  f'({disallowed_chars})')
+
+            # Loop over the data variables
+            for data_var in list(self._collections[collection_key].data_vars):
+
+                # Assert that the datavar contains '::' identifier, splitting group and variable
+                if '::' not in data_var:
+                    self.logger.abort(f'Collection \'{collection_key}\' contains the following ' +
+                                      f'data variable \'{data_var}\', which does not contain ' +
+                                      f'\'::\' splitting the group and variable.')
+                [group, variable] = data_var.split('::')
+                # Assert that the group name does not contain disallowed characters
+                if not string_does_not_contain(disallowed_chars, group):
+                    self.logger.abort(f'Collection \'{collection_key}\' contains the following ' +
+                                      f'element \'{data_var}\'. The group \'{group}\'' +
+                                      f'contains a character that is not permitted ' +
+                                      f'({disallowed_chars}).')
+                # Assert that the variable name does not contain disallowed characters
+                if not string_does_not_contain(disallowed_chars, variable):
+                    self.logger.abort(f'Collection \'{collection_key}\' contains the following ' +
+                                      f'element \'{data_var}\'. The variable \'{variable}\'' +
+                                      f'contains a character that is not permitted ' +
+                                      f'({disallowed_chars}).')
+
+    # ----------------------------------------------------------------------------------------------
+
+    def display_collections(self):
 
         # Print a list of variables that are available in the collection
-        self.logger.info("Collections available: ", )
+        self.logger.info('-'*80)
+        self.logger.info(fcol.bold + 'Collections available: ' + fcol.end)
         for collection_key in self._collections.keys():
             self.logger.info('')
-            self.logger.info('Collection name: ' + collection_key)
+            self.logger.info('Collection name: ' + fcol.underline + collection_key + fcol.end)
             self.logger.info(f'{self._collections[collection_key]}')
-        return(' ')
+        self.logger.info('-'*80)
 
     # ----------------------------------------------------------------------------------------------

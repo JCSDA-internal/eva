@@ -112,7 +112,7 @@ class IodaObsSpace(EvaBase):
                     # Rename variables with group
                     rename_dict = {}
                     for group_var in group_vars:
-                        rename_dict[group_var] = group_var + '-' + group_name
+                        rename_dict[group_var] = group_name + '::' + group_var
                     ds = ds.rename(rename_dict)
 
                     # Set channels
@@ -133,5 +133,5 @@ class IodaObsSpace(EvaBase):
                 # Add the dataset to the collections
                 data_collections.create_or_add_to_collection(collection_name, ds_groups, 'nlocs')
 
-        # Print the contents of the collections for helping the user with making plots
-        print(data_collections)
+        # Display the contents of the collections for helping the user with making plots
+        data_collections.display_collections()

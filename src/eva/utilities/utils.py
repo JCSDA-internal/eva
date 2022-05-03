@@ -7,9 +7,20 @@
 # --------------------------------------------------------------------------------------------------
 
 
+import re
+import string
 import yaml
 
 from eva.utilities.logger import Logger
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+class fontColors:
+    end = '\033[0m'
+    bold = '\033[1m'
+    underline = '\033[4m'
 
 
 # --------------------------------------------------------------------------------------------------
@@ -155,6 +166,81 @@ def parse_channel_list(channels_str_or_list, logger):
 
         logger.abort('In parse_channel_list the input is neither a list of integers or a string ' +
                      'that can be parsed into a list of integers.')
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def replace_vars(s, **defs):
+    """Interpolate/replace variables in string
+
+    Resolved variable formats is: ${var}. Undefined
+    variables remain unchanged in the returned string. This method will
+    recursively resolve variables of variables.
+
+    Parameters
+    ----------
+    s : string, required
+        Input string containing variables to be resolved.
+    defs: dict, required
+        dictionary of definitions for resolving variables expressed
+        as key-word arguments.
+
+    Returns
+    -------
+    s_interp: string
+        Interpolated string. Undefined variables are left unchanged.
+    """
+
+    expr = s
+
+    # Resolve special variables: ${var}
+    for var in re.findall(r'\$\{(\w+)\}', expr):
+        if var in defs:
+            expr = re.sub(r'\$\{'+var+r'\}', defs[var], expr)
+
+    # Resolve defs
+    s_interp = string.Template(expr).safe_substitute(defs)
+
+    # Recurse until no substitutions remain
+    if s_interp != s:
+        s_interp = replace_vars(s_interp, **defs)
+
+    return s_interp
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def remove_list_duplicates(input_list):
+
+    output_list = []
+    [output_list.append(x) for x in input_list if x not in output_list]
+
+    return output_list
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def remove_empty_from_list_of_strings(list):
+
+    while("" in list):
+        list.remove("")
+
+    return list
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def string_does_not_contain(disallowed_chars, string_to_check):
+
+    string_does_not_contain_flag = True
+    if any(disallowed_char in string_to_check for disallowed_char in disallowed_chars):
+        string_does_not_contain_flag = False
+
+    return string_does_not_contain_flag
 
 
 # --------------------------------------------------------------------------------------------------
