@@ -1,0 +1,98 @@
+diagnostics:
+
+
+  # Data read
+  # ---------
+- data:
+    type: IodaObsSpace
+    datasets:
+
+      - name: reference
+        filenames:
+          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+        groups:
+          - name: GsiHofXBc
+            variables: [air_temperature, eastward_wind]
+          #- name: GsiEffectiveQC
+          #  variables: [air_temperature, eastward_wind]
+
+      - name: experiment
+        filenames:
+          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+        groups:
+          - name: hofx
+            variables: [air_temperature, eastward_wind]
+          - name: ObsValue
+            variables: [air_temperature, eastward_wind]
+          - name: EffectiveQC
+            variables: [air_temperature, eastward_wind]
+          - name: MetaData
+            variables: [air_pressure, dateTime, height, latitude, longitude, record_number,
+                        station_id]
+
+
+  # Undertake transforms of variables
+  # ---------------------------------
+  transforms:
+
+    - transform: arithmetic
+      optional looping:
+        collections: [reference]
+        groups: [GsiHofXBc]
+        variables: [air_temperature, eastward_wind]
+      new collection name: reference
+      new group name: ObsValueMinusGsiHofXBc
+      new variable name: ${variable}
+      expression: experiment::ObsValue::${variable}-reference::GsiHofXBc::${variable}
+
+    - transform: arithmetic
+      optional looping:
+        variables: [air_temperature, eastward_wind]
+      new collection name: experiment
+      new group name: ObsValueMinusHofx
+      new variable name: ${variable}
+      expression: experiment::ObsValue::${variable}-experiment::hofx::${variable}
+
+    - transform: accept where
+      data to filter:
+        collections: [experiment]
+        groups: [hofx]
+        variables: [air_temperature, eastward_wind]
+      new names:
+        collection: ${collection}
+        group: HofxPassedQc
+        variable: ${variable}
+      where:
+        - experiment::EffectiveQC::${variable} == 0
+
+
+  # Figure and plot creation
+  # ------------------------
+  graphics:
+    - batch figure: false
+      figure:
+        layout: [1,1]
+        title: 'Aircraft Air Temperature'
+        output name: aircraft_air_temperature.png
+      plots:
+        - add_title: 'Scatter'
+          add_xlabel: 'Observation Value'
+          add_ylabel: 'H(x)'
+          add_grid:
+          add_legend:
+            loc: 'upper left'
+          layers:
+          - type: Scatter
+            comparison:
+             - experiment::ObsValue::air_temperature
+             - experiment::hofx::air_temperature
+            markersize: 5
+            color: 'black'
+            label: 'H(x) versus ObsValue'
+          - type: Scatter
+            comparison:
+             - experiment::ObsValue::air_temperature
+             - experiment::HofxPassedQc::air_temperature
+            markersize: 5
+            color: 'red'
+            label: 'H(x) versus ObsValue (Passed QC)'
