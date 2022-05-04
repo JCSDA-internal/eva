@@ -82,18 +82,17 @@ class DataCollections:
 
     def add_variable_to_collection(self, collection_name, group_name, variable_name, variable):
 
-        # Check that there is not an existing collection that is empty
-        if collection_name not in self._collections:
-            self.logger.abort(f'In add_variable_to_collection, trying to add variable ' +
-                              f'\'{variable_name}\' to collection \'{collection_name}\', but ' +
-                              'this collection does not exist.')
-
-        # Combine the group and variable name
-        group_variable_name = group_name + '::' + variable_name
-
         # Assert that new variable is an xarray Dataarray
         if not isinstance(variable, xr.DataArray):
             self.logger.abort('In add_variable_to_collection: variable must be xarray.DataArray')
+
+        # Check that there is not an existing collection that is empty
+        if collection_name not in self._collections:
+            # Create a new collection to hold the variable
+            self._collections[collection_name] = xr.Dataset()
+
+        # Combine the group and variable name
+        group_variable_name = group_name + '::' + variable_name
 
         # Add the variable to the collection
         self._collections[collection_name][group_variable_name] = variable
