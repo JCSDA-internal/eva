@@ -34,13 +34,6 @@ class Scatter():
         xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel)
         ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel)
 
-        print('xdata')
-        print(xdata.shape)
-        print(xdata)
-        print('ydata')
-        print(ydata.shape)
-        print(ydata)
-
         # Remove NaN values to enable regression
         # --------------------------------------
         xdata = xdata[~np.isnan(xdata)]

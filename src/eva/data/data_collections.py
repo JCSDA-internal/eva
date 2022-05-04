@@ -179,7 +179,7 @@ class DataCollections:
 
     def display_collections(self):
 
-        # Print a list of variables that are available in the collection
+        # Display a list of variables that are available in the collection
         self.logger.info('-'*80)
         self.logger.info(fcol.bold + 'Collections available: ' + fcol.end)
         for collection_key in self._collections.keys():
