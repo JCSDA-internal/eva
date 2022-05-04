@@ -49,7 +49,5 @@ class TransformDriver(EvaBase):
             self.logger.info('Tranforms complete. Collections after transforms:')
             data_collections.display_collections()
 
-        exit()
-
 
 # --------------------------------------------------------------------------------------------------

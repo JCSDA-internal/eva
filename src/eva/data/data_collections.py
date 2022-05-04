@@ -10,6 +10,7 @@
 # --------------------------------------------------------------------------------------------------
 
 
+import numpy as np
 import xarray as xr
 
 from eva.utilities.logger import Logger
@@ -102,19 +103,42 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_variable_data_array(self, collection_name, group_name, variable_name):
+    def get_variable_data_array(self, collection_name, group_name, variable_name, channels=None):
 
         group_variable_name = group_name + '::' + variable_name
 
-        return self._collections[collection_name][group_variable_name]
+        data_array = self._collections[collection_name][group_variable_name]
+
+        if channels is None:
+            return data_array
+        elif isinstance(channels, int) or not any(not isinstance(c, int) for c in channels):
+            # nchans must be a dimension if it will be used for selection
+            if 'nchans' not in list(self._collections[collection_name].dims):
+                self.logger.abort('In get_variable_data_array channels is provided but nchans ' +
+                                  'is not a dimension of the Dataset')
+            # Make sure it is a list
+            channels_sel = []
+            channels_sel.append(channels)
+            # Create a new DataArray with the requested channels
+            return data_array.sel(nchans=channels_sel)
+        else:
+            self.logger.abort('In get_variable_data_array channels is neither none or list of ' +
+                              'integers')
+
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_variable_data(self, collection_name, group_name, variable_name):
+    def get_variable_data(self, collection_name, group_name, variable_name, channels=None):
 
-        variable_array = self.get_variable_data_array(collection_name, group_name, variable_name)
+        variable_array = self.get_variable_data_array(collection_name, group_name, variable_name,
+                                                      channels)
 
-        return variable_array.data
+        variable_data = variable_array.data
+
+        # Squeeze in case of dimension of 1 (e.g. when 1 channel is needed)
+        variable_data = np.squeeze(variable_data)
+
+        return variable_data
 
     # ----------------------------------------------------------------------------------------------
 
