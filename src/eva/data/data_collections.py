@@ -125,7 +125,6 @@ class DataCollections:
             self.logger.abort('In get_variable_data_array channels is neither none or list of ' +
                               'integers')
 
-
     # ----------------------------------------------------------------------------------------------
 
     def get_variable_data(self, collection_name, group_name, variable_name, channels=None):

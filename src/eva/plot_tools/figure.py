@@ -217,7 +217,7 @@ class CreateFigure:
         else:
             skipvars = ['plottype', 'plot_ax', 'x', 'y',
                         'markersize', 'linear_regression',
-                        'density','channel']
+                        'density', 'channel']
             inputs = self._get_inputs_dict(skipvars, plotobj)
 
             s = ax.scatter(plotobj.x, plotobj.y, s=plotobj.markersize,
