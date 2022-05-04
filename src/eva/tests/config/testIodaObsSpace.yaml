@@ -1,106 +1,101 @@
 diagnostics:
-- data:
 
-    # Data read
-    # ---------
+
+  # Data read
+  # ---------
+- data:
     type: IodaObsSpace
     datasets:
 
       - name: reference
         filenames:
-          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
-          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+          - amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
+        channels: 1-15
         groups:
           - name: GsiHofXBc
-            variables: [air_temperature, eastward_wind]
-          - name: GsiEffectiveQC
-            variables: [air_temperature, eastward_wind]
+            variables: [brightness_temperature]
+          #- name: GsiEffectiveQC
+          #  variables: [brightness_temperature]
 
       - name: experiment
         filenames:
-          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
-          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+          - amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
         groups:
           - name: hofx
-            variables: [air_temperature, eastward_wind]
+            variables: [brightness_temperature]
           - name: ObsValue
-            variables: [air_temperature, eastward_wind]
+            variables: [brightness_temperature]
           - name: EffectiveQC
-            variables: [air_temperature, eastward_wind]
+            variables: [brightness_temperature]
           - name: MetaData
-            variables: [air_pressure, dateTime, height, latitude, longitude, record_number,
-                        station_id]
+            variables: [dateTime,height_above_mean_sea_level,latitude,longitude,record_number,
+                        scan_position,sensor_azimuth_angle,sensor_view_angle,sensor_zenith_angle,
+                        solar_azimuth_angle,solar_zenith_angle]
 
-#      - name: reference_amsua
-#        filenames:
-#          - amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
-#          - amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
-#        channels: 2,3,14
-#        groups:
-#          - name: hofx
-#            variables: [brightness_temperature]
-#          - name: ObsValue
-#            variables: [brightness_temperature]
-#          - name: MetaData
-#            variables: [dateTime, height_above_mean_sea_level, latitude, longitude, record_number,
-#                        scan_position, sensor_azimuth_angle, sensor_view_angle, sensor_zenith_angle,
-#                        solar_azimuth_angle, solar_zenith_angle]
-
-
-
-  # Transforms
+  # Undertake transforms of variables
+  # ---------------------------------
   transforms:
 
     - transform: arithmetic
-      arithmetic type: subtraction
-      collections: [reference]
-      variables: [air_temperature-*, eastward_wind-*]
-      new variable name: $(variable)-ObsValue-hofx
-      arithmetic variables: [$(collection)::$(variable)-ObsValue, $(collection)::$(variable)-GsiHofXBc]
+      optional looping:
+        collections: [reference]
+        groups: [GsiHofXBc]
+        variables: [brightness_temperature]
+      new collection name: reference
+      new group name: ObsValueMinusGsiHofXBc
+      new variable name: brightness_temperature
+      expression: experiment::ObsValue::${variable}-reference::GsiHofXBc::${variable}
 
     - transform: arithmetic
-      arithmetic type: subtraction
-      collections: [experiment]
-      variables: [air_temperature-*, eastward_wind-*]
-      new variable name: $(variable)-ObsValue-hofx
-      arithmetic variables: [$(collection)::$(variable)-ObsValue, $(collection)::$(variable)-hofx]
+      optional looping:
+        variables: [brightness_temperature]
+      new collection name: experiment
+      new group name: ObsValueMinusHofx
+      new variable name: ${variable}
+      expression: experiment::ObsValue::${variable}-experiment::hofx::${variable}
 
-    - transform: accept or reject where
-      collections: [reference, experiment]
-      variables: [air_temperature, eastward_wind]
-      new variable name: $(variable)-passed
+    - transform: accept where
+      data to filter:
+        collections: [experiment]
+        groups: [hofx]
+        variables: [brightness_temperature]
+      new names:
+        collection: ${collection}
+        group: HofxPassedQc
+        variable: ${variable}
       where:
-        - variables: [$(collection)::$(variable)-EffectiveQC]
-          accept or reject: accept
-          min value: 0
-          max value: 0
+        - experiment::EffectiveQC::${variable} == 0
 
-  # Not working yet
+
+  # Figure and plot creation
+  # ------------------------
   graphics:
     - batch figure: false
       figure:
         layout: [1,1]
-        title: 'Super Title'
+        title: 'AMSUA NOAA19 Channel 5 Brightness Temperature'
+        output name: amsua_n19-channel5_brightness_temperature.png
       plots:
         - add_title: 'Scatter'
-          set_xlim: [-1,6]
-          set_ylim: [-1,6]
-          add_xlabel: 'My X Label'
-          add_ylabel: 'My Y Label'
+          add_xlabel: 'Observation Value'
+          add_ylabel: 'H(x)'
           add_grid:
           add_legend:
             loc: 'upper left'
           layers:
           - type: Scatter
             comparison:
-             - dummy::x
-             - dummy::y
-            markersize: 50
-            color: 'red'
-            label: 'Big dots'
+             - experiment::ObsValue::brightness_temperature
+             - experiment::hofx::brightness_temperature
+            channel: 5
+            markersize: 5
+            color: 'black'
+            label: 'H(x) versus ObsValue'
           - type: Scatter
             comparison:
-             - dummy::x
-             - dummy::y
+             - experiment::ObsValue::brightness_temperature
+             - experiment::HofxPassedQc::brightness_temperature
+            channel: 5
             markersize: 5
-            label: 'Smaller dots'
+            color: 'red'
+            label: 'H(x) versus ObsValue (Passed QC)'
