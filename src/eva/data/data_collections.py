@@ -150,7 +150,7 @@ class DataCollections:
             # Assert that the collection name does not contain disallowed characters
             if not string_does_not_contain(disallowed_chars, collection_key):
                 self.logger.abort(f'Collection contains the key \'{collection_key}\', which ' +
-                                  f'contains a characeter that is not permitted ' +
+                                  f'contains a character that is not permitted ' +
                                   f'({disallowed_chars})')
 
             # Loop over the data variables
