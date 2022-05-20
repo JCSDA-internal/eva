@@ -40,6 +40,7 @@ def subset_channels(ds, channels, add_channels_variable=False):
 
 # --------------------------------------------------------------------------------------------------
 
+
 def check_nlocs(nlocs):
     if max(nlocs) == 0:
         new_nlocs = range(nlocs.size)
