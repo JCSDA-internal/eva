@@ -6,6 +6,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'Super Title'
+        output name: 'myfig.png'
       plots:
         - add_title: 'Scatter'
           set_xlim: [-1,6]
@@ -18,16 +19,16 @@ diagnostics:
           layers:
           - type: Scatter
             x:
-              variable: dummy::x
+              variable: dummy::dummy::x
             y:
-              variable: dummy::y
+              variable: dummy::dummy::y
             markersize: 50
             color: 'red'
             label: 'Big dots'
           - type: Scatter
             x:
-              variable: dummy::x
+              variable: dummy::dummy::x
             y:
-              variable: dummy::y
+              variable: dummy::dummy::y
             markersize: 5
             label: 'Smaller dots'

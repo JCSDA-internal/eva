@@ -10,7 +10,7 @@ class Dummy(EvaBase):
         y_dataArr = xr.DataArray([1, 2, 3, 4, 5])
 
         xy_dataSet = xr.Dataset()
-        xy_dataSet['x'] = x_dataArr
-        xy_dataSet['y'] = y_dataArr
+        xy_dataSet['dummy::x'] = x_dataArr
+        xy_dataSet['dummy::y'] = y_dataArr
 
         data_collections.create_or_add_to_collection('dummy', xy_dataSet)
