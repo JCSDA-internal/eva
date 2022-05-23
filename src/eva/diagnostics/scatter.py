@@ -36,11 +36,13 @@ class Scatter():
 
         # Remove NaN values to enable regression
         # --------------------------------------
-        xdata = xdata[~np.isnan(xdata)]
-        ydata = ydata[~np.isnan(xdata)]
+        mask = ~np.isnan(xdata)
+        xdata = xdata[mask]
+        ydata = ydata[mask]
 
-        xdata = xdata[~np.isnan(ydata)]
-        ydata = ydata[~np.isnan(ydata)]
+        mask = ~np.isnan(ydata)
+        xdata = xdata[mask]
+        ydata = ydata[mask]
 
         # Create declarative plotting Scatter object
         # ------------------------------------------
