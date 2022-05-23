@@ -41,6 +41,15 @@ def subset_channels(ds, channels, add_channels_variable=False):
 # --------------------------------------------------------------------------------------------------
 
 
+def check_nlocs(nlocs):
+    if max(nlocs) == 0:
+        new_nlocs = range(nlocs.size)
+        nlocs = new_nlocs + nlocs
+    return nlocs
+
+# --------------------------------------------------------------------------------------------------
+
+
 class IodaObsSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
@@ -74,6 +83,9 @@ class IodaObsSpace(EvaBase):
 
                 # Get file header
                 ds_header = xr.open_dataset(filename)
+
+                # fix nlocs if they are all zeros
+                ds_header['nlocs'] = check_nlocs(ds_header['nlocs'])
 
                 # Read header part of the file to get coordinates
                 ds_groups = xr.Dataset()
