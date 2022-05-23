@@ -84,17 +84,19 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::brightness_temperature
-             - experiment::hofx::brightness_temperature
+            x:
+              variable: experiment::ObsValue::brightness_temperature
+            y:
+              variable: experiment::hofx::brightness_temperature
             channel: 5
             markersize: 5
             color: 'black'
             label: 'H(x) versus ObsValue'
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::brightness_temperature
-             - experiment::HofxPassedQc::brightness_temperature
+            x:
+              variable: experiment::ObsValue::brightness_temperature
+            y:
+              variable: experiment::HofxPassedQc::brightness_temperature
             channel: 5
             markersize: 5
             color: 'red'

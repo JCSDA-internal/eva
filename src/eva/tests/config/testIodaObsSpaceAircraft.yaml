@@ -83,16 +83,18 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::air_temperature
-             - experiment::hofx::air_temperature
+            x:
+              variable: experiment::ObsValue::air_temperature
+            y:
+              variable: experiment::hofx::air_temperature
             markersize: 5
             color: 'black'
             label: 'H(x) versus ObsValue'
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::air_temperature
-             - experiment::HofxPassedQc::air_temperature
+            x:
+              variable: experiment::ObsValue::air_temperature
+            y:
+              variable: experiment::HofxPassedQc::air_temperature
             markersize: 5
             color: 'red'
             label: 'H(x) versus ObsValue (Passed QC)'
