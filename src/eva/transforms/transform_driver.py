@@ -10,11 +10,13 @@
 
 # --------------------------------------------------------------------------------------------------
 
+
 from eva.utilities.config import get
 from eva.eva_base import EvaBase
 
 import importlib
 import os
+
 
 # --------------------------------------------------------------------------------------------------
 
@@ -33,13 +35,19 @@ class TransformDriver(EvaBase):
             transform_type = get(transform, self.logger, 'transform')
 
             # Replace spaces with underscore
-            transform_type = transform_type.replace(" ", "_")
+            transform_type = transform_type.replace(' ', '_')
 
             # Instantiate the tranform object
-            transform_method = getattr(importlib.import_module("eva.transforms."+transform_type),
+            transform_method = getattr(importlib.import_module('eva.transforms.'+transform_type),
                                        transform_type)
 
             # Call the transform
             transform_method(transform, data_collections)
 
-        exit()
+        # Display the contents of the collections after updating with transforms
+        if transforms:
+            self.logger.info('Tranforms complete. Collections after transforms:')
+            data_collections.display_collections()
+
+
+# --------------------------------------------------------------------------------------------------

@@ -126,8 +126,7 @@ class FigureDriver(EvaBase):
         return out_conf
 
     def get_output_file(self, figure_conf):
-        file_type = figure_conf.get("figure file type", "png")
         file_path = figure_conf.get("output path", "./")
         output_name = figure_conf.get("output name", "")
-        output_file = os.path.join(file_path, f"{output_name}.{file_type}")
+        output_file = os.path.join(file_path, output_name)
         return output_file
