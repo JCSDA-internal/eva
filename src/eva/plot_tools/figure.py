@@ -229,17 +229,17 @@ class CreateFigure:
             s = ax.scatter(plotobj.x, plotobj.y, s=plotobj.markersize,
                            **inputs)
 
-#        # checks to see if linear regression attribute
-#        if hasattr(plotobj, 'linear_regression'):
-#            y_pred, r_sq, intercept, slope = get_linear_regression(plotobj.x,
-#                                                                   plotobj.y)
-#            label = f"y = {slope:.4f}x + {intercept:.4f}\nR\u00b2 : {r_sq:.4f}"
-#
-#            inputs = self._get_inputs_dict([], plotobj)
-#            if 'color' in plotobj.linear_regression and 'color' in inputs:
-#                plotobj.linear_regression['color'] = inputs['color']
-#            print('plotobj.linear_regression', plotobj.linear_regression)
-#            ax.plot(plotobj.x, y_pred, label=label, **plotobj.linear_regression)
+        # checks to see if linear regression attribute
+        if hasattr(plotobj, 'linear_regression'):
+            y_pred, r_sq, intercept, slope = get_linear_regression(plotobj.x,
+                                                                   plotobj.y)
+            label = f"y = {slope:.4f}x + {intercept:.4f}\nR\u00b2 : {r_sq:.4f}"
+
+            inputs = self._get_inputs_dict([], plotobj)
+            if 'color' in plotobj.linear_regression and 'color' in inputs:
+                plotobj.linear_regression['color'] = inputs['color']
+            print('plotobj.linear_regression', plotobj.linear_regression)
+            ax.plot(plotobj.x, y_pred, label=label, **plotobj.linear_regression)
 
     def _lineplot(self, plotobj, ax):
         """
