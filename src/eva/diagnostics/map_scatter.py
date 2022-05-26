@@ -8,11 +8,18 @@ class MapScatter():
 
     def __init__(self, config, logger, dataobj):
         # prepare data based on config
-        lonvar = dataobj.get_variable_data(config['longitude']['variable'])
+        # Optionally get the channel to plot
+        channel = None
+        if 'channel' in config['data']:
+            channel = config['data'].get('channel')
+        lonvar_cgv = config['longitude']['variable'].split('::')
+        lonvar = dataobj.get_variable_data(lonvar_cgv[0], lonvar_cgv[1], lonvar_cgv[2], channel)
         lonvar = slice_var_from_str(config['longitude'], lonvar, logger)
-        latvar = dataobj.get_variable_data(config['latitude']['variable'])
+        latvar_cgv = config['latitude']['variable'].split('::')
+        latvar = dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], channel)
         latvar = slice_var_from_str(config['latitude'], latvar, logger)
-        datavar = dataobj.get_variable_data(config['data']['variable'])
+        datavar_cgv = config['data']['variable'].split('::')
+        datavar = dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1], datavar_cgv[2], channel)
         datavar = slice_var_from_str(config['data'], datavar, logger)
         # create declarative plotting MapScatter object
         self.plotobj = eva.plot_tools.plots.MapScatter(lonvar, latvar, datavar)

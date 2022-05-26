@@ -101,3 +101,31 @@ diagnostics:
             markersize: 5
             color: 'red'
             label: 'H(x) versus ObsValue (Passed QC)'
+    - batch figure: false
+      figure:
+        layout: [1,1]
+        figure size: [12,8]
+        output name: amsua_n19-channel5_brightness_temperature_map.png
+        tight_layout: true
+      plots:
+        - add_title: 'Beautiful Map'
+          mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: 'H(x)'
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::hofx::brightness_temperature
+              channel: 5
+            markersize: 5
+            label: 'H(x)'
+            colorbar: true
+            cmap: 'bwr'

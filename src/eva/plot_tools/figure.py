@@ -60,7 +60,7 @@ class CreateFigure:
         for i, plot_obj in enumerate(self.plot_list):
 
             # check if object has projection and domain attributes to determine ax
-            if hasattr(plot_obj, 'projection') and hasattr(plot_obj, 'domain'):
+            if hasattr(plot_obj, 'projection'):
                 self.domain = Domain(plot_obj.domain)
                 self.projection = MapProjection(plot_obj.projection)
 
