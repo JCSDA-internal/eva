@@ -133,5 +133,8 @@ class IodaObsSpace(EvaBase):
                 # Add the dataset to the collections
                 data_collections.create_or_add_to_collection(collection_name, ds_groups, 'nlocs')
 
+        # Remove missing values
+        data_collections.remove_missing_values(1.0e10)
+
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()

@@ -36,15 +36,15 @@ class Scatter():
 
         # Remove NaN values to enable regression
         # --------------------------------------
-        xdata = xdata[~np.isnan(xdata)]
-        ydata = ydata[~np.isnan(xdata)]
+        xdata_nonan_x = xdata[~np.isnan(xdata)]
+        ydata_nonan_x = ydata[~np.isnan(xdata)]
 
-        xdata = xdata[~np.isnan(ydata)]
-        ydata = ydata[~np.isnan(ydata)]
+        xdata_nonan_y = xdata_nonan_x[~np.isnan(ydata_nonan_x)]
+        ydata_nonan_y = ydata_nonan_x[~np.isnan(ydata_nonan_x)]
 
         # Create declarative plotting Scatter object
         # ------------------------------------------
-        self.plotobj = eva.plot_tools.plots.Scatter(xdata, ydata)
+        self.plotobj = eva.plot_tools.plots.Scatter(xdata_nonan_y, ydata_nonan_y)
 
         # Get defaults from schema
         # ------------------------
