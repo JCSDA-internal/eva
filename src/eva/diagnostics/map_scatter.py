@@ -21,6 +21,10 @@ class MapScatter():
         datavar_cgv = config['data']['variable'].split('::')
         datavar = dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1], datavar_cgv[2], channel)
         datavar = slice_var_from_str(config['data'], datavar, logger)
+        # scatter data should be flattened
+        lonvar = lonvar.flatten()
+        latvar = latvar.flatten()
+        datavar = datavar.flatten()
         # create declarative plotting MapScatter object
         self.plotobj = eva.plot_tools.plots.MapScatter(latvar, lonvar, datavar)
         # get defaults from schema
