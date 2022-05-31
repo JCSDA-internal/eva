@@ -17,7 +17,6 @@ from eva.utilities.utils import parse_channel_list
 
 # --------------------------------------------------------------------------------------------------
 
-
 def subset_channels(ds, channels, add_channels_variable=False):
 
     if 'nchans' in list(ds.dims):
@@ -39,7 +38,6 @@ def subset_channels(ds, channels, add_channels_variable=False):
     return ds
 
 # --------------------------------------------------------------------------------------------------
-
 
 def check_nlocs(nlocs):
     if max(nlocs) == 0:
@@ -102,7 +100,7 @@ class IodaObsSpace(EvaBase):
 
                     # Group name and variables
                     group_name = get(group, self.logger, 'name')
-                    group_vars = get(group, self.logger, 'variables')
+                    group_vars = get(group, self.logger, 'variables', 'all')
 
                     # Set the collection name
                     collection_name = dataset['name']
@@ -110,8 +108,12 @@ class IodaObsSpace(EvaBase):
                     # Read the group
                     ds = xr.open_dataset(filename, group=group_name)
 
+                    # If user specifies all variables set to group list
+                    if group_vars == 'all':
+                        group_vars = list(ds.data_vars)
+
                     # Check that all user variables are in the dataset
-                    if not all(v in list(ds.keys()) for v in group_vars):
+                    if not all(v in list(ds.data_vars) for v in group_vars):
                         self.logger.abort('For collection \'' + dataset['name'] + '\', group \'' +
                                           group_name + '\' in file ' + filename +
                                           f' . Variables {group_vars} not all present in ' +
