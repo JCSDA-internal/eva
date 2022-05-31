@@ -62,7 +62,7 @@ class FigureDriver(EvaBase):
 
                 # Set some fake values to ensure the loops are entered
                 if variables == []:
-                    variables = ['none']
+                    self.logger.abort("Batch Figure must provide variables, even if with channels")
                 if channels == []:
                     channels = ['none']
 
@@ -70,14 +70,13 @@ class FigureDriver(EvaBase):
                 for variable in variables:
                     for channel in channels:
                         batch_conf_this = {}
-                        if variable != 'none':
-                            batch_conf_this['variable'] = variable
-                            # Version to be used in titles
-                            batch_conf_this['variable_title'] = variable.replace('_', ' ').title()
+                        batch_conf_this['variable'] = variable
+                        # Version to be used in titles
+                        batch_conf_this['variable_title'] = variable.replace('_', ' ').title()
                         if channel != 'none':
                             batch_conf_this['channel'] = channel
-                            # Version to be used in titles
-                            batch_conf_this['channel_title'] = 'Channel ' + str(channel)
+                            var_title = batch_conf_this['variable_title'] + ' Ch. ' + str(channel)
+                            batch_conf_this['variable_title'] = var_title
 
                         # Replace templated variables in figure and plots config
                         figure_conf_fill = copy.copy(figure_conf)

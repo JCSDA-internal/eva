@@ -227,7 +227,8 @@ class DataCollections:
                     max_string = 'Max=' + minmaxrms_format.format(np.nanmax(data_var_value))
                     rms_string = ''
                     if str(data_var_value.dtype) == 'float32':
-                        rms_string = 'RMS=' + minmaxrms_format.format(np.sqrt(np.nanmean(data_var_value**2)))
+                        rms = np.sqrt(np.nanmean(data_var_value**2))
+                        rms_string = 'RMS=' + minmaxrms_format.format(rms)
                     minmaxrms_string = ' | ' + min_string + ', ' + max_string + ', ' + rms_string
                 self.logger.info('  ' + data_var.ljust(max_name_len) + minmaxrms_string)
         self.logger.info('-'*100)

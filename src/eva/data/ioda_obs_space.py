@@ -17,6 +17,7 @@ from eva.utilities.utils import parse_channel_list
 
 # --------------------------------------------------------------------------------------------------
 
+
 def subset_channels(ds, channels, add_channels_variable=False):
 
     if 'nchans' in list(ds.dims):
@@ -37,13 +38,16 @@ def subset_channels(ds, channels, add_channels_variable=False):
 
     return ds
 
+
 # --------------------------------------------------------------------------------------------------
+
 
 def check_nlocs(nlocs):
     if max(nlocs) == 0:
         new_nlocs = range(nlocs.size)
         nlocs = new_nlocs + nlocs
     return nlocs
+
 
 # --------------------------------------------------------------------------------------------------
 

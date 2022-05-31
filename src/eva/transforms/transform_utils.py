@@ -16,29 +16,32 @@ from eva.utilities.utils import replace_vars_str
 
 # --------------------------------------------------------------------------------------------------
 
+
 def parse_for_dict(config, logger):
 
-      # Get the for dict (might not be provided so default to empty dict)
-      for_dict = get(config, logger, 'for', {})
+    # Get the for dict (might not be provided so default to empty dict)
+    for_dict = get(config, logger, 'for', {})
 
-      # List of allowable keys
-      allowable_keys = ['collection', 'group', 'variable']
+    # List of allowable keys
+    allowable_keys = ['collection', 'group', 'variable']
 
-      for key in for_dict.keys():
-          if key not in allowable_keys:
-              logger.abort(f'For dictionary contains the key \'{key}\', which is not permitted. ' +
-                           f'Allowable keys are: \'{allowable_keys}\'.')
+    for key in for_dict.keys():
+        if key not in allowable_keys:
+            logger.abort(f'For dictionary contains the key \'{key}\', which is not permitted. ' +
+                         f'Allowable keys are: \'{allowable_keys}\'.')
 
-      # Parse the for loop dictionary
-      cgv = []
-      cgv.append(get(for_dict, logger, 'collection', ['none']))
-      cgv.append(get(for_dict, logger, 'group', ['none']))
-      cgv.append(get(for_dict, logger, 'variable', ['none']))
+    # Parse the for loop dictionary
+    cgv = []
+    cgv.append(get(for_dict, logger, 'collection', ['none']))
+    cgv.append(get(for_dict, logger, 'group', ['none']))
+    cgv.append(get(for_dict, logger, 'variable', ['none']))
 
-      # Return list of collection group variable
-      return cgv
+    # Return list of collection group variable
+    return cgv
+
 
 # --------------------------------------------------------------------------------------------------
+
 
 def replace_cgv(logger, collection, group, variable, *argv):
 
@@ -68,12 +71,14 @@ def replace_cgv(logger, collection, group, variable, *argv):
         parse_chars = r'${}'
         if any(parse_char in replaced for parse_char in parse_chars):
             logger.abort(f'The expression \'{replaced}\' contains some special '
-                          f'characters ({parse_chars}) that should have been resolved.')
+                         f'characters ({parse_chars}) that should have been resolved.')
 
     # Return the arguments with replaced values
     return arg_replaced
 
+
 # --------------------------------------------------------------------------------------------------
+
 
 def split_collectiongroupvariable(logger, collectiongroupvariable):
 
@@ -87,5 +92,6 @@ def split_collectiongroupvariable(logger, collectiongroupvariable):
 
     # Return list containing three components
     return cgv
+
 
 # --------------------------------------------------------------------------------------------------
