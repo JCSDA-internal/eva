@@ -24,8 +24,10 @@ def ioda_platform_dict():
       "atms_npp": "ATMS NPP",
       "avhrr3_metop-a": "AVHRR3 METOP-A",
       "avhrr3_n18": "AVHRR3 NOAA-18",
+      "avhrr3_n19": "AVHRR3 NOAA-19",
       "cris-fsr_n20": "CRIS FSR NOAA-20",
       "cris-fsr_npp": "CRIS FSR NPP",
+      "gmi_gpm": "GMI GPM",
       "gnssrobndnbam": "GNSSRO",
       "iasi_metop-a": "IASI METOP-A",
       "iasi_metop-b": "IASI METOP-B",
@@ -79,7 +81,8 @@ def ioda_platform_to_full_name(ioda_platform, logger):
     try:
         ioda_platform_out = ioda_platform_dictionary[ioda_platform]
     except Exception:
-        logger.abort('\''+ioda_platform+'\' is not in the ioda platform dictionary')
+        ioda_platform_out = ioda_platform
+        logger.info('\''+ioda_platform+'\' is not in the ioda platform dictionary')
 
     return ioda_platform_out
 
