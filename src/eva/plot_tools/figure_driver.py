@@ -73,9 +73,10 @@ class FigureDriver(EvaBase):
                         batch_conf_this['variable'] = variable
                         # Version to be used in titles
                         batch_conf_this['variable_title'] = variable.replace('_', ' ').title()
-                        if channel != 'none':
-                            batch_conf_this['channel'] = channel
-                            var_title = batch_conf_this['variable_title'] + ' Ch. ' + str(channel)
+                        channel_str = str(channel)
+                        if channel_str != 'none':
+                            batch_conf_this['channel'] = channel_str
+                            var_title = batch_conf_this['variable_title'] + ' Ch. ' + channel_str
                             batch_conf_this['variable_title'] = var_title
 
                         # Replace templated variables in figure and plots config
@@ -131,6 +132,8 @@ class FigureDriver(EvaBase):
             fig.add_suptitle(figure_conf['title'])
         saveargs = self.get_saveargs(figure_conf)
         fig.save_figure(output_file, **saveargs)
+
+        fig.close_figure()
 
     def get_saveargs(self, figure_conf):
         out_conf = figure_conf

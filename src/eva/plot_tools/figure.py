@@ -34,8 +34,19 @@ class CreateFigure:
         if path != '':
             os.makedirs(path, exist_ok=True)
 
+        # Remove deprecated option from dictionary
+        if 'output name' in kwargs:
+            del kwargs['output name']
+
         # Save figure
         self.fig.savefig(pathfile, **kwargs)
+
+    def close_figure(self):
+        """
+        Method to close figure
+        """
+        # Close figure
+        plt.close()
 
     def create_figure(self):
         """
@@ -238,7 +249,6 @@ class CreateFigure:
             inputs = self._get_inputs_dict([], plotobj)
             if 'color' in plotobj.linear_regression and 'color' in inputs:
                 plotobj.linear_regression['color'] = inputs['color']
-            print('plotobj.linear_regression', plotobj.linear_regression)
             ax.plot(plotobj.x, y_pred, label=label, **plotobj.linear_regression)
 
     def _lineplot(self, plotobj, ax):

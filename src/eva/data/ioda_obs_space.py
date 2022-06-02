@@ -110,7 +110,8 @@ class IodaObsSpace(EvaBase):
                     collection_name = dataset['name']
 
                     # Read the group
-                    ds = xr.open_dataset(filename, group=group_name)
+                    ds = xr.open_dataset(filename, group=group_name, mask_and_scale=False,
+                                         decode_times=False)
 
                     # If user specifies all variables set to group list
                     if group_vars == 'all':
