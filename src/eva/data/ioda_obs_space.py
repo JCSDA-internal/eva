@@ -110,7 +110,8 @@ class IodaObsSpace(EvaBase):
                     collection_name = dataset['name']
 
                     # Read the group
-                    ds = xr.open_dataset(filename, group=group_name, decode_times=False)
+                    ds = xr.open_dataset(filename, group=group_name, mask_and_scale=False,
+                                         decode_times=False)
 
                     # If user specifies all variables set to group list
                     if group_vars == 'all':
@@ -151,8 +152,8 @@ class IodaObsSpace(EvaBase):
                 # Add the dataset to the collections
                 data_collections.create_or_add_to_collection(collection_name, ds_groups, 'nlocs')
 
-        # Remove missing values
-        data_collections.remove_missing_values(1.0e10)
+        # Nan out unphysical values
+        data_collections.nan_float_values_outside_threshold(1.0e10)
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()

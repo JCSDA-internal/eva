@@ -181,16 +181,38 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
-    def remove_missing_values(self, threshold):
+    def nan_float_values_outside_threshold(self, threshold, cgv_to_screen=None):
 
-        for collection in self._collections.keys():
+        # Set the collection, group and variables
+        # ---------------------------------------
+        if cgv_to_screen is None:
+            collections = self._collections.keys()
+        else:
+            cgv = cgv_to_screen.split('::')
+            collections = [cgv[0]]
+            groups_variables = [cgv[1]+'::'+cgv[2]]
 
-            for data_var in list(self._collections[collection].data_vars):
+        # Loop over the collections
+        # ------------------------------
+        for collection in collections:
 
-                group_var = data_var.split('::')
-                data_var_value = self.get_variable_data(collection, group_var[0], group_var[1])
+            # Set the variables to screen
+            # ---------------------------
+            if cgv_to_screen is None:
+                groups_variables = list(self._collections[collection].data_vars)
 
-                if str(data_var_value.dtype) == 'float32':
+            # Loop over the variables and set to nan outside of threshold
+            # -----------------------------------------------------------
+            for group_variable in groups_variables:
+
+                # Split name into group and variable
+                [group, variable] = group_variable.split('::')
+
+                # Get the data
+                data_var_value = self.get_variable_data(collection, group, variable)
+
+                # For float data sceen outside threshold
+                if 'float' in str(data_var_value.dtype):
                     data_var_value[np.abs(data_var_value) > threshold] = np.nan
 
     # ----------------------------------------------------------------------------------------------
@@ -230,7 +252,8 @@ class DataCollections:
                         rms = np.sqrt(np.nanmean(data_var_value**2))
                         rms_string = 'RMS=' + minmaxrms_format.format(rms)
                     minmaxrms_string = ' | ' + min_string + ', ' + max_string + ', ' + rms_string
-                self.logger.info('  ' + data_var.ljust(max_name_len) + minmaxrms_string)
+                self.logger.info('  ' + data_var.ljust(max_name_len) + ' (' +
+                                 str(data_var_value.dtype).ljust(7) + ')' + minmaxrms_string)
         self.logger.info('-'*100)
 
     # ----------------------------------------------------------------------------------------------
