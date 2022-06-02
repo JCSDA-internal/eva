@@ -219,12 +219,13 @@ class DataCollections:
 
     def display_collections(self):
 
-        minmaxrms_format_dict = {}
-        minmaxrms_format_dict['float32'] = '{:+.4e}'
-        minmaxrms_format_dict['int32'] = '{:+11d}'
+        minmaxrms_format_dict = {
+            'float32': '{:+.4e}',
+            'int32': '{:+11d}',
+        }
 
         # Display a list of variables that are available in the collection
-        self.logger.info('-'*100)
+        self.logger.info('-'*80)
         self.logger.info(fcol.bold + 'Collections available: ' + fcol.end)
         for collection in self._collections.keys():
             self.logger.info('')
@@ -254,6 +255,6 @@ class DataCollections:
                     minmaxrms_string = ' | ' + min_string + ', ' + max_string + ', ' + rms_string
                 self.logger.info('  ' + data_var.ljust(max_name_len) + ' (' +
                                  str(data_var_value.dtype).ljust(7) + ')' + minmaxrms_string)
-        self.logger.info('-'*100)
+        self.logger.info('-'*80)
 
     # ----------------------------------------------------------------------------------------------
