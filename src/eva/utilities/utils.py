@@ -137,6 +137,11 @@ def update_object(myObj, configDict, logger=None):
 
 def parse_channel_list(channels_str_or_list, logger):
 
+    # If the input is an empty list return an empty list
+    if channels_str_or_list is []:
+        channel_list = []
+        return channel_list
+
     # Check if the input is already a list
     if isinstance(channels_str_or_list, list):
 
@@ -171,7 +176,7 @@ def parse_channel_list(channels_str_or_list, logger):
 # --------------------------------------------------------------------------------------------------
 
 
-def replace_vars(s, **defs):
+def replace_vars_str(s, **defs):
     """Interpolate/replace variables in string
 
     Resolved variable formats is: ${var}. Undefined
@@ -204,9 +209,44 @@ def replace_vars(s, **defs):
 
     # Recurse until no substitutions remain
     if s_interp != s:
-        s_interp = replace_vars(s_interp, **defs)
+        s_interp = replace_vars_str(s_interp, **defs)
 
     return s_interp
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def replace_vars_dict(d, **defs):
+    """
+    At the highest level of the dictionary are definitions, such as swell_dir: /path/to/swell.
+    Elsewhere in the dictionary is use of these definitions, such as key: $(swell_dir)/some/file.ext
+    In this script variables like $(swell_dir) are replaced everywhere in the dictionary using the
+    definition.
+
+    Parameters
+    ----------
+    d : dictionary, required
+        Dictionary to be modified
+    defs: dictionary, required
+          Dictionary of definitions for resolving variables expressed as key-word arguments.
+
+    Returns
+    -------
+    d_interp: dictionary
+              Dictionary with any definitions resolved
+    """
+
+    # Convert dictionary to string representation in yaml form
+    d_string = yaml.dump(d)
+
+    # Replace the definitions everywhere in the dictionary
+    d_string = replace_vars_str(d_string, **defs)
+
+    # Convert back to dictionary
+    d_interp = yaml.safe_load(d_string)
+
+    return d_interp
 
 
 # --------------------------------------------------------------------------------------------------

@@ -13,8 +13,10 @@
 
 from eva.eva_base import EvaBase
 from eva.eva_path import return_eva_path
-from eva.utilities.utils import get_schema, camelcase_to_underscore
+from eva.utilities.utils import get_schema, camelcase_to_underscore, parse_channel_list
+from eva.utilities.utils import replace_vars_dict
 from eva.plot_tools.figure import CreatePlot, CreateFigure
+import copy
 import importlib
 import os
 
@@ -39,32 +41,55 @@ class FigureDriver(EvaBase):
 
             # Parse configuration for this graphic
             # -------------------
-
-            # batch_fig = True, loop through all data
-            # batch_fig = False, user must specify each plot/panel
-            batch_fig = graphic.get("batch figure", False)
-
-            # figure configuration
-            figure_conf = graphic.get("figure")
+            batch_conf = graphic.get("batch figure", {})  # batch configuration (default nothing)
+            figure_conf = graphic.get("figure")  # figure configuration
+            plots_conf = graphic.get("plots")  # list of plots/subplots
 
             # update figure conf based on schema
-            fig_schema = figure_conf.get("schema",
-                                         os.path.join(return_eva_path(),
-                                                      'defaults',
-                                                      'figure.yaml'))
+            # ----------------------------------
+            fig_schema = figure_conf.get('schema', os.path.join(return_eva_path(), 'defaults',
+                                         'figure.yaml'))
             figure_conf = get_schema(fig_schema, figure_conf, self.logger)
 
-            # list of plots/subplots
-            plots = graphic.get("plots")
-
             # pass configurations and make graphic(s)
-            # -------------------
-            if batch_fig:
-                # make batch figures for each variable
-                print('Nothing for now on batch_fig=True')
+            # ---------------------------------------
+            if batch_conf:
+                # Get potential variables
+                variables = batch_conf.get('variables', [])
+                # Get list of channels
+                channels_str_or_list = batch_conf.get('channels', [])
+                channels = parse_channel_list(channels_str_or_list, self.logger)
+
+                # Set some fake values to ensure the loops are entered
+                if variables == []:
+                    self.logger.abort("Batch Figure must provide variables, even if with channels")
+                if channels == []:
+                    channels = ['none']
+
+                # Loop over variables and channels
+                for variable in variables:
+                    for channel in channels:
+                        batch_conf_this = {}
+                        batch_conf_this['variable'] = variable
+                        # Version to be used in titles
+                        batch_conf_this['variable_title'] = variable.replace('_', ' ').title()
+                        channel_str = str(channel)
+                        if channel_str != 'none':
+                            batch_conf_this['channel'] = channel_str
+                            var_title = batch_conf_this['variable_title'] + ' Ch. ' + channel_str
+                            batch_conf_this['variable_title'] = var_title
+
+                        # Replace templated variables in figure and plots config
+                        figure_conf_fill = copy.copy(figure_conf)
+                        figure_conf_fill = replace_vars_dict(figure_conf_fill, **batch_conf_this)
+                        plots_conf_fill = copy.copy(plots_conf)
+                        plots_conf_fill = replace_vars_dict(plots_conf_fill, **batch_conf_this)
+
+                        # Make plot
+                        self.make_figure(figure_conf_fill, plots_conf_fill, data_collections)
             else:
                 # make just one figure per configuration
-                self.make_figure(figure_conf, plots, data_collections)
+                self.make_figure(figure_conf, plots_conf, data_collections)
 
     def make_figure(self, figure_conf, plots, data_collections):
 
@@ -107,6 +132,8 @@ class FigureDriver(EvaBase):
             fig.add_suptitle(figure_conf['title'])
         saveargs = self.get_saveargs(figure_conf)
         fig.save_figure(output_file, **saveargs)
+
+        fig.close_figure()
 
     def get_saveargs(self, figure_conf):
         out_conf = figure_conf

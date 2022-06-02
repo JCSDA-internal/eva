@@ -10,9 +10,10 @@
 # --------------------------------------------------------------------------------------------------
 
 
+from eva.transforms.transform_utils import parse_for_dict, split_collectiongroupvariable
+from eva.transforms.transform_utils import replace_cgv
 from eva.utilities.config import get
 from eva.utilities.logger import Logger
-from eva.utilities.utils import replace_vars
 
 
 # --------------------------------------------------------------------------------------------------
@@ -21,19 +22,14 @@ from eva.utilities.utils import replace_vars
 def accept_where(config, data_collections):
 
     # Create a logger
-    logger = Logger('RejectWhereTransform')
+    logger = Logger('AcceptWhereTransform')
 
-    # Parse the optional looping dictionary
-    data_to_filter = get(config, logger, 'data to filter')
-    collections = get(data_to_filter, logger, 'collections')
-    groups = get(data_to_filter, logger, 'groups')
-    variables = get(data_to_filter, logger, 'variables')
+    # Parse the for dictionary
+    [collections, groups, variables] = parse_for_dict(config, logger)
 
     # Parse config for the expression and new collection/group/variable naming
-    new_names = get(config, logger, 'new names')
-    new_collection_name_template = get(new_names, logger, 'collection')
-    new_group_name_template = get(new_names, logger, 'group')
-    new_variable_name_template = get(new_names, logger, 'variable')
+    new_name_template = get(config, logger, 'new name')
+    starting_field_template = get(config, logger, 'starting field')
 
     # Get the where dictionary
     wheres = get(config, logger, 'where')
@@ -43,54 +39,39 @@ def accept_where(config, data_collections):
         for group in groups:
             for variable in variables:
 
-                # Create dictionary with templates
-                tmplt_dict = {}
-                tmplt_dict['collection'] = collection
-                tmplt_dict['group'] = group
-                tmplt_dict['variable'] = variable
-
-                # Fill any templates
-                new_collection_name = replace_vars(new_collection_name_template, **tmplt_dict)
-                new_group_name = replace_vars(new_group_name_template, **tmplt_dict)
-                new_variable_name = replace_vars(new_variable_name_template, **tmplt_dict)
+                # Replace collection, group, variable in template
+                [new_name, starting_field] = replace_cgv(logger, collection, group, variable,
+                                                         new_name_template, starting_field_template)
 
                 # Get the variable to be adjusted
-                var_to_filter = data_collections.get_variable_data_array(collection, group,
-                                                                         variable)
+                cgv = split_collectiongroupvariable(logger, starting_field)
+                var_to_filter = data_collections.get_variable_data_array(cgv[0], cgv[1], cgv[2])
 
                 # Loop over wheres and create new variable with NaN where filtered
                 for where_expression in wheres:
 
-                    # Assertions on where expression
-                    where_exp_elems = where_expression.split(' ')
-                    if len(where_exp_elems) != 3:
-                        self.logger.abort(f'Where expression \'{where_expression}\' does not ' +
-                                          'have three space seperated elements. Should be of the ' +
-                                          'form \'variable condition value\', e.g. ' +
+                    # Split where into variable, condition and value
+                    try:
+                        [where_var, where_con, where_val] = where_expression.split(' ')
+                    except Exception:
+                        self.logger.abort(f'Failed to split \'{where_expression}\'. Check that ' +
+                                          'it has the correct format, e.g. ' +
                                           '\'${collection}::${group}::${variable} >= 0.0\'.')
-                    if '::' not in where_exp_elems[0]:
-                        self.logger.abort('The first element of the where expression ' +
-                                          f'\'{where_expression}\' does not contain \'::\'.' +
-                                          'Form should be: ${collection}::${group}::${variable}')
 
-                    # Replace templated aspects
-                    where_exp_elems[0] = replace_vars(where_exp_elems[0], **tmplt_dict)
-
-                    # Get collection, group and variable name
-                    where_exp_cgv = where_exp_elems[0].split('::')
+                    # Replace templated aspects in where statement
+                    [where_var] = replace_cgv(logger, collection, group, variable, where_var)
 
                     # Extract Dataarray for that variable
-                    where_var = data_collections.get_variable_data_array(where_exp_cgv[0],
-                                                                         where_exp_cgv[1],
-                                                                         where_exp_cgv[2])
+                    cgv = split_collectiongroupvariable(logger, where_var)
+                    where_var_dat = data_collections.get_variable_data_array(cgv[0], cgv[1], cgv[2])
 
                     # Perform evaluation to filter the variable
-                    where_string = 'where_var ' + where_exp_elems[1] + ' ' + where_exp_elems[2]
+                    where_string = 'where_var_dat ' + where_con + ' ' + where_val
                     var_to_filter = eval('var_to_filter.where(' + where_string + ')')
 
-                    # Add the variable to collection
-                data_collections.add_variable_to_collection(new_collection_name, new_group_name,
-                                                            new_variable_name, var_to_filter)
+                # Add the variable to collection
+                cgv = split_collectiongroupvariable(logger, new_name)
+                data_collections.add_variable_to_collection(cgv[0], cgv[1], cgv[2], var_to_filter)
 
 
 # --------------------------------------------------------------------------------------------------
