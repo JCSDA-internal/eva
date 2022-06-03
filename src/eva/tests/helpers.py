@@ -18,7 +18,7 @@ def load_yaml_file(yaml_file, logger):
     # to the install path of the eva package.
 
     if logger is None:
-        logger = Logger('EvaSetup')
+        logger = Logger('Test Helpers')
 
     try:
         loader = yaml.SafeLoader

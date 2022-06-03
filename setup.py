@@ -16,7 +16,7 @@ import setuptools
 
 setuptools.setup(
     name='eva',
-    version='0.0.0',
+    version='1.2.0',
     author='Community owned code',
     description='Evaluation and Verification of an Analysis',
     url='https://github.com/danholdaway/eva',
@@ -38,11 +38,13 @@ setuptools.setup(
         'matplotlib>=3.4.3',
         'cartopy==0.19.0.post1',
         'scikit-learn>=1.0.2',
+        'xarray>=0.11.3',
     ],
     package_data={
         '': [
                'tests/config/*',
                'tests/data/*',
+               'defaults/*.yaml'
              ],
     },
     entry_points={

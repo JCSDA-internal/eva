@@ -18,41 +18,10 @@ import yaml
 
 # local imports
 from eva.eva_path import return_eva_path
+from eva.utilities.config import Config
 from eva.utilities.logger import Logger
-from eva.utilities.utils import camelcase_to_underscore
-
-
-# --------------------------------------------------------------------------------------------------
-def load_yaml_file(eva_config, logger):
-    # utility function to help load a yaml file into a dict.
-
-    if logger is None:
-        logger = Logger('EvaSetup')
-
-    try:
-        with open(eva_config, 'r') as eva_config_opened:
-            eva_dict = yaml.safe_load(eva_config_opened)
-    except Exception as e:
-        logger.abort('Eva diagnostics is expecting a valid yaml file, but it encountered ' +
-                     f'errors when attempting to load: {eva_config}, error: {e}')
-
-    return eva_dict
-
-
-class Config(dict):
-
-    def __init__(self, dict_or_yaml):
-
-        logger = Logger('EvaSetup')
-
-        # Program can recieve a dictionary or a yaml file
-        if isinstance(dict_or_yaml, dict):
-            config = dict_or_yaml
-        else:
-            config = load_yaml_file(dict_or_yaml, logger)
-
-        # Initialize the parent class with the config
-        super().__init__(config)
+from eva.utilities.utils import camelcase_to_underscore, load_yaml_file
+from eva.data.data_collections import DataCollections
 
 
 # --------------------------------------------------------------------------------------------------
@@ -70,16 +39,20 @@ class EvaBase(ABC):
         else:
             self.logger = eva_logger
 
-        self.logger.info("  Initializing eva with the following parameters:")
-        self.logger.info("  Diagnostic:    " + eva_class_name)
-        self.logger.info(" ")
+        # Store name
+        # ----------
+        self.name = eva_class_name
+
+        # Write object initialization message
+        # -----------------------------------
+        self.logger.info(f"  Initializing eva {self.name} object")
 
         # Create a configuration object
         # -----------------------------
-        self.config = Config(config)
+        self.config = Config(config, self.logger)
 
     @abstractmethod
-    def execute(self):
+    def execute(self, data_collections):
         '''
         Each class must implement this method and it is where it will do all of its work.
         '''
@@ -91,7 +64,7 @@ class EvaBase(ABC):
 
 class EvaFactory():
 
-    def create_eva_object(self, eva_class_name, config, eva_logger):
+    def create_eva_object(self, eva_class_name, eva_group_name, config, eva_logger):
 
         # Create temporary logger
         logger = Logger('EvaFactory')
@@ -102,26 +75,30 @@ class EvaFactory():
 
         # Check user provided class name against valid tasks
         # --------------------------------------------------
-        # List of diagnostics in directory
-        valid_diagnostics = os.listdir(os.path.join(return_eva_path(), 'diagnostics'))
+        # List of modules in directory
+        valid_module = os.listdir(os.path.join(return_eva_path(), eva_group_name))
         # Remove files like __*
-        valid_diagnostics = [vd for vd in valid_diagnostics if '__' not in vd]
+        valid_module = [vm for vm in valid_module if '__' not in vm]
         # Remove trailing .py
-        valid_diagnostics = [vd.replace(".py", "") for vd in valid_diagnostics]
+        valid_module = [vm.replace(".py", "") for vm in valid_module]
         # Abort if not found
-        if (eva_module_name not in valid_diagnostics):
+        if (eva_module_name not in valid_module):
             logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
-                         'called ' + os.path.join(return_eva_path(), 'diagnostics', eva_module_name)
+                         'called ' + os.path.join(return_eva_path(),
+                                                  eva_group_name,
+                                                  eva_module_name)
                          + '.py but no such file was found.')
 
         # Import class based on user selected task
         # ----------------------------------------
         try:
-            eva_class = getattr(importlib.import_module("eva.diagnostics."+eva_module_name),
+            eva_class = getattr(importlib.import_module("eva."+eva_group_name+"."+eva_module_name),
                                 eva_class_name)
         except Exception as e:
             logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
-                         'called ' + os.path.join(return_eva_path(), 'diagnostics', eva_module_name)
+                         'called ' + os.path.join(return_eva_path(),
+                                                  eva_group_name,
+                                                  eva_module_name)
                          + '.py but no such class was found or an error occurred.')
 
         # Return implementation of the class (calls base class constructor that is above)
@@ -136,6 +113,8 @@ def eva(eva_config, eva_logger=None):
 
     # Create temporary logger
     logger = Logger('EvaSetup')
+
+    logger.info('Starting Eva')
 
     # Convert incoming config (either dictionary or file) to dictionary
     if isinstance(eva_config, dict):
@@ -157,20 +136,52 @@ def eva(eva_config, eva_logger=None):
     # Loop over the applications and run
     for diagnostic_config in diagnostic_configs:
 
-        # Extract name for this diagnostic
-        try:
-            eva_class_name = diagnostic_config['diagnostic name']
-        except Exception as e:
-            msg = '\'diagnostic name\' key not found. \'diagnostic_config\': ' \
-                  f'{diagnostic_config}, error: {e}'
+        # Each diagnostic should have two dictionaries: data and graphics
+        if not all(sub_config in diagnostic_config for sub_config in ['data', 'graphics']):
+            msg = "diagnostic config must contain 'data' and 'graphics'"
             raise KeyError(msg)
 
-        # Create the diagnostic object
-        creator = EvaFactory()
-        eva_object = creator.create_eva_object(eva_class_name, diagnostic_config, eva_logger)
+        # Extract name for this diagnostic data type
+        try:
+            eva_data_class_name = diagnostic_config['data']['type']
+        except Exception as e:
+            msg = '\'type\' key not found. \'diagnostic_data_config\': ' \
+                  f'{diagnostic_data_config}, error: {e}'
+            raise KeyError(msg)
 
-        # Run the diagnostic
-        eva_object.execute()
+        # Create the data collections
+        # ---------------------------
+        data_collections = DataCollections()
+
+        # Create the data object
+        creator = EvaFactory()
+        eva_data_object = creator.create_eva_object(eva_data_class_name,
+                                                    'data',
+                                                    diagnostic_config['data'],
+                                                    eva_logger)
+
+        # Prepare diagnostic data
+        logger.info(f'Running execute for {eva_data_object.name}')
+        eva_data_object.execute(data_collections)
+
+        # Create the transforms
+        if 'transforms' in diagnostic_config:
+            eva_transform_object = creator.create_eva_object('TransformDriver',
+                                                             'transforms',
+                                                             diagnostic_config,
+                                                             eva_logger)
+            logger.info(f'Running execute for {eva_transform_object.name}')
+            eva_transform_object.execute(data_collections)
+
+        # Create the figure object
+        eva_figure_object = creator.create_eva_object('FigureDriver',
+                                                      'plot_tools',
+                                                      diagnostic_config,
+                                                      eva_logger)
+
+        # Generate figure(s)
+        logger.info(f'Running execute for {eva_figure_object.name}')
+        eva_figure_object.execute(data_collections)
 
 
 # --------------------------------------------------------------------------------------------------

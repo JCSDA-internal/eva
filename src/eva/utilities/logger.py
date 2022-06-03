@@ -18,6 +18,14 @@ import sys
 #
 # --------------------------------------------------------------------------------------------------
 
+
+def prepend(prepend_string, text):
+    return "X: " + text.replace("\n", "\nX: ")
+
+
+# --------------------------------------------------------------------------------------------------
+
+
 class Logger:
 
     def __init__(self, task_name):
@@ -44,7 +52,9 @@ class Logger:
     def send_message(self, level, message):
 
         if level.upper() == 'ABORT' or self.loggerdict[level]:
-            print(level+' '+self.task_name+': '+message)
+            prepend = level+' '+self.task_name+': '
+            message = prepend + message.replace('\n', '\n'+prepend)
+            print(message)
 
     # ----------------------------------------------------------------------------------------------
 

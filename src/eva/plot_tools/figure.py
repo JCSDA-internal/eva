@@ -1,4 +1,5 @@
 # This work developed by NOAA/NWS/EMC under the Apache 2.0 license.
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -24,11 +25,28 @@ class CreateFigure:
         self.sharey = sharey
         self.plot_list = []
 
-    def save_figure(self, filepath, **kwargs):
+    def save_figure(self, pathfile, **kwargs):
         """
         Method to save figure to file
         """
-        self.fig.savefig(filepath, **kwargs)
+        # Create directory if needed
+        path, file = os.path.split(pathfile)
+        if path != '':
+            os.makedirs(path, exist_ok=True)
+
+        # Remove deprecated option from dictionary
+        if 'output name' in kwargs:
+            del kwargs['output name']
+
+        # Save figure
+        self.fig.savefig(pathfile, **kwargs)
+
+    def close_figure(self):
+        """
+        Method to close figure
+        """
+        # Close figure
+        plt.close()
 
     def create_figure(self):
         """
@@ -92,8 +110,6 @@ class CreateFigure:
                 self._sharex(ax)
             if self.sharey:
                 self._sharey(ax)
-
-        gs.tight_layout(self.fig)
 
     def add_suptitle(self, text, **kwargs):
         """
@@ -219,9 +235,8 @@ class CreateFigure:
         else:
             skipvars = ['plottype', 'plot_ax', 'x', 'y',
                         'markersize', 'linear_regression',
-                        'density']
+                        'density', 'channel']
             inputs = self._get_inputs_dict(skipvars, plotobj)
-
             s = ax.scatter(plotobj.x, plotobj.y, s=plotobj.markersize,
                            **inputs)
 
@@ -230,7 +245,11 @@ class CreateFigure:
             y_pred, r_sq, intercept, slope = get_linear_regression(plotobj.x,
                                                                    plotobj.y)
             label = f"y = {slope:.4f}x + {intercept:.4f}\nR\u00b2 : {r_sq:.4f}"
-            ax.plot(plotobj.x, y_pred, **plotobj.linear_regression)
+
+            inputs = self._get_inputs_dict([], plotobj)
+            if 'color' in plotobj.linear_regression and 'color' in inputs:
+                plotobj.linear_regression['color'] = inputs['color']
+            ax.plot(plotobj.x, y_pred, label=label, **plotobj.linear_regression)
 
     def _lineplot(self, plotobj, ax):
         """
