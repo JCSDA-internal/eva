@@ -291,8 +291,8 @@ def slice_var_from_str(config, datavar, logger):
         try:
             datavar = eval("datavar"+config['slices'])
         except IndexError:
-            logger.send_message('ABORT', f"IndexError: {config['variable']}" +\
-                                         f" has dimensions {datavar.shape}" +\
+            logger.send_message('ABORT', f"IndexError: {config['variable']}" +
+                                         f" has dimensions {datavar.shape}" +
                                          f" and input slices string is {config['slices']}")
     return datavar
 

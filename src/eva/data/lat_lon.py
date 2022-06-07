@@ -27,7 +27,7 @@ class LatLon(EvaBase):
 
             if group not in valid_groups:
                 self.logger.abort('For collection \'' + dataset['name'] + '\'' +
-                                  f' group \'{group}\' is not a valid group type for LatLon.'+
+                                  f' group \'{group}\' is not a valid group type for LatLon.' +
                                   f' The valid types are {valid_groups}')
 
             # open the input netCDF file
@@ -58,5 +58,3 @@ class LatLon(EvaBase):
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
-
-
