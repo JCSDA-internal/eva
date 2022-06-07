@@ -222,30 +222,16 @@ diagnostics:
 
     - batch figure:
         variables:
-        - water_area_fraction
-        - land_area_fraction
-        - water_area_fraction
-        - land_area_fraction
-        - ice_area_fraction
-        - surface_snow_area_fraction
-        - surface_temperature_where_sea
-        - surface_temperature_where_land
-        - surface_temperature_where_ice
-        - surface_temperature_where_snow
-        - vegetation_area_fraction
-        - leaf_area_index
-        - volume_fraction_of_condensed_water_in_soil
-        - soil_temperature
-        - surface_snow_thickness
-        - vegetation_type_index
-        - soil_type
-        - mole_fraction_of_carbon_dioxide_in_air
-        - surface_wind_speed
-        - surface_wind_from_direction
         - average_surface_temperature_within_field_of_view
+        - soil_type
+        - surface_temperature_where_ice
+        - surface_temperature_where_land
+        - surface_temperature_where_sea
+        - surface_temperature_where_snow
+        - vegetation_type_index
       figure:
-        layout: [1,2]
-        figure size: [12,20]
+        layout: [2,1]
+        figure size: [40,24]
         output name: surface_geovals/gsi_vs_jedi_map_amsua_n19_${variable}.png
         tight_layout: true
       plots:
@@ -265,10 +251,10 @@ diagnostics:
               variable: experiment::MetaData::latitude
             data:
               variable: experiment::GsiGeoVaLs::${variable}
-            markersize: 5
+            markersize: 2
             label: '$(variable)'
             colorbar: true
-            cmap: 'bwr'
+            cmap: 'viridis'
         - add_title: 'JEDI GeoVaLs ${variable}'
           mapping:
             projection: plcarr
@@ -285,7 +271,67 @@ diagnostics:
               variable: experiment::MetaData::latitude
             data:
               variable: experiment::GeoVaLs::${variable}
-            markersize: 5
+            markersize: 2
             label: '${variable}'
             colorbar: true
-            cmap: 'bwr'
+            cmap: 'viridis'
+
+    - batch figure:
+        variables:
+        - ice_area_fraction
+        - land_area_fraction
+        - leaf_area_index
+        - soil_temperature
+        - surface_snow_area_fraction
+        - surface_snow_thickness
+        - surface_wind_from_direction
+        - surface_wind_speed
+        - vegetation_area_fraction
+        - volume_fraction_of_condensed_water_in_soil
+        - water_area_fraction
+      figure:
+        layout: [2,1]
+        figure size: [40,24]
+        output name: surface_geovals/gsi_vs_jedi_map_amsua_n19_${variable}.png
+        tight_layout: true
+      plots:
+        - add_title: 'GSI GeoVaLs ${variable}'
+          mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::GsiGeoVaLs::${variable}
+            markersize: 2
+            label: '$(variable)'
+            colorbar: true
+            cmap: 'YlGn'
+        - add_title: 'JEDI GeoVaLs ${variable}'
+          mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::GeoVaLs::${variable}
+            markersize: 2
+            label: '${variable}'
+            colorbar: true
+            cmap: 'YlGn'
