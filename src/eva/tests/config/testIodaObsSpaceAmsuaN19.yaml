@@ -8,7 +8,7 @@ diagnostics:
     datasets:
       - name: experiment
         filenames:
-          - 2020-12-15T00:00:00Z/x0044-jedi.amsua_n19.2020-12-14T21:00:00Z.nc4
+          - 2020-12-15T00:00:00Z/ncdiag.exp.ob.PT6H.amsua_n19.2020-12-14T21:00:00Z.nc4
         channels: &channels 1-15
         groups:
           - name: ObsValue
@@ -18,6 +18,8 @@ diagnostics:
           - name: hofx
           - name: EffectiveQC
           - name: MetaData
+          - name: GsiGeoVaLs
+          - name: GeoVaLs
 
   transforms:
 
@@ -90,17 +92,19 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::${variable}
-             - experiment::hofx::${variable}
+            x:
+              variable: experiment::ObsValue::${variable}
+            y:
+              variable: experiment::hofx::${variable}
             channel: ${channel}
             markersize: 5
             color: 'black'
             label: 'JEDI h(x) versus obs (all obs)'
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::${variable}
-             - experiment::hofxPassedQc::${variable}
+            x:
+              variable: experiment::ObsValue::${variable}
+            y:
+              variable: experiment::hofxPassedQc::${variable}
             channel: ${channel}
             markersize: 5
             color: 'red'
@@ -123,17 +127,19 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::${variable}
-             - experiment::GsiHofXBc::${variable}
+            x:
+              variable: experiment::ObsValue::${variable}
+            y:
+              variable: experiment::GsiHofXBc::${variable}
             channel: ${channel}
             markersize: 5
             color: 'black'
             label: 'GSI h(x) versus obs (all obs)'
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::${variable}
-             - experiment::GsiHofXBcPassedQc::${variable}
+            x:
+              variable: experiment::ObsValue::${variable}
+            y:
+              variable: experiment::GsiHofXBcPassedQc::${variable}
             channel: ${channel}
             markersize: 5
             color: 'red'
@@ -157,17 +163,19 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::GsiHofXBc::${variable}
-             - experiment::hofx::${variable}
+            x:
+              variable: experiment::GsiHofXBc::${variable}
+            y:
+              variable: experiment::hofx::${variable}
             channel: ${channel}
             markersize: 5
             color: 'black'
             label: 'JEDI h(x) versus GSI h(x)'
           - type: Scatter
-            comparison:
-             - experiment::GsiHofXBcPassedQc::${variable}
-             - experiment::hofxPassedQc::${variable}
+            x:
+              variable: experiment::GsiHofXBcPassedQc::${variable}
+            y:
+              variable: experiment::hofxPassedQc::${variable}
             channel: ${channel}
             markersize: 5
             color: 'red'
@@ -191,17 +199,19 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::ObsValueMinusGsiHofXBc::${variable}
-             - experiment::ObsValueMinusHofx::${variable}
+            x:
+              variable: experiment::ObsValueMinusGsiHofXBc::${variable}
+            y:
+              variable: experiment::ObsValueMinusHofx::${variable}
             channel: ${channel}
             markersize: 5
             color: 'black'
             label: 'GSI omb vs JEDI omb (all obs)'
           - type: Scatter
-            comparison:
-             - experiment::ObsValueMinusGsiHofXBcPassedQc::${variable}
-             - experiment::ObsValueMinushofxPassedQc::${variable}
+            x:
+              variable: experiment::ObsValueMinusGsiHofXBcPassedQc::${variable}
+            y:
+              variable: experiment::ObsValueMinushofxPassedQc::${variable}
             channel: ${channel}
             markersize: 5
             color: 'red'
@@ -210,20 +220,42 @@ diagnostics:
     # Map plot
     # --------
 
-    - batch figure: false
+    - batch figure:
+        variables:
+        - water_area_fraction
+        - land_area_fraction
+        - water_area_fraction
+        - land_area_fraction
+        - ice_area_fraction
+        - surface_snow_area_fraction
+        - surface_temperature_where_sea
+        - surface_temperature_where_land
+        - surface_temperature_where_ice
+        - surface_temperature_where_snow
+        - vegetation_area_fraction
+        - leaf_area_index
+        - volume_fraction_of_condensed_water_in_soil
+        - soil_temperature
+        - surface_snow_thickness
+        - vegetation_type_index
+        - soil_type
+        - mole_fraction_of_carbon_dioxide_in_air
+        - surface_wind_speed
+        - surface_wind_from_direction
+        - average_surface_temperature_within_field_of_view
       figure:
-        layout: [1,1]
-        figure size: [12,8]
-        output name: amsua_n19-channel5_brightness_temperature_map.png
+        layout: [1,2]
+        figure size: [12,20]
+        output name: surface_geovals/gsi_vs_jedi_map_amsua_n19_${variable}.png
         tight_layout: true
       plots:
-        - add_title: 'Beautiful Map'
+        - add_title: 'GSI GeoVaLs ${variable}'
           mapping:
             projection: plcarr
             domain: global
           add_map_features: ['coastline']
           add_colorbar:
-            label: 'H(x)'
+            label: '${variable}'
           add_grid:
           layers:
           - type: MapScatter
@@ -232,9 +264,28 @@ diagnostics:
             latitude:
               variable: experiment::MetaData::latitude
             data:
-              variable: experiment::hofx::brightness_temperature
-              channel: 5
+              variable: experiment::GsiGeoVaLs::${variable}
             markersize: 5
-            label: 'H(x)'
+            label: '$(variable)'
+            colorbar: true
+            cmap: 'bwr'
+        - add_title: 'JEDI GeoVaLs ${variable}'
+          mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::GeoVaLs::${variable}
+            markersize: 5
+            label: '${variable}'
             colorbar: true
             cmap: 'bwr'

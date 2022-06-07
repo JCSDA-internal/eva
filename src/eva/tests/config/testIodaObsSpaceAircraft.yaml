@@ -87,16 +87,18 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::${variable}
-             - experiment::hofx::${variable}
+            x:
+              variable: experiment::ObsValue::${variable}
+            y:
+              variable: experiment::hofx::${variable}
             markersize: 5
             color: 'black'
             label: 'JEDI h(x) versus obs (all obs)'
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::${variable}
-             - experiment::hofxPassedQc::${variable}
+            x:
+              variable: experiment::ObsValue::${variable}
+            y:
+              variable: experiment::hofxPassedQc::${variable}
             markersize: 5
             color: 'red'
             label: 'JEDI h(x) versus obs (passed QC in JEDI)'
@@ -117,16 +119,18 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::${variable}
-             - experiment::GsiHofXBc::${variable}
+            x:
+              variable: experiment::ObsValue::${variable}
+            y:
+              variable: experiment::GsiHofXBc::${variable}
             markersize: 5
             color: 'black'
             label: 'GSI h(x) versus obs (all obs)'
           - type: Scatter
-            comparison:
-             - experiment::ObsValue::${variable}
-             - experiment::GsiHofXBcPassedQc::${variable}
+            x:
+              variable: experiment::ObsValue::${variable}
+            y:
+              variable: experiment::GsiHofXBcPassedQc::${variable}
             markersize: 5
             color: 'red'
             label: 'GSI h(x) versus obs (passed QC in JEDI)'
@@ -148,16 +152,18 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::GsiHofXBc::${variable}
-             - experiment::hofx::${variable}
+            x:
+              variable: experiment::GsiHofXBc::${variable}
+            y:
+              variable: experiment::hofx::${variable}
             markersize: 5
             color: 'black'
             label: 'JEDI h(x) versus GSI h(x)'
           - type: Scatter
-            comparison:
-             - experiment::GsiHofXBcPassedQc::${variable}
-             - experiment::hofxPassedQc::${variable}
+            x:
+              variable: experiment::GsiHofXBcPassedQc::${variable}
+            y:
+              variable: experiment::hofxPassedQc::${variable}
             markersize: 5
             color: 'red'
             label: 'JEDI h(x) versus GSI h(x) (passed QC in JEDI)'
@@ -179,16 +185,18 @@ diagnostics:
             loc: 'upper left'
           layers:
           - type: Scatter
-            comparison:
-             - experiment::ObsValueMinusGsiHofXBc::${variable}
-             - experiment::ObsValueMinusHofx::${variable}
+            x:
+              variable: experiment::ObsValueMinusGsiHofXBc::${variable}
+            y:
+              variable: experiment::ObsValueMinusHofx::${variable}
             markersize: 5
             color: 'black'
             label: 'GSI omb vs JEDI omb (all obs)'
           - type: Scatter
-            comparison:
-             - experiment::ObsValueMinusGsiHofXBcPassedQc::${variable}
-             - experiment::ObsValueMinushofxPassedQc::${variable}
+            x:
+              variable: experiment::ObsValueMinusGsiHofXBcPassedQc::${variable}
+            y:
+              variable: experiment::ObsValueMinushofxPassedQc::${variable}
             markersize: 5
             color: 'red'
             label: 'GSI omb vs JEDI omb (passed QC in JEDI)'

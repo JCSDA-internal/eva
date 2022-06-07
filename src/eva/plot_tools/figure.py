@@ -34,9 +34,12 @@ class CreateFigure:
         if path != '':
             os.makedirs(path, exist_ok=True)
 
-        # Remove deprecated option from dictionary
+        # Remove deprecated options from dictionary
         if 'output name' in kwargs:
             del kwargs['output name']
+
+        if 'tight_layout' in kwargs:
+            del kwargs['tight_layout']
 
         # Save figure
         self.fig.savefig(pathfile, **kwargs)

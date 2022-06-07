@@ -109,7 +109,6 @@ class DataCollections:
 
         data_array = self._collections[collection_name][group_variable_name]
 
-        #if channels is None or group_name in ['MetaData']:
         if channels is None:
             return data_array
         elif isinstance(channels, int) or not any(not isinstance(c, int) for c in channels):

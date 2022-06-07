@@ -13,10 +13,10 @@ class MapScatter():
         if 'channel' in config['data']:
             channel = config['data'].get('channel')
         lonvar_cgv = config['longitude']['variable'].split('::')
-        lonvar = dataobj.get_variable_data(lonvar_cgv[0], lonvar_cgv[1], lonvar_cgv[2], channel)
+        lonvar = dataobj.get_variable_data(lonvar_cgv[0], lonvar_cgv[1], lonvar_cgv[2], None)
         lonvar = slice_var_from_str(config['longitude'], lonvar, logger)
         latvar_cgv = config['latitude']['variable'].split('::')
-        latvar = dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], channel)
+        latvar = dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], None)
         latvar = slice_var_from_str(config['latitude'], latvar, logger)
         datavar_cgv = config['data']['variable'].split('::')
         datavar = dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1], datavar_cgv[2], channel)
