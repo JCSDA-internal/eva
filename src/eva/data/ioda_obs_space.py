@@ -38,6 +38,7 @@ def subset_channels(ds, channels, add_channels_variable=False):
 
     return ds
 
+
 # --------------------------------------------------------------------------------------------------
 
 
@@ -46,6 +47,7 @@ def check_nlocs(nlocs):
         new_nlocs = range(nlocs.size)
         nlocs = new_nlocs + nlocs
     return nlocs
+
 
 # --------------------------------------------------------------------------------------------------
 
@@ -102,16 +104,21 @@ class IodaObsSpace(EvaBase):
 
                     # Group name and variables
                     group_name = get(group, self.logger, 'name')
-                    group_vars = get(group, self.logger, 'variables')
+                    group_vars = get(group, self.logger, 'variables', 'all')
 
                     # Set the collection name
                     collection_name = dataset['name']
 
                     # Read the group
-                    ds = xr.open_dataset(filename, group=group_name)
+                    ds = xr.open_dataset(filename, group=group_name, mask_and_scale=False,
+                                         decode_times=False)
+
+                    # If user specifies all variables set to group list
+                    if group_vars == 'all':
+                        group_vars = list(ds.data_vars)
 
                     # Check that all user variables are in the dataset
-                    if not all(v in list(ds.keys()) for v in group_vars):
+                    if not all(v in list(ds.data_vars) for v in group_vars):
                         self.logger.abort('For collection \'' + dataset['name'] + '\', group \'' +
                                           group_name + '\' in file ' + filename +
                                           f' . Variables {group_vars} not all present in ' +
@@ -144,6 +151,9 @@ class IodaObsSpace(EvaBase):
 
                 # Add the dataset to the collections
                 data_collections.create_or_add_to_collection(collection_name, ds_groups, 'nlocs')
+
+        # Nan out unphysical values
+        data_collections.nan_float_values_outside_threshold(1.0e10)
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()

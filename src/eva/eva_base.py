@@ -39,9 +39,13 @@ class EvaBase(ABC):
         else:
             self.logger = eva_logger
 
-        self.logger.info("  Initializing eva with the following parameters:")
-        self.logger.info("  Class:    " + eva_class_name)
-        self.logger.info(" ")
+        # Store name
+        # ----------
+        self.name = eva_class_name
+
+        # Write object initialization message
+        # -----------------------------------
+        self.logger.info(f"  Initializing eva {self.name} object")
 
         # Create a configuration object
         # -----------------------------
@@ -110,6 +114,8 @@ def eva(eva_config, eva_logger=None):
     # Create temporary logger
     logger = Logger('EvaSetup')
 
+    logger.info('Starting Eva')
+
     # Convert incoming config (either dictionary or file) to dictionary
     if isinstance(eva_config, dict):
         eva_dict = eva_config
@@ -155,6 +161,7 @@ def eva(eva_config, eva_logger=None):
                                                     eva_logger)
 
         # Prepare diagnostic data
+        logger.info(f'Running execute for {eva_data_object.name}')
         eva_data_object.execute(data_collections)
 
         # Create the transforms
@@ -163,6 +170,7 @@ def eva(eva_config, eva_logger=None):
                                                              'transforms',
                                                              diagnostic_config,
                                                              eva_logger)
+            logger.info(f'Running execute for {eva_transform_object.name}')
             eva_transform_object.execute(data_collections)
 
         # Create the figure object
@@ -172,6 +180,7 @@ def eva(eva_config, eva_logger=None):
                                                       eva_logger)
 
         # Generate figure(s)
+        logger.info(f'Running execute for {eva_figure_object.name}')
         eva_figure_object.execute(data_collections)
 
 

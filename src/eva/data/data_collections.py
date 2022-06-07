@@ -109,7 +109,8 @@ class DataCollections:
 
         data_array = self._collections[collection_name][group_variable_name]
 
-        if channels is None or group_name in ['MetaData']:
+        #if channels is None or group_name in ['MetaData']:
+        if channels is None:
             return data_array
         elif isinstance(channels, int) or not any(not isinstance(c, int) for c in channels):
             # nchans must be a dimension if it will be used for selection
@@ -119,8 +120,11 @@ class DataCollections:
             # Make sure it is a list
             channels_sel = []
             channels_sel.append(channels)
+
             # Create a new DataArray with the requested channels
-            return data_array.sel(nchans=channels_sel)
+            data_array_channels = data_array.sel(nchans=channels_sel)
+            return data_array_channels
+
         else:
             self.logger.abort('In get_variable_data_array channels is neither none or list of ' +
                               'integers')
@@ -132,6 +136,7 @@ class DataCollections:
         variable_array = self.get_variable_data_array(collection_name, group_name, variable_name,
                                                       channels)
 
+        # Extract the actual data array
         variable_data = variable_array.data
 
         # Squeeze in case of dimension of 1 (e.g. when 1 channel is needed)
@@ -177,15 +182,80 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
+    def nan_float_values_outside_threshold(self, threshold, cgv_to_screen=None):
+
+        # Set the collection, group and variables
+        # ---------------------------------------
+        if cgv_to_screen is None:
+            collections = self._collections.keys()
+        else:
+            cgv = cgv_to_screen.split('::')
+            collections = [cgv[0]]
+            groups_variables = [cgv[1]+'::'+cgv[2]]
+
+        # Loop over the collections
+        # ------------------------------
+        for collection in collections:
+
+            # Set the variables to screen
+            # ---------------------------
+            if cgv_to_screen is None:
+                groups_variables = list(self._collections[collection].data_vars)
+
+            # Loop over the variables and set to nan outside of threshold
+            # -----------------------------------------------------------
+            for group_variable in groups_variables:
+
+                # Split name into group and variable
+                [group, variable] = group_variable.split('::')
+
+                # Get the data
+                data_var_value = self.get_variable_data(collection, group, variable)
+
+                # For float data sceen outside threshold
+                if 'float' in str(data_var_value.dtype):
+                    data_var_value[np.abs(data_var_value) > threshold] = np.nan
+
+    # ----------------------------------------------------------------------------------------------
+
     def display_collections(self):
+
+        minmaxrms_format_dict = {
+            'float32': '{:+.4e}',
+            'int32': '{:+11d}',
+        }
 
         # Display a list of variables that are available in the collection
         self.logger.info('-'*80)
         self.logger.info(fcol.bold + 'Collections available: ' + fcol.end)
-        for collection_key in self._collections.keys():
+        for collection in self._collections.keys():
             self.logger.info('')
-            self.logger.info('Collection name: ' + fcol.underline + collection_key + fcol.end)
-            self.logger.info(f'{self._collections[collection_key]}')
+            self.logger.info('Collection name: ' + fcol.underline + collection + fcol.end)
+            self.logger.info('\n Dimensions:')
+            for dim in list(self._collections[collection].dims):
+                dim_value = self._collections[collection].dims[dim]
+                self.logger.info(f'  {dim}: {dim_value}')
+            self.logger.info('\n Coordinates:')
+            for coord in list(self._collections[collection].coords):
+                self.logger.info(f'  {coord}')
+            self.logger.info('\n Data (group::variable):')
+            data_vars = list(self._collections[collection].data_vars)
+            max_name_len = len(max(data_vars, key=len))
+            for data_var in data_vars:
+                group_var = data_var.split('::')
+                data_var_value = self.get_variable_data(collection, group_var[0], group_var[1])
+                minmaxrms = ''
+                if str(data_var_value.dtype) in minmaxrms_format_dict:
+                    minmaxrms_format = minmaxrms_format_dict[str(data_var_value.dtype)]
+                    min_string = 'Min=' + minmaxrms_format.format(np.nanmin(data_var_value))
+                    max_string = 'Max=' + minmaxrms_format.format(np.nanmax(data_var_value))
+                    rms_string = ''
+                    if str(data_var_value.dtype) == 'float32':
+                        rms = np.sqrt(np.nanmean(data_var_value**2))
+                        rms_string = 'RMS=' + minmaxrms_format.format(rms)
+                    minmaxrms_string = ' | ' + min_string + ', ' + max_string + ', ' + rms_string
+                self.logger.info('  ' + data_var.ljust(max_name_len) + ' (' +
+                                 str(data_var_value.dtype).ljust(7) + ')' + minmaxrms_string)
         self.logger.info('-'*80)
 
     # ----------------------------------------------------------------------------------------------

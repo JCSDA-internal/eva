@@ -1,100 +1,194 @@
 diagnostics:
 
-
   # Data read
   # ---------
 - data:
     type: IodaObsSpace
     datasets:
-
-      - name: reference
-        filenames:
-          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
-        groups:
-          - name: GsiHofXBc
-            variables: [air_temperature, eastward_wind]
-          #- name: GsiEffectiveQC
-          #  variables: [air_temperature, eastward_wind]
-
       - name: experiment
         filenames:
-          - aircraft.hofx.2020-12-14T21:00:00Z.nc4
+          - 2020-12-15T00:00:00Z/x0044-jedi.aircraft.2020-12-14T21:00:00Z.nc4
         groups:
-          - name: hofx
-            variables: [air_temperature, eastward_wind]
           - name: ObsValue
-            variables: [air_temperature, eastward_wind]
+            variables: &variables [air_temperature, eastward_wind]
+          - name: GsiHofXBc
+          #- name: GsiEffectiveQC
+          - name: hofx
           - name: EffectiveQC
-            variables: [air_temperature, eastward_wind]
           - name: MetaData
-            variables: [air_pressure, dateTime, height, latitude, longitude, record_number,
-                        station_id]
 
-
-  # Undertake transforms of variables
-  # ---------------------------------
   transforms:
 
+    # Generate omb for GSI
     - transform: arithmetic
-      optional looping:
-        collections: [reference]
-        groups: [GsiHofXBc]
-        variables: [air_temperature, eastward_wind]
-      new collection name: reference
-      new group name: ObsValueMinusGsiHofXBc
-      new variable name: ${variable}
-      expression: experiment::ObsValue::${variable}-reference::GsiHofXBc::${variable}
+      new name: experiment::ObsValueMinusGsiHofXBc::${variable}
+      equals: experiment::ObsValue::${variable}-experiment::GsiHofXBc::${variable}
+      for:
+        variable: *variables
 
+    # Generate omb for JEDI
     - transform: arithmetic
-      optional looping:
-        variables: [air_temperature, eastward_wind]
-      new collection name: experiment
-      new group name: ObsValueMinusHofx
-      new variable name: ${variable}
-      expression: experiment::ObsValue::${variable}-experiment::hofx::${variable}
+      new name: experiment::ObsValueMinusHofx::${variable}
+      equals: experiment::ObsValue::${variable}-experiment::hofx::${variable}
+      for:
+        variable: *variables
 
+    # Generate hofx that passed QC for JEDI
     - transform: accept where
-      data to filter:
-        collections: [experiment]
-        groups: [hofx]
-        variables: [air_temperature, eastward_wind]
-      new names:
-        collection: ${collection}
-        group: HofxPassedQc
-        variable: ${variable}
+      new name: experiment::hofxPassedQc::${variable}
+      starting field: experiment::hofx::${variable}
       where:
         - experiment::EffectiveQC::${variable} == 0
+      for:
+        variable: *variables
 
+    # Generate GSI hofx that passed JEDI QC
+    - transform: accept where
+      new name: experiment::GsiHofXBcPassedQc::${variable}
+      starting field: experiment::GsiHofXBc::${variable}
+      where:
+        - experiment::EffectiveQC::${variable} == 0
+      for:
+        variable: *variables
 
-  # Figure and plot creation
-  # ------------------------
+    # Generate omb that passed QC for JEDI
+    - transform: accept where
+      new name: experiment::ObsValueMinushofxPassedQc::${variable}
+      starting field: experiment::ObsValueMinusHofx::${variable}
+      where:
+        - experiment::EffectiveQC::${variable} == 0
+      for:
+        variable: *variables
+
+    # Generate omb that passed QC for GSI
+    - transform: accept where
+      new name: experiment::ObsValueMinusGsiHofXBcPassedQc::${variable}
+      starting field: experiment::ObsValueMinusGsiHofXBc::${variable}
+      where:
+        - experiment::EffectiveQC::${variable} == 0
+      for:
+        variable: *variables
+
   graphics:
-    - batch figure: false
+
+    # JEDI h(x) vs Observations
+    # -------------------------
+    - batch figure:
+        variables: *variables
       figure:
         layout: [1,1]
-        title: 'Aircraft Air Temperature'
-        output name: aircraft_air_temperature.png
+        title: 'Observations vs. JEDI h(x) | Aircraft | ${variable_title}'
+        output name: observation_scatter_plots/aircraft/${variable}/jedi_hofx_vs_obs_aircraft_${variable}.png
       plots:
-        - add_title: 'Scatter'
-          add_xlabel: 'Observation Value'
-          add_ylabel: 'H(x)'
+        - add_xlabel: 'Observation Value'
+          add_ylabel: 'JEDI h(x)'
           add_grid:
           add_legend:
             loc: 'upper left'
           layers:
           - type: Scatter
-            x:
-              variable: experiment::ObsValue::air_temperature
-            y:
-              variable: experiment::hofx::air_temperature
+            comparison:
+             - experiment::ObsValue::${variable}
+             - experiment::hofx::${variable}
             markersize: 5
             color: 'black'
-            label: 'H(x) versus ObsValue'
+            label: 'JEDI h(x) versus obs (all obs)'
           - type: Scatter
-            x:
-              variable: experiment::ObsValue::air_temperature
-            y:
-              variable: experiment::HofxPassedQc::air_temperature
+            comparison:
+             - experiment::ObsValue::${variable}
+             - experiment::hofxPassedQc::${variable}
             markersize: 5
             color: 'red'
-            label: 'H(x) versus ObsValue (Passed QC)'
+            label: 'JEDI h(x) versus obs (passed QC in JEDI)'
+
+    # GSI h(x) vs Observations
+    # -------------------------
+    - batch figure:
+        variables: *variables
+      figure:
+        layout: [1,1]
+        title: 'Observations vs. GSI h(x) | Aircraft | ${variable_title}'
+        output name: observation_scatter_plots/aircraft/${variable}/gsi_hofx_vs_obs_aircraft_${variable}.png
+      plots:
+        - add_xlabel: 'Observation Value'
+          add_ylabel: 'GSI h(x)'
+          add_grid:
+          add_legend:
+            loc: 'upper left'
+          layers:
+          - type: Scatter
+            comparison:
+             - experiment::ObsValue::${variable}
+             - experiment::GsiHofXBc::${variable}
+            markersize: 5
+            color: 'black'
+            label: 'GSI h(x) versus obs (all obs)'
+          - type: Scatter
+            comparison:
+             - experiment::ObsValue::${variable}
+             - experiment::GsiHofXBcPassedQc::${variable}
+            markersize: 5
+            color: 'red'
+            label: 'GSI h(x) versus obs (passed QC in JEDI)'
+
+    # JEDI h(x) vs GSI h(x)
+    # ---------------------
+
+    - batch figure:
+        variables: *variables
+      figure:
+        layout: [1,1]
+        title: 'JEDI h(x) vs. GSI h(x) | Aircraft | ${variable_title}'
+        output name: observation_scatter_plots/aircraft/${variable}/gsi_hofx_vs_jedi_hofx_aircraft_${variable}.png
+      plots:
+        - add_xlabel: 'GSI h(x)'
+          add_ylabel: 'JEDI h(x)'
+          add_grid:
+          add_legend:
+            loc: 'upper left'
+          layers:
+          - type: Scatter
+            comparison:
+             - experiment::GsiHofXBc::${variable}
+             - experiment::hofx::${variable}
+            markersize: 5
+            color: 'black'
+            label: 'JEDI h(x) versus GSI h(x)'
+          - type: Scatter
+            comparison:
+             - experiment::GsiHofXBcPassedQc::${variable}
+             - experiment::hofxPassedQc::${variable}
+            markersize: 5
+            color: 'red'
+            label: 'JEDI h(x) versus GSI h(x) (passed QC in JEDI)'
+
+    # JEDI omb vs GSI omb
+    # ---------------------
+
+    - batch figure:
+        variables: *variables
+      figure:
+        layout: [1,1]
+        title: 'JEDI omb vs. GSI omb| Aircraft | ${variable_title}'
+        output name: observation_scatter_plots/aircraft/${variable}/gsi_omb_vs_jedi_omb_aircraft_${variable}.png
+      plots:
+        - add_xlabel: 'GSI observation minus h(x)'
+          add_ylabel: 'JEDI observation minus h(x)'
+          add_grid:
+          add_legend:
+            loc: 'upper left'
+          layers:
+          - type: Scatter
+            comparison:
+             - experiment::ObsValueMinusGsiHofXBc::${variable}
+             - experiment::ObsValueMinusHofx::${variable}
+            markersize: 5
+            color: 'black'
+            label: 'GSI omb vs JEDI omb (all obs)'
+          - type: Scatter
+            comparison:
+             - experiment::ObsValueMinusGsiHofXBcPassedQc::${variable}
+             - experiment::ObsValueMinushofxPassedQc::${variable}
+            markersize: 5
+            color: 'red'
+            label: 'GSI omb vs JEDI omb (passed QC in JEDI)'
