@@ -34,9 +34,12 @@ class CreateFigure:
         if path != '':
             os.makedirs(path, exist_ok=True)
 
-        # Remove deprecated option from dictionary
+        # Remove deprecated options from dictionary
         if 'output name' in kwargs:
             del kwargs['output name']
+
+        if 'tight_layout' in kwargs:
+            del kwargs['tight_layout']
 
         # Save figure
         self.fig.savefig(pathfile, **kwargs)
@@ -78,7 +81,7 @@ class CreateFigure:
         for i, plot_obj in enumerate(self.plot_list):
 
             # check if object has projection and domain attributes to determine ax
-            if hasattr(plot_obj, 'projection') and hasattr(plot_obj, 'domain'):
+            if hasattr(plot_obj, 'projection'):
                 self.domain = Domain(plot_obj.domain)
                 self.projection = MapProjection(plot_obj.projection)
 
@@ -156,7 +159,7 @@ class CreateFigure:
                             transform=self.projection.projection)
         else:
             skipvars = ['plottype', 'longitude', 'latitude',
-                        'data', 'markersize']
+                        'data', 'markersize', 'colorbar']
             inputs = self._get_inputs_dict(skipvars, plotobj)
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             c=plotobj.data, s=plotobj.markersize,

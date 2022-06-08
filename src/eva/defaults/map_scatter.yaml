@@ -1,0 +1,10 @@
+# Scatter class default schema
+markersize: 5
+marker: 'o'
+vmin:
+vmax:
+alpha:
+linewidths: 1.5
+edgecolors:
+label: 'Points'
+cmap: 'jet'

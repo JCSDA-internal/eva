@@ -1,6 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
-from eva.utilities.utils import get_schema, update_object
+from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import eva.plot_tools.plots
 import os
 import numpy as np
@@ -12,9 +12,8 @@ class Scatter():
 
         # Get the data to plot from the data_collection
         # ---------------------------------------------
-        varnames = config['comparison']
-        var0 = varnames[0]
-        var1 = varnames[1]
+        var0 = config['x']['variable']
+        var1 = config['y']['variable']
 
         var0_cgv = var0.split('::')
         var1_cgv = var1.split('::')
@@ -33,6 +32,14 @@ class Scatter():
 
         xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel)
         ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel)
+
+        # see if we need to slice data
+        xdata = slice_var_from_str(config['x'], xdata, logger)
+        ydata = slice_var_from_str(config['y'], ydata, logger)
+
+        # scatter data should be flattened
+        xdata = xdata.flatten()
+        ydata = ydata.flatten()
 
         # Remove NaN values to enable regression
         # --------------------------------------
@@ -53,7 +60,7 @@ class Scatter():
         layer_schema = config.get('schema', os.path.join(return_eva_path(), 'defaults',
                                   'scatter.yaml'))
         config = get_schema(layer_schema, config, logger)
-        delvars = ['comparison', 'type', 'schema']
+        delvars = ['x', 'y', 'type', 'schema']
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, logger)

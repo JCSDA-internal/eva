@@ -243,6 +243,7 @@ class MapScatter:
         self.vmin = None
         self.vmax = None
         self.label = None
+        self.colorbar = None
 
 
 class MapGridded:
