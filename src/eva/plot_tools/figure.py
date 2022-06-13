@@ -176,7 +176,7 @@ class CreateFigure:
                 if vmin is None or vmax is None:
                     print("Abort: vmin and vmax must be set for integer fields")
                     exit()
-                norm = matplotlib.colors.BoundaryNorm(np.arange(vmin-0.5,vmax,1), cmap.N)
+                norm = matplotlib.colors.BoundaryNorm(np.arange(vmin-0.5, vmax, 1), cmap.N)
 
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             c=plotobj.data, s=plotobj.markersize,
