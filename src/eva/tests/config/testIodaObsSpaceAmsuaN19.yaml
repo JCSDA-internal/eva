@@ -222,13 +222,127 @@ diagnostics:
 
     - batch figure:
         variables:
-        - average_surface_temperature_within_field_of_view
+        - vegetation_type_index
+      figure:
+        layout: [2,1]
+        figure size: [40,24]
+        output name: surface_geovals/gsi_vs_jedi_map_amsua_n19_${variable}.png
+        tight_layout: true
+      plots:
+        - add_title: 'GSI GeoVaLs ${variable}'
+          mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+            ticks: [1,2,3,4,5,6,7,8,9,10,11,12,13]
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::GsiGeoVaLs::${variable}
+            markersize: 2
+            label: '$(variable)'
+            colorbar: true
+            cmap: 'rainbow'
+            vmin: 1
+            vmax: 14
+            integer_field:
+        - add_title: 'JEDI GeoVaLs ${variable}'
+          mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+            ticks: [1,2,3,4,5,6,7,8,9,10,11,12,13]
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::GeoVaLs::${variable}
+            markersize: 2
+            label: '${variable}'
+            colorbar: true
+            cmap: 'rainbow'
+            vmin: 1
+            vmax: 14
+            integer_field:
+
+    - batch figure:
+        variables:
         - soil_type
+      figure:
+        layout: [2,1]
+        figure size: [40,24]
+        output name: surface_geovals/gsi_vs_jedi_map_amsua_n19_${variable}.png
+        tight_layout: true
+      plots:
+        - add_title: 'GSI GeoVaLs ${variable}'
+          mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+            ticks: [1,2,3,4,5,6,7,8,9]
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::GsiGeoVaLs::${variable}
+            markersize: 2
+            label: '$(variable)'
+            colorbar: true
+            cmap: 'rainbow'
+            vmin: 1
+            vmax: 10
+            integer_field:
+        - add_title: 'JEDI GeoVaLs ${variable}'
+          mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+            ticks: [1,2,3,4,5,6,7,8,9]
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::GeoVaLs::${variable}
+            markersize: 2
+            label: '${variable}'
+            colorbar: true
+            cmap: 'rainbow'
+            vmin: 1
+            vmax: 10
+            integer_field:
+
+    - batch figure:
+        variables:
+        - average_surface_temperature_within_field_of_view
         - surface_temperature_where_ice
         - surface_temperature_where_land
         - surface_temperature_where_sea
         - surface_temperature_where_snow
-        - vegetation_type_index
       figure:
         layout: [2,1]
         figure size: [40,24]
