@@ -176,7 +176,7 @@ class CreateFigure:
                 if vmin is None or vmax is None:
                     print("Abort: vmin and vmax must be set for integer fields")
                     exit()
-                norm = matplotlib.colors.BoundaryNorm(np.arange(vmin-0.5, vmax, 1), cmap.N)
+                norm = matplotlib.colors.BoundaryNorm(np.arange(vmin-0.5,vmax,1), cmap.N)
 
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             c=plotobj.data, s=plotobj.markersize,
@@ -376,7 +376,6 @@ class CreateFigure:
                     cb.set_label(colorbar['label'], fontsize=colorbar['fontsize'])
 
             else:
-                print('colorbarcolorbar', colorbar)
                 cb = self.fig.colorbar(self.cs, ax=ax,
                                        **colorbar['kwargs'])
                 cb.set_label(colorbar['label'], fontsize=colorbar['fontsize'])
@@ -701,3 +700,4 @@ class CreatePlot():
                              f'choices are: {" | ".join(valid_scales)}')
 
         self.yscale = scale
+  
