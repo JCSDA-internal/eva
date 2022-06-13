@@ -700,4 +700,3 @@ class CreatePlot():
                              f'choices are: {" | ".join(valid_scales)}')
 
         self.yscale = scale
-  
