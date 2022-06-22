@@ -1,6 +1,7 @@
 # This work developed by NOAA/NWS/EMC under the Apache 2.0 license.
 import os
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import cartopy.crs as ccrs
@@ -149,9 +150,14 @@ class CreateFigure:
 
     def _map_scatter(self, plotobj, ax):
 
+        # Flag set for integer fields
+        integer_field = False
+        if 'integer_field' in vars(plotobj):
+            integer_field = True
+
         if plotobj.data is None:
             skipvars = ['plottype', 'longitude', 'latitude',
-                        'markersize']
+                        'markersize', 'integer_field']
             inputs = self._get_inputs_dict(skipvars, plotobj)
 
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
@@ -159,11 +165,22 @@ class CreateFigure:
                             transform=self.projection.projection)
         else:
             skipvars = ['plottype', 'longitude', 'latitude',
-                        'data', 'markersize', 'colorbar']
+                        'data', 'markersize', 'colorbar', 'normalize', 'integer_field']
             inputs = self._get_inputs_dict(skipvars, plotobj)
+
+            norm = None
+            if integer_field:
+                cmap = matplotlib.cm.get_cmap(inputs['cmap'])
+                vmin = inputs['vmin']
+                vmax = inputs['vmax']
+                if vmin is None or vmax is None:
+                    print("Abort: vmin and vmax must be set for integer fields")
+                    exit()
+                norm = matplotlib.colors.BoundaryNorm(np.arange(vmin-0.5, vmax, 1), cmap.N)
+
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             c=plotobj.data, s=plotobj.markersize,
-                            **inputs, transform=self.projection.projection)
+                            **inputs, norm=norm, transform=self.projection.projection)
         if plotobj.colorbar:
             self.cs = cs
 
