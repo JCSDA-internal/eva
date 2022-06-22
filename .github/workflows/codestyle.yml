@@ -14,6 +14,13 @@ jobs:
         sudo apt-get install libproj-dev proj-data proj-bin
         sudo apt-get install libgeos-dev musl-dev libc-dev
         sudo ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+        mkdir proj && cd proj
+        curl -sSL https://download.osgeo.org/proj/proj-8.2.1.tar.gz | tar -xvz
+        cd proj-8.2.1
+        mkdir build && cd build
+        cmake ..
+        cmake --build .
+        sudo cmake --build . --target install
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
