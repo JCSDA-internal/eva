@@ -50,7 +50,7 @@ def arithmetic(config, data_collections):
                 expression = ''.join(expression.split())
 
                 # Split math equation
-                expression_elements = re.split(r'\(|\)|-|\*|\+|\/|mean|sqrt|\d', expression)
+                expression_elements = re.split(r'\(|\)|-|\*|\+|\/', expression)
 
                 # Remove empty elements and duplicates from expression elements
                 expression_elements = remove_empty_from_list_of_strings(expression_elements)
