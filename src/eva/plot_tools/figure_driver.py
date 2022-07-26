@@ -123,13 +123,15 @@ class FigureDriver(EvaBase):
             plotobj = CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
             # make changes to subplot based on YAML configuration
             for key, value in plot.items():
-                if key not in ['layers', 'mapping']:
+                if key not in ['layers', 'mapping', 'statistics']:
                     if isinstance(value, dict):
                         getattr(plotobj, key)(**value)
                     elif value is None:
                         getattr(plotobj, key)()
                     else:
                         getattr(plotobj, key)(value)
+                if key in ['statistics']:
+                    print('placeholder for now')
             plot_list.append(plotobj)
         # create figure
         fig = CreateFigure(nrows=figure_conf['layout'][0],

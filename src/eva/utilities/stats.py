@@ -4,12 +4,15 @@ stats.py contains statistics utility functions
 '''
 
 __all__ = ['lregress', 'ttest', 'get_weights', 'get_weighted_mean',
-           'get_linear_regression', 'bootstrap']
+           'get_linear_regression', 'bootstrap', 'stat_helper']
 
 import numpy as _np
 from scipy.stats import t as _t
 from sklearn.linear_model import LinearRegression
 
+
+def stat_helper():
+    print('placeholder for stat_helper')
 
 def lregress(x, y, ci=95.0):
     '''
