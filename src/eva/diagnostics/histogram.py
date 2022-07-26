@@ -16,14 +16,13 @@ class Histogram():
         var_cgv = varstr.split('::')
 
         if len(var_cgv) != 3:
-            logger.abort('In Histogram the variable \'var_cgv\' does not appear to '+
+            logger.abort('In Histogram the variable \'var_cgv\' does not appear to ' +
                          'be in the required format of collection::group::variable.')
-
 
         # Optionally get the channel to plot
         channel = None
         if 'channel' in config['data']:
-            channel = config.get('channel')
+            channel = config['data'].get('channel')
 
         data = dataobj.get_variable_data(var_cgv[0], var_cgv[1], var_cgv[2], channel)
 
