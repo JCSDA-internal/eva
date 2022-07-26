@@ -234,7 +234,7 @@ diagnostics:
           - type: Histogram
             data:
               variable: experiment::ObsValueMinusGsiHofXBc::${variable}
-            channel: ${channel}
+              channel: ${channel}
             color: 'blue'
             label: 'GSI omb (all obs)'
             bins: 100
@@ -242,7 +242,7 @@ diagnostics:
           - type: Histogram
             data:
               variable: experiment::ObsValueMinusHofx::${variable}
-            channel: ${channel}
+              channel: ${channel}
             color: 'red'
             label: 'JEDI omb (all obs)'
             bins: 100
