@@ -1,0 +1,16 @@
+# Histogram class default schema
+bins: 10
+range:
+density: false
+weights:
+cumulative: false
+bottom:
+histtype: 'bar'
+align: 'mid'
+orientation: 'vertical'
+rwidth:
+log: false
+color: 'tab:blue'
+label:
+stacked: false
+alpha:

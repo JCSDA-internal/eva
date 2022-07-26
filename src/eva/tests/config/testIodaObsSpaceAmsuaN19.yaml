@@ -217,6 +217,37 @@ diagnostics:
             color: 'red'
             label: 'GSI omb vs JEDI omb (passed QC in JEDI)'
 
+    # Histogram
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      figure:
+        layout: [1,1]
+        title: 'JEDI omb vs. GSI omb | AMSU-A NOAA-19 | ${variable_title}'
+        output name: histograms/amsua_n19/${variable}/${channel}/gsi_omb_jedi_omb_histogram_amsua_n19_${variable}_${channel}.png
+      plots:
+        - add_xlabel: 'Observation minus h(x)'
+          add_ylabel: 'Count'
+          add_legend:
+            loc: 'upper left'
+          layers:
+          - type: Histogram
+            data:
+              variable: experiment::ObsValueMinusGsiHofXBc::${variable}
+              channel: ${channel}
+            color: 'blue'
+            label: 'GSI omb (all obs)'
+            bins: 100
+            alpha: 0.5
+          - type: Histogram
+            data:
+              variable: experiment::ObsValueMinusHofx::${variable}
+              channel: ${channel}
+            color: 'red'
+            label: 'JEDI omb (all obs)'
+            bins: 100
+            alpha: 0.5
+
     # Map plot
     # --------
 
