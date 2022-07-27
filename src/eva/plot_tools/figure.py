@@ -9,7 +9,7 @@ import cartopy.feature as cfeature
 from scipy.interpolate import interpn
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 from eva.plot_tools.maps import Domain, MapProjection
-from eva.utilities.stats import get_linear_regression, stat_helper
+from eva.utilities.stats import get_linear_regression
 
 __all__ = ['CreateFigure', 'CreatePlot']
 
