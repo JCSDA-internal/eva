@@ -72,6 +72,7 @@ def stats_helper(logger, plotobj, data_collections, config):
     plotobj.add_stats_dict(stats_dict=stats_dict, xloc=xloc,
                            yloc=yloc, ha=ha, **kwargs)
 
+
 def lregress(x, y, ci=95.0):
     '''
     Function that computes the linear regression between two variables and
