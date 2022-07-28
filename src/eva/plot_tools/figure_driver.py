@@ -133,7 +133,7 @@ class FigureDriver(EvaBase):
                         getattr(plotobj, key)(value)
                 if key in ['statistics']:
                     # call the stats helper
-                    stats_helper(plotobj, data_collections, value)
+                    stats_helper(self.logger, plotobj, data_collections, value)
 
             plot_list.append(plotobj)
         # create figure
