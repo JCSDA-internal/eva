@@ -9,7 +9,7 @@ import cartopy.feature as cfeature
 from scipy.interpolate import interpn
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 from eva.plot_tools.maps import Domain, MapProjection
-#from eva.utilities.stats import get_linear_regression
+from eva.utilities.stats import get_linear_regression
 
 __all__ = ['CreateFigure', 'CreatePlot']
 
@@ -260,19 +260,19 @@ class CreateFigure:
             s = ax.scatter(plotobj.x, plotobj.y, s=plotobj.markersize,
                            **inputs)
 
-        ## checks to see if linear regression attribute
-        #if hasattr(plotobj, 'linear_regression'):
+        # checks to see if linear regression attribute
+        if hasattr(plotobj, 'linear_regression'):
 
-            ## Assert that plotobj contains nonzero-length data
-            #if len(plotobj.x) != 0 and len(plotobj.y) != 0:
-                #y_pred, r_sq, intercept, slope = get_linear_regression(plotobj.x,
-                                                                       #plotobj.y)
-                #label = f"y = {slope:.4f}x + {intercept:.4f}\nR\u00b2 : {r_sq:.4f}"
+            # Assert that plotobj contains nonzero-length data
+            if len(plotobj.x) != 0 and len(plotobj.y) != 0:
+                y_pred, r_sq, intercept, slope = get_linear_regression(plotobj.x,
+                                                                       plotobj.y)
+                label = f"y = {slope:.4f}x + {intercept:.4f}\nR\u00b2 : {r_sq:.4f}"
 
-                #inputs = self._get_inputs_dict([], plotobj)
-                #if 'color' in plotobj.linear_regression and 'color' in inputs:
-                    #plotobj.linear_regression['color'] = inputs['color']
-                #ax.plot(plotobj.x, y_pred, label=label, **plotobj.linear_regression)
+                inputs = self._get_inputs_dict([], plotobj)
+                if 'color' in plotobj.linear_regression and 'color' in inputs:
+                    plotobj.linear_regression['color'] = inputs['color']
+                ax.plot(plotobj.x, y_pred, label=label, **plotobj.linear_regression)
 
     def _lineplot(self, plotobj, ax):
         """

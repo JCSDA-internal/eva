@@ -4,7 +4,7 @@ stats.py contains statistics utility functions
 '''
 
 __all__ = ['lregress', 'ttest', 'get_weights', 'get_weighted_mean',
-           'bootstrap', 'stats_helper']
+           'get_linear_regression', 'bootstrap', 'stats_helper']
 
 import numpy as _np
 from scipy.stats import t as _t
@@ -197,31 +197,31 @@ def get_weighted_mean(data, weights, axis=None):
     return _np.average(data, weights=weights, axis=axis)
 
 
-#def get_linear_regression(x, y):
-    #"""
-    #Calculate linear regression between two sets of data.
-    #Fits a linear model with coefficients to minumize the
-    #residual sum of squares between the observed targets
-    #in the dataset, and the targets predicted by the linear
-    #approximation.
-    #Args:
-        #y, x : (array like) Data to calculate linear regression
-    #Returns:
-        #The predicted y values from calculation,
-        #the R squared value, the intercept of the line, and the
-        #slope of the line from the equation for the predicted
-        #y values.
-    #"""
-    #from sklearn.linear_model import LinearRegression
-    #x = x.reshape((-1, 1))
-    #model = LinearRegression().fit(x, y)
-    #r_sq = model.score(x, y)
-    #intercept = model.intercept_
-    #slope = model.coef_[0]
-    ## This is the same as if you calculated y_pred
-    ## by y_pred = slope * x + intercept
-    #y_pred = model.predict(x)
-    #return y_pred, r_sq, intercept, slope
+def get_linear_regression(x, y):
+    """
+    Calculate linear regression between two sets of data.
+    Fits a linear model with coefficients to minumize the
+    residual sum of squares between the observed targets
+    in the dataset, and the targets predicted by the linear
+    approximation.
+    Args:
+        y, x : (array like) Data to calculate linear regression
+    Returns:
+        The predicted y values from calculation,
+        the R squared value, the intercept of the line, and the
+        slope of the line from the equation for the predicted
+        y values.
+    """
+    from sklearn.linear_model import LinearRegression
+    x = x.reshape((-1, 1))
+    model = LinearRegression().fit(x, y)
+    r_sq = model.score(x, y)
+    intercept = model.intercept_
+    slope = model.coef_[0]
+    # This is the same as if you calculated y_pred
+    # by y_pred = slope * x + intercept
+    y_pred = model.predict(x)
+    return y_pred, r_sq, intercept, slope
 
 
 def bootstrap(insample, level=.95, estimator='mean', nrepl=10000):
