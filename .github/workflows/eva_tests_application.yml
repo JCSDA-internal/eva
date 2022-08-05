@@ -4,8 +4,8 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-env:
-  PYTHONPATH: /home/runner/.local/lib/python3.9/site-packages
+#env:
+#  PYTHONPATH: /home/runner/.local/lib/python3.9/site-packages
 
 jobs:
   evaapp:
@@ -17,13 +17,20 @@ jobs:
         sudo apt-get install libproj-dev proj-data proj-bin
         sudo apt-get install libgeos-dev musl-dev libc-dev
         sudo ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - name: Checkout github repo (+ download lfs dependencies)
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+    - name: Setup Python
+      uses: actions/setup-python@v2
       with:
         python-version: '3.9'
         cache: 'pip'
-    - run: pip install --upgrade pip
-    - run: pip install netCDF4 --user
-    - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
-    - run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - run: eva_tests application
+    - name: Upgrade pip
+      run: pip install --upgrade pip
+    - name: Install eva and dependencies
+      run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
+    - name: Put eva in the path
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - name: Run eva applications tests
+      run: eva_tests application
