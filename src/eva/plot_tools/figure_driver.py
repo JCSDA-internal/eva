@@ -13,6 +13,7 @@
 
 from eva.eva_base import EvaBase
 from eva.eva_path import return_eva_path
+from eva.utilities.stats import stats_helper
 from eva.utilities.utils import get_schema, camelcase_to_underscore, parse_channel_list
 from eva.utilities.utils import replace_vars_dict
 from eva.plot_tools.figure import CreatePlot, CreateFigure
@@ -135,13 +136,17 @@ class FigureDriver(EvaBase):
             plotobj = CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
             # make changes to subplot based on YAML configuration
             for key, value in plot.items():
-                if key not in ['layers', 'mapping']:
+                if key not in ['layers', 'mapping', 'statistics']:
                     if isinstance(value, dict):
                         getattr(plotobj, key)(**value)
                     elif value is None:
                         getattr(plotobj, key)()
                     else:
                         getattr(plotobj, key)(value)
+                if key in ['statistics']:
+                    # call the stats helper
+                    stats_helper(self.logger, plotobj, data_collections, value)
+
             plot_list.append(plotobj)
         # create figure
         fig = CreateFigure(nrows=figure_conf['layout'][0],

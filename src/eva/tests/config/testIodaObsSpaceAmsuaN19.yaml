@@ -89,6 +89,19 @@ diagnostics:
           add_grid:
           add_legend:
             loc: 'upper left'
+          statistics:
+            data:
+              variable: experiment::hofx::${variable}
+              channel: ${channel}
+            statistic list:
+            - n
+            - min
+            - mean
+            - max
+            - std
+            - name
+            kwargs:
+              fontsize: 6
           layers:
           - type: Scatter
             x:
