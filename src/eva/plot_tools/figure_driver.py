@@ -13,7 +13,7 @@
 
 from eva.eva_base import EvaBase
 from eva.eva_path import return_eva_path
-from eva.utilities.stats import stats_helper
+#from eva.utilities.stats import stats_helper
 from eva.utilities.utils import get_schema, camelcase_to_underscore, parse_channel_list
 from eva.utilities.utils import replace_vars_dict
 from eva.plot_tools.figure import CreatePlot, CreateFigure
