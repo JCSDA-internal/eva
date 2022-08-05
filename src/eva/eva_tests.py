@@ -54,7 +54,7 @@ def application_tests(logger):
         test_config = replace_vars_dict(test_config, **overwrite_dict)
 
         # Run Eva with that config
-        #eva(test_config)
+        eva(test_config)
 
 
 # --------------------------------------------------------------------------------------------------
