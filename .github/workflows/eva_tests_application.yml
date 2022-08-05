@@ -23,7 +23,7 @@ jobs:
     - run: pip install netCDF4 --user
     - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
     - run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - run: echo "$HOME/.local/lib/python3.9/site-packages" >> $PYTHONPATH
+    - run: export PYTHONPATH=$HOME/.local/lib/python3.9/site-packages
     - run: echo $GITHUB_PATH; echo $PYTHONPATH
     - run: ls -lrt /home/runner/.local/lib/python3.9/site-packages/eva/tests/data/amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
     - run: eva_tests application
