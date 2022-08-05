@@ -39,7 +39,8 @@ def application_tests(logger):
 
     # Create dictionary that contains overwrite
     overwrite_dict = {}
-    overwrite_dict['tests_data_path'] = os.path.join(eva_path, 'tests', 'data')
+    overwrite_dict['data_input_path'] = os.path.join(eva_path, 'tests', 'data')
+    overwrite_dict['plot_output_path'] = os.getcwd()
 
     # Loop over tests, populate YAML and run test
     for test in tests:
@@ -51,8 +52,6 @@ def application_tests(logger):
 
         # Replace templated variables using values from the overwrite dictionary
         test_config = replace_vars_dict(test_config, **overwrite_dict)
-
-        print(test_config)
 
         # Run Eva with that config
         eva(test_config)
