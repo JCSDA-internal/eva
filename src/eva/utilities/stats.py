@@ -7,8 +7,8 @@ __all__ = ['lregress', 'ttest', 'get_weights', 'get_weighted_mean',
            'get_linear_regression', 'bootstrap', 'stats_helper']
 
 import numpy as _np
-# from scipy.stats import t as _t
-from sklearn.linear_model import LinearRegression
+from scipy.stats import t as _t
+# from sklearn.linear_model import LinearRegression
 
 
 def stats_helper(logger, plotobj, data_collections, config):
