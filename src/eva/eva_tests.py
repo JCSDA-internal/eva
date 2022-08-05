@@ -40,7 +40,6 @@ def application_tests(logger):
     # Create dictionary that contains overwrite
     overwrite_dict = {}
     overwrite_dict['data_input_path'] = os.path.join(eva_path, 'tests', 'data')
-    overwrite_dict['plot_output_path'] = ''
 
     # Loop over tests, populate YAML and run test
     for test in tests:

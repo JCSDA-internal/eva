@@ -87,7 +87,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'Observations vs. JEDI h(x) | Aircraft | ${variable_title}'
-        output name: ${plot_output_path}/observation_scatter_plots/aircraft/${variable}/jedi_hofx_vs_obs_aircraft_${variable}.png
+        output name: observation_scatter_plots/aircraft/${variable}/jedi_hofx_vs_obs_aircraft_${variable}.png
       plots:
         - add_xlabel: 'Observation Value'
           add_ylabel: 'JEDI h(x)'
@@ -118,7 +118,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'Observations vs. GSI h(x) | Aircraft | ${variable_title}'
-        output name: ${plot_output_path}/observation_scatter_plots/aircraft/${variable}/gsi_hofx_vs_obs_aircraft_${variable}.png
+        output name: observation_scatter_plots/aircraft/${variable}/gsi_hofx_vs_obs_aircraft_${variable}.png
       plots:
         - add_xlabel: 'Observation Value'
           add_ylabel: 'GSI h(x)'
@@ -149,7 +149,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'JEDI h(x) vs. GSI h(x) | Aircraft | ${variable_title}'
-        output name: ${plot_output_path}/observation_scatter_plots/aircraft/${variable}/gsi_hofx_vs_jedi_hofx_aircraft_${variable}.png
+        output name: observation_scatter_plots/aircraft/${variable}/gsi_hofx_vs_jedi_hofx_aircraft_${variable}.png
       plots:
         - add_xlabel: 'GSI h(x)'
           add_ylabel: 'JEDI h(x)'
@@ -180,7 +180,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'JEDI omb vs. GSI omb| Aircraft | ${variable_title}'
-        output name: ${plot_output_path}/observation_scatter_plots/aircraft/${variable}/gsi_omb_vs_jedi_omb_aircraft_${variable}.png
+        output name: observation_scatter_plots/aircraft/${variable}/gsi_omb_vs_jedi_omb_aircraft_${variable}.png
       plots:
         - add_xlabel: 'GSI observation minus h(x)'
           add_ylabel: 'JEDI observation minus h(x)'
@@ -214,7 +214,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'JEDI omb vs. GSI omb | Aircraft | ${variable_title}'
-        output name: ${plot_output_path}/histograms/aircraft/${variable}/gsi_omb_jedi_omb_histogram_aircraft_${variable}.png
+        output name: histograms/aircraft/${variable}/gsi_omb_jedi_omb_histogram_aircraft_${variable}.png
       plots:
         - add_xlabel: 'Observation minus h(x)'
           add_ylabel: 'Count'
@@ -261,7 +261,7 @@ diagnostics:
         figure size: [20,10]
         layout: [1,1]
         title: 'Observations | Aircraft | Obs Value'
-        output name: ${plot_output_path}/map_plots/aircraft/${variable}/observations_aircraft_${variable}.png
+        output name: map_plots/aircraft/${variable}/observations_aircraft_${variable}.png
       plots:
         - mapping:
             projection: plcarr
@@ -295,7 +295,7 @@ diagnostics:
         figure size: [20,10]
         layout: [1,1]
         title: 'JEDI OmB | Aircraft | ${variable_title}'
-        output name: ${plot_output_path}/map_plots/aircraft/${variable}/omb_jedi_aircraft_${variable}.png
+        output name: map_plots/aircraft/${variable}/omb_jedi_aircraft_${variable}.png
       plots:
         - mapping:
             projection: plcarr
@@ -329,7 +329,7 @@ diagnostics:
         figure size: [20,10]
         layout: [1,1]
         title: 'GSI OmB | Aircraft | ${variable_title}'
-        output name: ${plot_output_path}/map_plots/aircraft/${variable}/omb_gsi_aircraft_${variable}.png
+        output name: map_plots/aircraft/${variable}/omb_gsi_aircraft_${variable}.png
       plots:
         - mapping:
             projection: plcarr
@@ -363,7 +363,7 @@ diagnostics:
         figure size: [20,10]
         layout: [1,1]
         title: 'Hofx Difference | Aircraft | ${variable_title}'
-        output name: ${plot_output_path}/map_plots/aircraft/${variable}/hofx_difference_aircraft_${variable}.png
+        output name: map_plots/aircraft/${variable}/hofx_difference_aircraft_${variable}.png
       plots:
         - mapping:
             projection: plcarr
