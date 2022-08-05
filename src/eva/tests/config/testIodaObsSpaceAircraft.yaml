@@ -7,7 +7,7 @@ diagnostics:
     datasets:
       - name: experiment
         filenames:
-          - 2020-12-15T00:00:00Z/ncdiag.exp.ob.PT6H.aircraft.2020-12-14T21:00:00Z.nc4
+          - ${tests_data_path}/aircraft.hofx.2020-12-14T21:00:00Z.nc4
         groups:
           - name: ObsValue
             variables: &variables [air_temperature, eastward_wind]
