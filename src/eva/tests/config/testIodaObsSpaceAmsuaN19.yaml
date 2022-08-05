@@ -89,7 +89,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'Observations vs. JEDI h(x) | AMSU-A NOAA-19 | ${variable_title}'
-        output name: ${plot_output_path}/observation_scatter_plots/amsua_n19/${variable}/${channel}/jedi_hofx_vs_obs_amsua_n19_${variable}_${channel}.png
+        output name: observation_scatter_plots/amsua_n19/${variable}/${channel}/jedi_hofx_vs_obs_amsua_n19_${variable}_${channel}.png
       plots:
         - add_xlabel: 'Observation Value'
           add_ylabel: 'JEDI h(x)'
@@ -136,7 +136,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'Observations vs. GSI h(x) | AMSU-A NOAA-19 | ${variable_title}'
-        output name: ${plot_output_path}/observation_scatter_plots/amsua_n19/${variable}/${channel}/gsi_hofx_vs_obs_amsua_n19_${variable}_${channel}.png
+        output name: observation_scatter_plots/amsua_n19/${variable}/${channel}/gsi_hofx_vs_obs_amsua_n19_${variable}_${channel}.png
       plots:
         - add_xlabel: 'Observation Value'
           add_ylabel: 'GSI h(x)'
@@ -170,7 +170,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'JEDI h(x) vs. GSI h(x) | AMSU-A NOAA-19 | ${variable_title}'
-        output name: ${plot_output_path}/observation_scatter_plots/amsua_n19/${variable}/${channel}/gsi_hofx_vs_jedi_hofx_amsua_n19_${variable}_${channel}.png
+        output name: observation_scatter_plots/amsua_n19/${variable}/${channel}/gsi_hofx_vs_jedi_hofx_amsua_n19_${variable}_${channel}.png
       plots:
         - add_xlabel: 'GSI h(x)'
           add_ylabel: 'JEDI h(x)'
@@ -204,7 +204,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'JEDI omb vs. GSI omb| AMSU-A NOAA-19 | ${variable_title}'
-        output name: ${plot_output_path}/observation_scatter_plots/amsua_n19/${variable}/${channel}/gsi_omb_vs_jedi_omb_amsua_n19_${variable}_${channel}.png
+        output name: observation_scatter_plots/amsua_n19/${variable}/${channel}/gsi_omb_vs_jedi_omb_amsua_n19_${variable}_${channel}.png
       plots:
         - add_xlabel: 'GSI observation minus h(x)'
           add_ylabel: 'JEDI observation minus h(x)'
@@ -242,7 +242,7 @@ diagnostics:
       figure:
         layout: [1,1]
         title: 'JEDI omb vs. GSI omb | AMSU-A NOAA-19 | ${variable_title}'
-        output name: ${plot_output_path}/histograms/amsua_n19/${variable}/${channel}/gsi_omb_jedi_omb_histogram_amsua_n19_${variable}_${channel}.png
+        output name: histograms/amsua_n19/${variable}/${channel}/gsi_omb_jedi_omb_histogram_amsua_n19_${variable}_${channel}.png
       plots:
         - add_xlabel: 'Observation minus h(x)'
           add_ylabel: 'Count'
@@ -294,7 +294,7 @@ diagnostics:
         figure size: [20,10]
         layout: [1,1]
         title: 'Observations | AMSU-A NOAA-19 | Obs Value'
-        output name: ${plot_output_path}/map_plots/amsua_n19/${variable}/${channel}/observations_amsua_n19_${variable}_${channel}.png
+        output name: map_plots/amsua_n19/${variable}/${channel}/observations_amsua_n19_${variable}_${channel}.png
       plots:
         - mapping:
             projection: plcarr
@@ -331,7 +331,7 @@ diagnostics:
         figure size: [20,10]
         layout: [1,1]
         title: 'JEDI OmB | AMSU-A NOAA-19 | ${variable_title}'
-        output name: ${plot_output_path}/map_plots/amsua_n19/${variable}/${channel}/omb_jedi_amsua_n19_${variable}_${channel}.png
+        output name: map_plots/amsua_n19/${variable}/${channel}/omb_jedi_amsua_n19_${variable}_${channel}.png
       plots:
         - mapping:
             projection: plcarr
@@ -368,7 +368,7 @@ diagnostics:
         figure size: [20,10]
         layout: [1,1]
         title: 'GSI OmB | AMSU-A NOAA-19 | ${variable_title}'
-        output name: ${plot_output_path}/map_plots/amsua_n19/${variable}/${channel}/omb_gsi_amsua_n19_${variable}_${channel}.png
+        output name: map_plots/amsua_n19/${variable}/${channel}/omb_gsi_amsua_n19_${variable}_${channel}.png
       plots:
         - mapping:
             projection: plcarr
@@ -405,7 +405,7 @@ diagnostics:
         figure size: [20,10]
         layout: [1,1]
         title: 'Hofx Difference | AMSU-A NOAA-19 | ${variable_title}'
-        output name: ${plot_output_path}/map_plots/amsua_n19/${variable}/${channel}/hofx_difference_amsua_n19_${variable}_${channel}.png
+        output name: map_plots/amsua_n19/${variable}/${channel}/hofx_difference_amsua_n19_${variable}_${channel}.png
       plots:
         - mapping:
             projection: plcarr
