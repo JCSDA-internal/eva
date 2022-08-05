@@ -89,7 +89,7 @@ class IodaObsSpace(EvaBase):
                     logger.abort(f'In IodaObsSpace file \'{filename}\' does not exist')
 
                 # Get file header
-                ds_header = xr.open_dataset(filename)
+                ds_header = xr.open_dataset(filename, engine='netcdf4')
 
                 # fix nlocs if they are all zeros
                 ds_header['nlocs'] = check_nlocs(ds_header['nlocs'])
@@ -116,7 +116,7 @@ class IodaObsSpace(EvaBase):
 
                     # Read the group
                     ds = xr.open_dataset(filename, group=group_name, mask_and_scale=False,
-                                         decode_times=False)
+                                         decode_times=False, engine='netcdf4')
 
                     # If user specifies all variables set to group list
                     if group_vars == 'all':
