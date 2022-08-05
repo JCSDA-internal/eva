@@ -19,5 +19,5 @@ jobs:
       with:
         python-version: '3.9'
         cache: 'pip'
-    - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt
-    - run: eva_tests application
+    - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt --prefix=/home/eva/ .
+    - run: /home/eva/bin/eva_tests application
