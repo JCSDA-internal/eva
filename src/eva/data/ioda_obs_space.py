@@ -8,6 +8,7 @@
 
 # --------------------------------------------------------------------------------------------------
 
+import os
 import xarray as xr
 
 from eva.eva_base import EvaBase
@@ -82,6 +83,10 @@ class IodaObsSpace(EvaBase):
             # Loop over filenames
             # -------------------
             for filename in filenames:
+
+                # Assert that file exists
+                if not os.path.exists(filename):
+                    logger.abort(f'In IodaObsSpace file \'{filename}\' does not exist')
 
                 # Get file header
                 ds_header = xr.open_dataset(filename)
