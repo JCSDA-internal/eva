@@ -19,6 +19,7 @@ jobs:
       with:
         python-version: '3.9'
         cache: 'pip'
+    - run: pip install netCDF4 --user
     - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
     - run: echo "$HOME/.local/bin" >> $GITHUB_PATH
     - run: eva_tests application
