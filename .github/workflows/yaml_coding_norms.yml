@@ -9,6 +9,7 @@ on:
 # and is controlled by the .yamllint.yml file
 jobs:
   validate-YAML:
+    name: Check YAML Coding Norms
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
