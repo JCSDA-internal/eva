@@ -265,7 +265,7 @@ def remove_list_duplicates(input_list):
 
 def remove_empty_from_list_of_strings(list):
 
-    while("" in list):
+    while ("" in list):
         list.remove("")
 
     return list
