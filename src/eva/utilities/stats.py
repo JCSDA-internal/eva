@@ -212,9 +212,10 @@ def get_linear_regression(x, y):
         slope of the line from the equation for the predicted
         y values.
     """
-    from sklearn.linear_model import LinearRegression
+    from sklearn import linear_model
+    # from sklearn.linear_model import LinearRegression
     x = x.reshape((-1, 1))
-    model = LinearRegression().fit(x, y)
+    model = linear_model.LinearRegression().fit(x, y)
     r_sq = model.score(x, y)
     intercept = model.intercept_
     slope = model.coef_[0]
