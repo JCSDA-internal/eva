@@ -11,8 +11,6 @@ jobs:
   evaapp:
     name: Run eva application tests
     runs-on: ubuntu-latest
-    env:
-
     steps:
     - name: Install ubuntu dependencies
       run: |
