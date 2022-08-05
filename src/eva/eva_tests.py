@@ -17,7 +17,7 @@ import argparse
 import os
 
 # local imports
-from eva.eva_base import eva
+#from eva.eva_base import eva
 from eva.eva_path import return_eva_path
 from eva.utilities.logger import Logger
 from eva.utilities.utils import load_yaml_file, replace_vars_dict
@@ -53,7 +53,7 @@ def application_tests(logger):
         test_config = replace_vars_dict(test_config, **overwrite_dict)
 
         # Run Eva with that config
-        eva(test_config)
+        #eva(test_config)
 
 
 # --------------------------------------------------------------------------------------------------
