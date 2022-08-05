@@ -17,7 +17,6 @@ import argparse
 import os
 
 # local imports
-#from eva.eva_base import eva
 from eva.eva_path import return_eva_path
 from eva.utilities.logger import Logger
 from eva.utilities.utils import load_yaml_file, replace_vars_dict
@@ -27,6 +26,8 @@ from eva.utilities.utils import load_yaml_file, replace_vars_dict
 
 
 def application_tests(logger):
+
+    from eva.eva_base import eva
 
     # Write some messaging
     logger.info(f'Running Eva application tests ...')
