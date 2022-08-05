@@ -12,65 +12,65 @@ from sklearn.linear_model import LinearRegression
 
 
 def stats_helper(logger, plotobj, data_collections, config):
-#    """
-#    Add specified statistics to a plot
-#    Args:
-#        logger : logging object
-#        plotobj : declarative plotting object
-#        data_collections : eva data collections object
-#        config : input configuration dictionary
-#    """
-#    from eva.utilities.utils import slice_var_from_str
-#    # get the variable to compute statistics for and place on the plot
-#    varstr = config['data']['variable']
-#    var_cgv = varstr.split('::')
-#    if len(var_cgv) != 3:
-#        logger.abort('In stats_helper the variable \'var_cgv\' does not appear to ' +
-#                     'be in the required format of collection::group::variable.')
-#
-#    # Optionally get the channel to plot
-#    channel = None
-#    if 'channel' in config['data']:
-#        channel = config['data'].get('channel')
-#
-#    data = data_collections.get_variable_data(var_cgv[0], var_cgv[1], var_cgv[2], channel)
-#
-#    # See if we need to slice data
-#    data = slice_var_from_str(config['data'], data, logger)
-#
-#    # flatten and mask missing data
-#    data = data.flatten()
-#    mask = ~_np.isnan(data)
-#    data = data[mask]
-#
-#    # do we round
-#    digits = config.get('round', 4)
-#
-#    # get an empty stats dict
-#    stats_dict = {}
-#
-#    # loop through stats list in config
-#    for stat in config['statistic list']:
-#        if stat in ['n']:
-#            stats_dict[stat] = f'{len(data)}'
-#        elif stat in ['min', 'max', 'mean', 'median', 'std', 'var']:
-#            statvalue = eval(f'_np.nan{stat}(data)')
-#            statvalue = eval(f'_np.round(statvalue, {digits})')
-#            stats_dict[stat] = str(statvalue)
-#        elif stat in ['name']:
-#            stats_dict[stat] = varstr
-#        else:
-#            logger.abort(f'In stats_helper the statistic {stat} is not supported.')
-#
-#    # get additional config
-#    xloc = config.get('xloc', 0.5)
-#    yloc = config.get('yloc', -0.1)
-#    ha = config.get('ha', 'center')
-#    kwargs = config.get('kwargs', {})
-#
-#    # call plot object method
-#    plotobj.add_stats_dict(stats_dict=stats_dict, xloc=xloc,
-#                           yloc=yloc, ha=ha, **kwargs)
+    """
+    Add specified statistics to a plot
+    Args:
+        logger : logging object
+        plotobj : declarative plotting object
+        data_collections : eva data collections object
+        config : input configuration dictionary
+    """
+    from eva.utilities.utils import slice_var_from_str
+    # get the variable to compute statistics for and place on the plot
+    varstr = config['data']['variable']
+    var_cgv = varstr.split('::')
+    if len(var_cgv) != 3:
+        logger.abort('In stats_helper the variable \'var_cgv\' does not appear to ' +
+                     'be in the required format of collection::group::variable.')
+
+    # Optionally get the channel to plot
+    channel = None
+    if 'channel' in config['data']:
+        channel = config['data'].get('channel')
+
+    data = data_collections.get_variable_data(var_cgv[0], var_cgv[1], var_cgv[2], channel)
+
+    # See if we need to slice data
+    data = slice_var_from_str(config['data'], data, logger)
+
+    # flatten and mask missing data
+    data = data.flatten()
+    mask = ~_np.isnan(data)
+    data = data[mask]
+
+    # do we round
+    digits = config.get('round', 4)
+
+    # get an empty stats dict
+    stats_dict = {}
+
+    # loop through stats list in config
+    for stat in config['statistic list']:
+        if stat in ['n']:
+            stats_dict[stat] = f'{len(data)}'
+        elif stat in ['min', 'max', 'mean', 'median', 'std', 'var']:
+            statvalue = eval(f'_np.nan{stat}(data)')
+            statvalue = eval(f'_np.round(statvalue, {digits})')
+            stats_dict[stat] = str(statvalue)
+        elif stat in ['name']:
+            stats_dict[stat] = varstr
+        else:
+            logger.abort(f'In stats_helper the statistic {stat} is not supported.')
+
+    # get additional config
+    xloc = config.get('xloc', 0.5)
+    yloc = config.get('yloc', -0.1)
+    ha = config.get('ha', 'center')
+    kwargs = config.get('kwargs', {})
+
+    # call plot object method
+    plotobj.add_stats_dict(stats_dict=stats_dict, xloc=xloc,
+                           yloc=yloc, ha=ha, **kwargs)
 
 
 def lregress(x, y, ci=95.0):
