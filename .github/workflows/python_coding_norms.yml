@@ -19,4 +19,5 @@ jobs:
       with:
         python-version: '3.9'
         cache: 'pip'
+    - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt
     - run: python3 pycodestyle_run.py
