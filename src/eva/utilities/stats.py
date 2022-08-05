@@ -4,7 +4,7 @@ stats.py contains statistics utility functions
 '''
 
 __all__ = ['lregress', 'ttest', 'get_weights', 'get_weighted_mean',
-           'get_linear_regression', 'bootstrap', 'stats_helper']
+           'bootstrap', 'stats_helper']
 
 import numpy as _np
 from scipy.stats import t as _t
