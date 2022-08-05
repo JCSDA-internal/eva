@@ -11,7 +11,7 @@
 
 
 import math
-import numpy
+import numpy as np
 from scipy.stats import skew
 
 from eva.utilities.utils import replace_vars_dict
@@ -54,20 +54,26 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
 
     # Find minimum and maximum values
     cmap = option_dict.get('sequential colormap', 'viridis')
-    vmax = np.max(datavar_check)
-    vmin = np.min(datavar_check)
+    vmax = np.nanmax(datavar_check)
+    vmin = np.nanmin(datavar_check)
 
     # If positive and negative values are present then a diverging colormap centered on zero should
     # be used.
     if vmin < 0.0 and vmax > 0.0:
-        vmax = np.max(np.abs(datavar_check))
+        vmax = np.nanmax(np.abs(datavar_check))
         vmin = -vmax
+        cmap = option_dict.get('diverging colormap', 'seismic')
+
+    # Check for nan
+    if np.isnan(vmax) or np.isnan(vmin):
+        vmax = 0.0
+        vmin = 0.0
         cmap = option_dict.get('diverging colormap', 'seismic')
 
     # Prepare dictionary with values to be overwritten in other dictionaries
     overwrite_dict = {}
-    overwrite_dict['dynamic_vmax'] = vmax
-    overwrite_dict['dynamic_vmin'] = vmin
+    overwrite_dict['dynamic_vmax'] = str(vmax)
+    overwrite_dict['dynamic_vmin'] = str(vmin)
     overwrite_dict['dynamic_cmap'] = cmap
 
     # Perform the overwrite of the plots_dict dictionary and return new dictionary
@@ -91,18 +97,22 @@ def histogram_bins(logger, option_dict, plots_dict, data_collections):
     # Compute size of the array of data
     n = np.count_nonzero(~np.isnan(datavar))
 
+    # Check for zero data, set to 3 as a reasonable minimum
+    if n == 0:
+        n = 2
+
     # Compute number of bins using standard rule
     rule = option_dict.get('number of bins rule', 'sturges')
     rule = rule.lower()  # User might capitalize names so convert to lowercase
 
     # Allow for some standard rules for computing the number of bins for the histogram
-    if rule = 'square root':
+    if rule == 'square root':
         nbins = math.sqrt(n)
-    elif rule = 'sturges':
+    elif rule == 'sturges':
         nbins = 1 + math.log2(n)
-    elif rule = 'rice':
+    elif rule == 'rice':
         nbins = 2 * math.pow(n, 1/3)
-    elif rule = 'doane':
+    elif rule == 'doane':
         if n < 3:
             logger.abort(f'Rule \'doane\' is not valid for data with fewer than 3 samples.')
         g1 = skew(datavar, nan_policy='omit')
@@ -113,7 +123,7 @@ def histogram_bins(logger, option_dict, plots_dict, data_collections):
 
     # Prepare dictionary with values to be overwritten in other dictionaries
     overwrite_dict = {}
-    overwrite_dict['dynamic_bins'] = nbins
+    overwrite_dict['dynamic_bins'] = str(round(nbins))
 
     # Perform the overwrite of the plots_dict dictionary and return new dictionary
     return replace_vars_dict(plots_dict, **overwrite_dict)

@@ -85,10 +85,13 @@ class FigureDriver(EvaBase):
                         figure_conf_fill = replace_vars_dict(figure_conf_fill, **batch_conf_this)
                         plots_conf_fill = copy.copy(plots_conf)
                         plots_conf_fill = replace_vars_dict(plots_conf_fill, **batch_conf_this)
+                        dynamic_options_conf_fill = copy.copy(dynamic_options_conf)
+                        dynamic_options_conf_fill = replace_vars_dict(dynamic_options_conf_fill,
+                                                                      **batch_conf_this)
 
                         # Make plot
-                        self.make_figure(figure_conf_fill, plots_conf_fill, dynamic_options_conf,
-                                         data_collections)
+                        self.make_figure(figure_conf_fill, plots_conf_fill,
+                                         dynamic_options_conf_fill, data_collections)
             else:
                 # make just one figure per configuration
                 self.make_figure(figure_conf, plots_conf, dynamic_options_conf, data_collections)
