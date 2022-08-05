@@ -5,8 +5,8 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  pycodestyle:
-    name: Check Python Coding Norms
+  evaapp:
+    name: Run eva application tests
     runs-on: ubuntu-latest
     steps:
     - name: Install ubuntu dependencies
@@ -19,5 +19,6 @@ jobs:
       with:
         python-version: '3.9'
         cache: 'pip'
-    - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt --prefix=/home/eva/ .
-    - run: /home/eva/bin/eva_tests application
+    - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
+    - run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - run: eva_tests application
