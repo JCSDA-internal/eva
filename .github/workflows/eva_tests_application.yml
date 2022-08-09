@@ -14,15 +14,18 @@ jobs:
         sudo apt-get install libproj-dev proj-data proj-bin
         sudo apt-get install libgeos-dev musl-dev libc-dev
         sudo ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
-    - name: Proj which
+    - name: Uninstall proj
       run: which proj
-    - name: Install proj
-      run: sudo apt-get install proj-bin
-    - name: Proj which
-      run: which proj
+    - name: Uninstall proj
+      run: sudo apt-get remove proj-bin
+    - name: Install proj with homebrew
+      run: brew install proj
 
+    - name: Proj which
+      run: which proj
     - name: Proj version
       run: proj --version
+
     - name: Clone eva repo
       uses: actions/checkout@v2
       with:
