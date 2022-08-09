@@ -26,8 +26,8 @@ jobs:
       run: brew install python@3.9
     - name: Install gcc-5 with brew
       run: brew install gcc@5
-    - name: Install geos with brew
-      run: brew install geos
+    #- name: Install geos with brew
+    #  run: brew install geos
 
     # Clone the eva code
     - name: Clone eva repo
