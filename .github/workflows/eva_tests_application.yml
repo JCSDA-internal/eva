@@ -43,4 +43,5 @@ jobs:
 
     # Run the eva test suite
     - name: Run eva applications tests
-      run: eva_tests application
+      #run: eva_tests application
+      run: python3 -v /home/runner/.local/bin/eva_tests application
