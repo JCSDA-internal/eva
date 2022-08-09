@@ -9,13 +9,15 @@ jobs:
     name: Run eva application tests
     runs-on: ubuntu-latest
     steps:
+
+    # Ubuntu setup stuff
     - name: Install ubuntu dependencies
       run: |
         sudo apt-get install libproj-dev proj-data proj-bin
         sudo apt-get install libgeos-dev musl-dev libc-dev
         sudo ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
-    - name: Uninstall proj
-      run: which proj
+
+    # Switch to brew for proj and python to bump proj to version compatible with cartopy
     - name: Uninstall proj
       run: sudo apt-get remove proj-bin libproj-dev proj-data
     - name: Install proj with homebrew
@@ -25,29 +27,20 @@ jobs:
     - name: Install gcc-5 with brew
       run: brew install gcc@5
 
-
-
-    - name: which pip
-      run: which pip
-    - name: which python
-      run: which python
-
+    # Clone the eva code
     - name: Clone eva repo
       uses: actions/checkout@v2
       with:
         lfs: true
 
-#    - name: Setup Python
-#      uses: actions/setup-python@v2
-#      with:
-#        python-version: '3.9'
-#        cache: 'pip'
-
+    # Install eva
     - name: Upgrade pip
       run: /home/linuxbrew/.linuxbrew/bin/pip3 install --upgrade pip
     - name: Install eva and dependencies
-      run: /home/linuxbrew/.linuxbrew/bin/pip3 install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
+      run: /home/linuxbrew/.linuxbrew/bin/pip3 install --use-deprecated=legacy-resolver -r requirements.txt --user .
     - name: Put eva in the path
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    # Run the eva test suite
     - name: Run eva applications tests
-      run: /home/linuxbrew/.linuxbrew/bin/python3 -v /home/runner/.local/bin/eva_tests application
+      run: eva_tests application
