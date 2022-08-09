@@ -29,7 +29,5 @@ jobs:
       run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
     - name: Put eva in the path
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Check eva path
-      run: which eva_tests
     - name: Run eva applications tests
-      run: eva_tests application
+      run: python3 -v /home/runner/.local/bin/eva_tests application
