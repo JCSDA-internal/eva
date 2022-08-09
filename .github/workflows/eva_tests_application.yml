@@ -23,8 +23,6 @@ jobs:
 
     - name: Proj which
       run: which proj
-    - name: Proj version
-      run: proj --version
 
     - name: Clone eva repo
       uses: actions/checkout@v2
