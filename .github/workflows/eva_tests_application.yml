@@ -17,7 +17,7 @@ jobs:
     - name: Uninstall proj
       run: which proj
     - name: Uninstall proj
-      run: sudo apt-get remove proj-bin
+      run: sudo apt-get remove proj-bin libproj-dev proj-data
     - name: Install proj with homebrew
       run: brew install proj
     - name: Install python with brew
