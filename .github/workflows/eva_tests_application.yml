@@ -32,7 +32,7 @@ jobs:
     - run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test
     - run: sudo apt-get update
     - run: sudo apt-get upgrade
-    - run: sudo apt-get dist-upgrade
+    - run: sudo apt-get --fix-missing dist-upgrade
 
     # Clone the eva code
     - name: Clone eva repo
