@@ -17,7 +17,7 @@ jobs:
     - name: Proj which
       run: which proj
     - name: Install proj
-      run: brew install proj
+      run: sudo apt-get install proj-bin
     - name: Proj which
       run: which proj
     - name: Proj version
