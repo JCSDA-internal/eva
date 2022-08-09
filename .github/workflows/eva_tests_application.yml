@@ -41,7 +41,13 @@ jobs:
     - name: Put eva in the path
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+    - name: ls
+      run: ls -l /home/runner/.local/lib/python3.9/site-packages/eva/plot_tools/figure_driver.py
+
+    - name: cat
+      run: cat /home/runner/.local/lib/python3.9/site-packages/eva/plot_tools/figure_driver.py
+
     # Run the eva test suite
     - name: Run eva applications tests
       #run: eva_tests application
-      run: python3 -v /home/runner/.local/bin/eva_tests application
+      run: python3 -v /home/runner/.local/bin/eva_tests application  # Get verbose output (debug)
