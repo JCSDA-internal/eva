@@ -20,19 +20,25 @@ jobs:
       run: sudo apt-get remove proj-bin
     - name: Install proj with homebrew
       run: brew install proj
+    - name: Install python with brew
+      run: brew install python@3.9
 
-    - name: Proj which
-      run: which proj
+    - name: which pip
+      run: which pip
+    - name: which python
+      run: which python
 
     - name: Clone eva repo
       uses: actions/checkout@v2
       with:
         lfs: true
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
-        cache: 'pip'
+
+#    - name: Setup Python
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.9'
+#        cache: 'pip'
+
     - name: Upgrade pip
       run: pip install --upgrade pip
     - name: Install eva and dependencies
