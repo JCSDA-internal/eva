@@ -35,9 +35,9 @@ jobs:
 
     # Install eva
     - name: Upgrade pip
-      run: /home/linuxbrew/.linuxbrew/bin/pip3 install --upgrade pip
+      run: pip3 install --upgrade pip
     - name: Install eva and dependencies
-      run: /home/linuxbrew/.linuxbrew/bin/pip3 install --use-deprecated=legacy-resolver -r requirements.txt --user .
+      run: pip3 install --use-deprecated=legacy-resolver -r requirements.txt --user .
     - name: Put eva in the path
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
