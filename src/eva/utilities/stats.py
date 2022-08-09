@@ -8,6 +8,7 @@ __all__ = ['lregress', 'ttest', 'get_weights', 'get_weighted_mean',
 
 import numpy as _np
 from scipy.stats import t as _t
+from sklearn.linear_model import LinearRegression
 
 
 def stats_helper(logger, plotobj, data_collections, config):
@@ -212,7 +213,6 @@ def get_linear_regression(x, y):
         slope of the line from the equation for the predicted
         y values.
     """
-    from sklearn.linear_model import LinearRegression
     x = x.reshape((-1, 1))
     model = LinearRegression().fit(x, y)
     r_sq = model.score(x, y)
