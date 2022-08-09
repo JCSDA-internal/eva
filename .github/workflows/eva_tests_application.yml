@@ -29,6 +29,11 @@ jobs:
     #- name: Install geos with brew
     #  run: brew install geos
 
+    - run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+    - run: sudo apt-get update
+    - run: sudo apt-get upgrade
+    - run: sudo apt-get dist-upgrade
+
     # Clone the eva code
     - name: Clone eva repo
       uses: actions/checkout@v2
