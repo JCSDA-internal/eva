@@ -18,11 +18,11 @@ jobs:
       with:
         python-version: 3.9
 
-    # Add to path
-    - name: Add conda/bin to path
-      run: echo "${CONDA}/bin" >> $GITHUB_PATH
-    - name: Add conda/lib to path
-      run: echo "${CONDA}/lib" >> $GITHUB_PATH
+#    # Add to path
+#    - name: Add conda/bin to path
+#      run: echo "${CONDA}/bin" >> $GITHUB_PATH
+#    - name: Add conda/lib to path
+#      run: echo "${CONDA}/lib" >> $GITHUB_PATH
 
     - name: Echo path
       run: echo $GITHUB_PATH
@@ -31,17 +31,17 @@ jobs:
     - name: Update conda
       run: conda update -n base -c defaults conda
 
-    # Uninstall proj
-    - name: Uninstall proj
-      run: sudo apt-get remove proj-bin libproj-dev proj-data
-
-    # Install proj
-    - name: Install proj
-      run: conda install -c conda-forge proj
-
-    # Install geos
-    - name: Install geos
-      run: conda install -c conda-forge geos
+#    # Uninstall proj
+#    - name: Uninstall proj
+#      run: sudo apt-get remove proj-bin libproj-dev proj-data
+#
+#    # Install proj
+#    - name: Install proj
+#      run: conda install -c conda-forge proj
+#
+#    # Install geos
+#    - name: Install geos
+#      run: conda install -c conda-forge geos
 
     # Install cartopy
     - name: Install cartopy
@@ -64,7 +64,6 @@ jobs:
     # Run the eva test suite
     - name: Run eva applications tests
       run: eva_tests application
-      #run: python3 -v /home/runner/.local/bin/eva_tests application  # Get verbose output (debug)
 
 #jobs:
 #  evaapp:
