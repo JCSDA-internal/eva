@@ -45,6 +45,7 @@ class FigureDriver(EvaBase):
             batch_conf = graphic.get("batch figure", {})  # batch configuration (default nothing)
             figure_conf = graphic.get("figure")  # figure configuration
             plots_conf = graphic.get("plots")  # list of plots/subplots
+            dynamic_options_conf = graphic.get("dynamic options", [])  # Dynamic overwrites
 
             # update figure conf based on schema
             # ----------------------------------
@@ -85,14 +86,25 @@ class FigureDriver(EvaBase):
                         figure_conf_fill = replace_vars_dict(figure_conf_fill, **batch_conf_this)
                         plots_conf_fill = copy.copy(plots_conf)
                         plots_conf_fill = replace_vars_dict(plots_conf_fill, **batch_conf_this)
+                        dynamic_options_conf_fill = copy.copy(dynamic_options_conf)
+                        dynamic_options_conf_fill = replace_vars_dict(dynamic_options_conf_fill,
+                                                                      **batch_conf_this)
 
                         # Make plot
-                        self.make_figure(figure_conf_fill, plots_conf_fill, data_collections)
+                        self.make_figure(figure_conf_fill, plots_conf_fill,
+                                         dynamic_options_conf_fill, data_collections)
             else:
                 # make just one figure per configuration
-                self.make_figure(figure_conf, plots_conf, data_collections)
+                self.make_figure(figure_conf, plots_conf, dynamic_options_conf, data_collections)
 
-    def make_figure(self, figure_conf, plots, data_collections):
+    def make_figure(self, figure_conf, plots, dynamic_options, data_collections):
+
+        # Adjust the plots configs if there are dynamic options
+        # -----------------------------------------------------
+        for dynamic_option in dynamic_options:
+            dynamic_option_module = importlib.import_module("eva.plot_tools.dynamic_config")
+            dynamic_option_method = getattr(dynamic_option_module, dynamic_option['type'])
+            plots = dynamic_option_method(self.logger, dynamic_option, plots, data_collections)
 
         # Grab some figure configuration
         # -------------------
