@@ -18,9 +18,17 @@ jobs:
       with:
         python-version: 3.9
 
+    # Uninstall proj
+    - name: Uninstall proj
+      run: sudo apt-get remove proj-bin libproj-dev proj-data
+
     # Install proj
     - name: Install proj
       run: $CONDA/bin/conda install -c conda-forge proj
+
+    # Install geos
+    - name: Install geos
+      run: $CONDA/bin/conda install -c conda-forge geos
 
     # Clone the eva code
     - name: Clone eva repo
