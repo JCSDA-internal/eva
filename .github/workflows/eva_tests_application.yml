@@ -18,30 +18,9 @@ jobs:
       with:
         python-version: 3.9
 
-#    # Add to path
-#    - name: Add conda/bin to path
-#      run: echo "${CONDA}/bin" >> $GITHUB_PATH
-#    - name: Add conda/lib to path
-#      run: echo "${CONDA}/lib" >> $GITHUB_PATH
-
-    - name: Echo path
-      run: echo $GITHUB_PATH
-
     # Update conda
     - name: Update conda
       run: conda update -n base -c defaults conda
-
-#    # Uninstall proj
-#    - name: Uninstall proj
-#      run: sudo apt-get remove proj-bin libproj-dev proj-data
-#
-#    # Install proj
-#    - name: Install proj
-#      run: conda install -c conda-forge proj
-#
-#    # Install geos
-#    - name: Install geos
-#      run: conda install -c conda-forge geos
 
     # Install cartopy
     - name: Install cartopy
@@ -64,58 +43,3 @@ jobs:
     # Run the eva test suite
     - name: Run eva applications tests
       run: eva_tests application
-
-#jobs:
-#  evaapp:
-#    name: Run eva application tests
-#    runs-on: ubuntu-latest
-#    steps:
-#
-#    # Ubuntu setup stuff
-#    - name: Install ubuntu dependencies
-#      run: |
-#        sudo apt-get install libproj-dev proj-data proj-bin
-#        sudo apt-get install libgeos-dev musl-dev libc-dev
-#        sudo ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
-#
-#    # Switch to brew for proj and python to bump proj to version compatible with cartopy
-#    - name: Uninstall proj
-#      run: sudo apt-get remove proj-bin libproj-dev proj-data
-#    - name: Install proj with homebrew
-#      run: brew install proj
-#    - name: Install python with brew
-#      run: brew install python@3.9
-#    - name: Install gcc-5 with brew
-#      run: brew install gcc@5
-#    #- name: Install geos with brew
-#    #  run: brew install geos
-#
-#    - run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-#    - run: sudo apt-get update
-#    - run: sudo apt-get upgrade
-#    - run: sudo apt-get --fix-missing dist-upgrade
-#
-#    # Clone the eva code
-#    - name: Clone eva repo
-#      uses: actions/checkout@v2
-#      with:
-#        lfs: true
-#
-#    # Install eva
-#    - name: Upgrade pip
-#      run: pip3 install --upgrade pip
-#    - name: Install eva and dependencies
-#      run: pip3 install --use-deprecated=legacy-resolver -r requirements.txt --user .
-#    - name: Put eva in the path
-#      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-#
-#    - name: ls
-#      run: ls -l /home/runner/.local/lib/python3.9/site-packages/eva/plot_tools/figure_driver.py
-#
-#    - name: cat
-#      run: cat /home/runner/.local/lib/python3.9/site-packages/eva/plot_tools/figure_driver.py
-#
-#    # Run the eva test suite
-#    - name: Run eva applications tests
-#      #run: eva_tests application
-#      run: python3 -v /home/runner/.local/bin/eva_tests application  # Get verbose output (debug)

@@ -8,16 +8,31 @@ jobs:
   pycodestyle:
     name: Check Python Coding Norms
     runs-on: ubuntu-latest
+
     steps:
-    - name: Install ubuntu dependencies
-      run: |
-        sudo apt-get install libproj-dev proj-data proj-bin
-        sudo apt-get install libgeos-dev musl-dev libc-dev
-        sudo ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+
+    # Setup Python
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
-        cache: 'pip'
-    - run: pip install --use-deprecated=legacy-resolver -r requirements-github.txt
-    - run: python3 pycodestyle_run.py
+        python-version: 3.9
+
+    # Update conda
+    - name: Update conda
+      run: conda update -n base -c defaults conda
+
+    # Install pycodestyle
+    - name: Install pycodestyle
+      run: conda install -c conda-forge pycodestyle
+
+    # Clone the eva code
+    - name: Clone eva repo
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+
+    # Clone the eva code
+    - name: Run python codestyle
+    - run: $CONDA/bin/python3 pycodestyle_run.py
+
+
