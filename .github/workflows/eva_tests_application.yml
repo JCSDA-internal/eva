@@ -30,6 +30,10 @@ jobs:
     - name: Install proj
       run: conda install -c conda-forge proj
 
+    # Install geos
+    - name: Install geos
+      run: conda install -c conda-forge geos
+
     # Install proj
     #- name: Install proj
     #  run: $CONDA/bin/conda install -c conda-forge proj
