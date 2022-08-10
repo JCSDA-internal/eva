@@ -4,57 +4,75 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+
 jobs:
   evaapp:
     name: Run eva application tests
     runs-on: ubuntu-latest
+
     steps:
-
-    # Ubuntu setup stuff
-    - name: Install ubuntu dependencies
-      run: |
-        sudo apt-get install libproj-dev proj-data proj-bin
-        sudo apt-get install libgeos-dev musl-dev libc-dev
-        sudo ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
-
-    # Switch to brew for proj and python to bump proj to version compatible with cartopy
-    - name: Uninstall proj
-      run: sudo apt-get remove proj-bin libproj-dev proj-data
-    - name: Install proj with homebrew
-      run: brew install proj
-    - name: Install python with brew
-      run: brew install python@3.9
-    - name: Install gcc-5 with brew
-      run: brew install gcc@5
-    #- name: Install geos with brew
-    #  run: brew install geos
-
-    - run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-    - run: sudo apt-get update
-    - run: sudo apt-get upgrade
-    - run: sudo apt-get --fix-missing dist-upgrade
-
-    # Clone the eva code
-    - name: Clone eva repo
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
       with:
-        lfs: true
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        $CONDA/bin/conda env update --file environment.yml --name base
 
-    # Install eva
-    - name: Upgrade pip
-      run: pip3 install --upgrade pip
-    - name: Install eva and dependencies
-      run: pip3 install --use-deprecated=legacy-resolver -r requirements.txt --user .
-    - name: Put eva in the path
-      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-    - name: ls
-      run: ls -l /home/runner/.local/lib/python3.9/site-packages/eva/plot_tools/figure_driver.py
-
-    - name: cat
-      run: cat /home/runner/.local/lib/python3.9/site-packages/eva/plot_tools/figure_driver.py
-
-    # Run the eva test suite
-    - name: Run eva applications tests
-      #run: eva_tests application
-      run: python3 -v /home/runner/.local/bin/eva_tests application  # Get verbose output (debug)
+#jobs:
+#  evaapp:
+#    name: Run eva application tests
+#    runs-on: ubuntu-latest
+#    steps:
+#
+#    # Ubuntu setup stuff
+#    - name: Install ubuntu dependencies
+#      run: |
+#        sudo apt-get install libproj-dev proj-data proj-bin
+#        sudo apt-get install libgeos-dev musl-dev libc-dev
+#        sudo ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+#
+#    # Switch to brew for proj and python to bump proj to version compatible with cartopy
+#    - name: Uninstall proj
+#      run: sudo apt-get remove proj-bin libproj-dev proj-data
+#    - name: Install proj with homebrew
+#      run: brew install proj
+#    - name: Install python with brew
+#      run: brew install python@3.9
+#    - name: Install gcc-5 with brew
+#      run: brew install gcc@5
+#    #- name: Install geos with brew
+#    #  run: brew install geos
+#
+#    - run: sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+#    - run: sudo apt-get update
+#    - run: sudo apt-get upgrade
+#    - run: sudo apt-get --fix-missing dist-upgrade
+#
+#    # Clone the eva code
+#    - name: Clone eva repo
+#      uses: actions/checkout@v2
+#      with:
+#        lfs: true
+#
+#    # Install eva
+#    - name: Upgrade pip
+#      run: pip3 install --upgrade pip
+#    - name: Install eva and dependencies
+#      run: pip3 install --use-deprecated=legacy-resolver -r requirements.txt --user .
+#    - name: Put eva in the path
+#      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+#
+#    - name: ls
+#      run: ls -l /home/runner/.local/lib/python3.9/site-packages/eva/plot_tools/figure_driver.py
+#
+#    - name: cat
+#      run: cat /home/runner/.local/lib/python3.9/site-packages/eva/plot_tools/figure_driver.py
+#
+#    # Run the eva test suite
+#    - name: Run eva applications tests
+#      #run: eva_tests application
+#      run: python3 -v /home/runner/.local/bin/eva_tests application  # Get verbose output (debug)
