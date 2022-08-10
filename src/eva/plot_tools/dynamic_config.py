@@ -99,7 +99,7 @@ def histogram_bins(logger, option_dict, plots_dict, data_collections):
 
     # Check for zero data, set to 3 as a reasonable minimum
     if n == 0:
-        n = 2
+        n = 3
 
     # Compute number of bins using standard rule
     rule = option_dict.get('number of bins rule', 'sturges')
