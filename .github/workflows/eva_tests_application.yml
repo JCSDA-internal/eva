@@ -32,7 +32,7 @@ jobs:
 
     # Install geos
     - name: Install cartopy
-      run: $CONDA/bin/conda install -c conda-forge cartopy
+      run: $CONDA/bin/conda install -c conda-forge cartopy>=0.20.3
 
     # Clone the eva code
     - name: Clone eva repo
