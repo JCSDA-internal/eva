@@ -9,6 +9,14 @@ jobs:
     name: Check Python Coding Norms
     runs-on: ubuntu-latest
     steps:
+
+    # Setup Python
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+
     - name: Install ubuntu dependencies
       run: |
         sudo apt-get install libproj-dev proj-data proj-bin
