@@ -18,9 +18,18 @@ jobs:
       with:
         python-version: 3.9
 
+    # Add to path
+    - name: Add conda/bin to path
+      run: echo "${CONDA}/bin" >> $GITHUB_PATH
+    - name: Add conda/lib to path
+      run: echo "${CONDA}/lib" >> $GITHUB_PATH
+
+    - name: Echo path
+      run: echo $GITHUB_PATH
+
     # Update conda
     - name: Update conda
-      run: $CONDA/bin/conda update -n base -c defaults conda
+      run: conda update -n base -c defaults conda
 
     # Uninstall proj
     - name: Uninstall proj
@@ -35,12 +44,13 @@ jobs:
       run: conda install -c conda-forge geos
 
     # Add to path
-    - name: Echo path
-      run: echo "${CONDA}/lib" >> $GITHUB_PATH
+
+
+
 
     # Install cartopy
     - name: Install cartopy
-      run: $CONDA/bin/conda install -c conda-forge cartopy>=0.20.2
+      run: conda install -c conda-forge cartopy>=0.20.2
 
     # Clone the eva code
     - name: Clone eva repo
