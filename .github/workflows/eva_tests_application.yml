@@ -20,7 +20,7 @@ jobs:
 
     # Install proj
     - name: Install proj
-      run: ls $CONDA/bin/conda install -c conda-forge proj
+      run: $CONDA/bin/conda install -c conda-forge proj
 
     # Clone the eva code
     - name: Clone eva repo
