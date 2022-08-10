@@ -21,6 +21,8 @@ from eva.eva_path import return_eva_path
 from eva.utilities.logger import Logger
 from eva.utilities.utils import load_yaml_file, replace_vars_dict
 
+from eva.plot_tools import figure_driver
+from eva.plot_tools.figure_driver import FigureDriver
 
 # --------------------------------------------------------------------------------------------------
 
