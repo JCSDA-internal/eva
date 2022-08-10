@@ -18,6 +18,10 @@ jobs:
       with:
         python-version: 3.9
 
+    # Update conda
+    - name: Update conda
+      run: $CONDA/bin/conda update -n base -c defaults conda
+
     # Uninstall proj
     - name: Uninstall proj
       run: sudo apt-get remove proj-bin libproj-dev proj-data
