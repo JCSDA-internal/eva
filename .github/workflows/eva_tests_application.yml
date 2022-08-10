@@ -11,13 +11,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+
+    # Setup Python
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: Install dependencies
-      run: ls $CONDA/bin
+
+    # Install proj
+    - name: Install proj
+      run: ls $CONDA/bin/conda install -c conda-forge proj
+
+    # Clone the eva code
+    - name: Clone eva repo
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+
+    # Install eva
+    - name: Upgrade pip
+      run: $CONDA/bin/pip3 install --upgrade pip
+    - name: Install eva and dependencies
+      run: $CONDA/bin/pip3 install --use-deprecated=legacy-resolver -r requirements.txt --user .
+    - name: Put eva in the path
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
 
 #jobs:
