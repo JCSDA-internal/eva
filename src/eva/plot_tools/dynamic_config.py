@@ -41,7 +41,7 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
 
     # Decide how many values to throw out on each end of the dataset
     n = datavar.size
-    n_throw_out = (100-percentage_capture) * n / 200
+    n_throw_out = ((100-percentage_capture) * n / 100) / 2
 
     # The value needs to be an integer
     n_throw_out = np.floor(n_throw_out)
