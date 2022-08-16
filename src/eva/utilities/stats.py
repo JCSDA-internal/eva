@@ -50,17 +50,20 @@ def stats_helper(logger, plotobj, data_collections, config):
     stats_dict = {}
 
     # loop through stats list in config
-    for stat in config['statistic list']:
-        if stat in ['n']:
-            stats_dict[stat] = f'{len(data)}'
-        elif stat in ['min', 'max', 'mean', 'median', 'std', 'var']:
-            statvalue = eval(f'_np.nan{stat}(data)')
-            statvalue = eval(f'_np.round(statvalue, {digits})')
-            stats_dict[stat] = str(statvalue)
-        elif stat in ['name']:
-            stats_dict[stat] = varstr
-        else:
-            logger.abort(f'In stats_helper the statistic {stat} is not supported.')
+    if len(data) > 0:
+        for stat in config['statistic list']:
+            if stat in ['n']:
+                stats_dict[stat] = f'{len(data)}'
+            elif stat in ['min', 'max', 'mean', 'median', 'std', 'var']:
+                statvalue = eval(f'_np.nan{stat}(data)')
+                statvalue = eval(f'_np.round(statvalue, {digits})')
+                stats_dict[stat] = str(statvalue)
+            elif stat in ['name']:
+                stats_dict[stat] = varstr
+            else:
+                logger.abort(f'In stats_helper the statistic {stat} is not supported.')
+    else:
+        logger.debug('In stats_helper, len(data) == 0')
 
     # get additional config
     xloc = config.get('xloc', 0.5)
