@@ -97,6 +97,12 @@ class IodaObsSpace(EvaBase):
                 # Read header part of the file to get coordinates
                 ds_groups = xr.Dataset()
 
+                # Save sensor_channels for later
+                nchans_present = False
+                if 'nchans' in ds_header.keys():
+                    sensor_channels = ds_header['nchans']
+                    nchans_present = True
+
                 # Merge in the header and close
                 ds_groups = ds_groups.merge(ds_header)
                 ds_header.close()
@@ -138,6 +144,10 @@ class IodaObsSpace(EvaBase):
                     for group_var in group_vars:
                         rename_dict[group_var] = group_name + '::' + group_var
                     ds = ds.rename(rename_dict)
+
+                    # Reset channel numbers from header
+                    if nchans_present:
+                        ds['nchans'] = sensor_channels
 
                     # Set channels
                     ds = subset_channels(ds, channels)
