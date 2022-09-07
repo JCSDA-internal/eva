@@ -98,9 +98,10 @@ class IodaObsSpace(EvaBase):
                 ds_groups = xr.Dataset()
 
                 # Save sensor_channels for later
-                sensor_channels = 0
+                nchans_present = False
                 if 'nchans' in ds_header.keys():
                     sensor_channels = ds_header['nchans']
+                    nchans_present = True
 
                 # Merge in the header and close
                 ds_groups = ds_groups.merge(ds_header)
@@ -145,7 +146,7 @@ class IodaObsSpace(EvaBase):
                     ds = ds.rename(rename_dict)
 
                     # Reset channel numbers from header
-                    if 'nchans' in ds.keys()
+                    if nchans_present:
                         ds['nchans'] = sensor_channels
 
                     # Set channels
