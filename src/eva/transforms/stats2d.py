@@ -55,7 +55,6 @@ def stats2d(config, data_collections):
                 for stat_function in stat_functions:
                     function_name = getattr(exp_var_data, stat_function.lower())
                     result = function_name(dim='nlocs')
-                    print(stat_function, result)
                     # Add the new field to the data collections
                     cgv = split_collectiongroupvariable(logger, variable_name)
                     data_collections.add_variable_to_collection(cgv[0], cgv[1]+stat_function, cgv[2], result)
