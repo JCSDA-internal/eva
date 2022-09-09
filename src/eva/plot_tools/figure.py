@@ -142,6 +142,7 @@ class CreateFigure:
             'invert_xaxis': self._invert_xaxis,
             'invert_yaxis': self._invert_yaxis,
             'yscale': self._set_yscale,
+            'xscale': self._set_xscale,
             'map_features': self._add_map_features
         }
 
@@ -492,6 +493,12 @@ class CreateFigure:
         if invert_yaxis:
             ax.invert_yaxis()
 
+    def _set_xscale(self, ax, xscale):
+        """
+        Set x-scale on specified ax.
+        """
+        ax.set_xscale(xscale)
+
     def _set_yscale(self, ax, yscale):
         """
         Set y-scale on specified ax.
@@ -692,8 +699,15 @@ class CreatePlot():
 
         self.invert_yaxis = True
 
-    def set_yscale(self, scale):
+    def set_xscale(self, scale):
 
+        valid_scales = ['log', 'linear', 'symlog', 'logit']
+        if scale not in valid_scales:
+            raise ValueError(f'requested scale {scale} is invalid. Valid '
+                             f'choices are: {" | ".join(valid_scales)}')
+        self.xscale = scale
+
+    def set_yscale(self, scale):
         valid_scales = ['log', 'linear', 'symlog', 'logit']
         if scale not in valid_scales:
             raise ValueError(f'requested scale {scale} is invalid. Valid '
