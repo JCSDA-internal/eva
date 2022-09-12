@@ -33,7 +33,6 @@ def channel_stats(config, data_collections):
     # Define default stat functions to calculate
     if 'statistic list' in config:
         stat_functions = get(config, logger, 'statistic list')
-        print('stat_functions=',stat_functions)
     else:
         stat_functions = ['Mean', 'Std', 'Count', 'Median', 'Min', 'Max']
 
