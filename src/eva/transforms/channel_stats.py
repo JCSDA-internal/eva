@@ -57,6 +57,7 @@ def channel_stats(config, data_collections):
                     result = function_name(dim='nlocs')
                     # Add the new field to the data collections
                     cgv = split_collectiongroupvariable(logger, variable_name)
-                    data_collections.add_variable_to_collection(cgv[0], cgv[1]+stat_function, cgv[2], result)
+                    data_collections.add_variable_to_collection(cgv[0], cgv[1]+stat_function,
+                                                                cgv[2], result)
 
 # --------------------------------------------------------------------------------------------------
