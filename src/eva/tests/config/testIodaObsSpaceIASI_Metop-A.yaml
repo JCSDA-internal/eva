@@ -39,7 +39,7 @@ diagnostics:
       variable_name: experiment::hofx::${variable}
       for:
         variable: *variables
-  
+ 
     # Generate hofx that passed QC for GSI
     - transform: accept where
       new name: experiment::hofxPassedGSIQc::${variable}
