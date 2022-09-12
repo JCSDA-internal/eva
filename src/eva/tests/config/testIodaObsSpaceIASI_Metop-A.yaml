@@ -59,7 +59,7 @@ diagnostics:
   graphics:
 
     # ---------- Statistical Plot ----------
-    # JEDI h(x) vs GSI h(x)    
+    # JEDI h(x) vs GSI h(x)
     # -------------------------
     - figure:
         layout: [1,1]
