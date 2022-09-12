@@ -25,7 +25,7 @@ from eva.utilities.utils import remove_empty_from_list_of_strings
 # --------------------------------------------------------------------------------------------------
 
 
-def stats2d(config, data_collections):
+def channel_stats(config, data_collections):
 
     # Create a logger
     logger = Logger('Stats2DTransform')
