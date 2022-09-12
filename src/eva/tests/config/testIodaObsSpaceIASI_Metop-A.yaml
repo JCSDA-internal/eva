@@ -36,6 +36,7 @@ diagnostics:
 
     # Stats for hofx
     - transform: channel_stats
+      statistic list: ['Mean', 'Count']
       variable_name: experiment::hofx::${variable}
       for:
         variable: *variables
@@ -57,8 +58,8 @@ diagnostics:
 
   graphics:
 
-    # ---------- Scatter Plots ----------
-    # JEDI h(x) vs Observations
+    # ---------- Statistical Plot ----------
+    # JEDI h(x) vs GSI h(x)    
     # -------------------------
     - figure:
         layout: [1,1]
@@ -79,6 +80,7 @@ diagnostics:
               variable: experiment::hofxMean::brightness_temperature
             markersize: 5
             color: 'red'
+            label: 'JEDI h(x) versus channels (all obs)'
           - type: Scatter
             x:
               variable: experiment::MetaData::sensor_channel

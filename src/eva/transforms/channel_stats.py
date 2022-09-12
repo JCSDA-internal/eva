@@ -28,10 +28,14 @@ from eva.utilities.utils import remove_empty_from_list_of_strings
 def channel_stats(config, data_collections):
 
     # Create a logger
-    logger = Logger('Stats2DTransform')
+    logger = Logger('ChannelStatsTransform')
 
-    # Define stat functions to calcualte
-    stat_functions = ['Mean', 'Std', 'Count', 'Median', 'Min', 'Max']
+    # Define default stat functions to calculate
+    if 'statistic list' in config:
+        stat_functions = get(config, logger, 'statistic list')
+        print('stat_functions=',stat_functions)
+    else:
+        stat_functions = ['Mean', 'Std', 'Count', 'Median', 'Min', 'Max']
 
     # Parse the for dictionary
     [collections, groups, variables] = parse_for_dict(config, logger)
