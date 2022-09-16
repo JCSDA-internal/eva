@@ -78,7 +78,7 @@ class IodaObsSpace(EvaBase):
 
             # Get missing value threshold
             # ---------------------------
-            threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e06))
+            threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e10))
 
             # Get the groups to be read
             # -------------------------
