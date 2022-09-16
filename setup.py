@@ -39,6 +39,7 @@ setuptools.setup(
         'cartopy>=0.20.2',
         'scikit-learn>=1.0.2',
         'xarray>=0.11.3',
+        'tornado'
     ],
     package_data={
         '': [
