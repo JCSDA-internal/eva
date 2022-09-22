@@ -93,7 +93,7 @@ class EvaFactory():
         # Import class based on user selected task
         # ----------------------------------------
         module_to_import = "eva."+eva_group_name+"."+eva_module_name
-        #timing.start(f'EvaFactory import: {eva_class_name} from {module_to_import}')
+        # timing.start(f'EvaFactory import: {eva_class_name} from {module_to_import}')
         try:
             eva_class = getattr(importlib.import_module(module_to_import), eva_class_name)
         except Exception as e:
@@ -102,7 +102,7 @@ class EvaFactory():
                                                   eva_group_name,
                                                   eva_module_name)
                          + '.py but no such class was found or an error occurred.')
-        #timing.stop(f'EvaFactory import: {eva_class_name} from {module_to_import}')
+        # timing.stop(f'EvaFactory import: {eva_class_name} from {module_to_import}')
 
         # Return implementation of the class (calls base class constructor that is above)
         # -------------------------------------------------------------------------------

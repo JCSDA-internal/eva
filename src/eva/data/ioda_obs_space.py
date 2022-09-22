@@ -123,7 +123,7 @@ class IodaObsSpace(EvaBase):
                     # Read the group
                     timing.start(f'IodaObsSpace: open_dataset')
                     ds = open_dataset(filename, group=group_name, mask_and_scale=False,
-                                         decode_times=False)
+                                      decode_times=False)
                     timing.stop(f'IodaObsSpace: open_dataset')
 
                     # If user specifies all variables set to group list

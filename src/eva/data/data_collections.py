@@ -74,7 +74,7 @@ class DataCollections:
                                   'along which to concatenate. Valid dimensions are ' +
                                   f'{dims}')
             self._collections[collection_name] = concat([self._collections[collection_name],
-                                                           collection], dim=concat_dimension)
+                                                        collection], dim=concat_dimension)
 
         # Check that nothing violates the naming conventions
         self.validate_names()

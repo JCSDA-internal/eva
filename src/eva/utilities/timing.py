@@ -72,7 +72,9 @@ class Timing():
                               f'running')
 
         # Record the final time
-        self.timing_dict[timer_name]['total_time'] = time.perf_counter() - self.timing_dict[timer_name]['start_time']
+        elapsed = time.perf_counter() - self.timing_dict[timer_name]['start_time']
+        self.timing_dict[timer_name]['total_time'] = elapsed
+
         self.timing_dict[timer_name]['running'] = False
 
         return
@@ -119,22 +121,21 @@ class Timing():
 
             if first:
                 write_str_len = len(write_string)
-                self.logger.info(' ' )
+                self.logger.info(' ')
                 self.logger.info('-' * write_str_len)
-                self.logger.info(' ' )
+                self.logger.info(' ')
                 self.logger.info('TIMING INFORMATION'.center(write_str_len))
-                self.logger.info(' ' )
+                self.logger.info(' ')
                 first = False
 
             # Write timer info
             self.logger.info(write_string)
 
-        self.logger.info(' ' )
+        self.logger.info(' ')
         self.logger.info(f'Total time taken {total_time_formatted} seconds.')
-        self.logger.info(' ' )
+        self.logger.info(' ')
         self.logger.info('-' * write_str_len)
-        self.logger.info(' ' )
-
+        self.logger.info(' ')
 
 
 # --------------------------------------------------------------------------------------------------
