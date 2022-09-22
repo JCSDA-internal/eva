@@ -261,6 +261,9 @@ class CreateFigure:
             s = ax.scatter(plotobj.x, plotobj.y, s=plotobj.markersize,
                            **inputs)
 
+        #print(plotobj)
+        #print(sadfdsf)
+
         # checks to see if linear regression attribute
         if hasattr(plotobj, 'linear_regression'):
 

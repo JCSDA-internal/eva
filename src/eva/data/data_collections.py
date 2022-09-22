@@ -11,7 +11,7 @@
 
 
 import numpy as np
-import xarray as xr
+from xarray import Dataset, concat, DataArray
 
 from eva.utilities.logger import Logger
 from eva.utilities.utils import fontColors as fcol, string_does_not_contain
@@ -43,7 +43,7 @@ class DataCollections:
     def create_or_add_to_collection(self, collection_name, collection, concat_dimension=None):
 
         # Collections should only be xarray datasets
-        if not isinstance(collection, xr.Dataset):
+        if not isinstance(collection, Dataset):
             self.logger.abort('In add_collection: collection must be an xarray.Dataset')
 
         # Check that there is not an existing collection that is empty
@@ -73,7 +73,7 @@ class DataCollections:
                                   concat_dimension + '\' that is requested as the dimension ' +
                                   'along which to concatenate. Valid dimensions are ' +
                                   f'{dims}')
-            self._collections[collection_name] = xr.concat([self._collections[collection_name],
+            self._collections[collection_name] = concat([self._collections[collection_name],
                                                            collection], dim=concat_dimension)
 
         # Check that nothing violates the naming conventions
@@ -84,13 +84,13 @@ class DataCollections:
     def add_variable_to_collection(self, collection_name, group_name, variable_name, variable):
 
         # Assert that new variable is an xarray Dataarray
-        if not isinstance(variable, xr.DataArray):
+        if not isinstance(variable, DataArray):
             self.logger.abort('In add_variable_to_collection: variable must be xarray.DataArray')
 
         # Check that there is not an existing collection that is empty
         if collection_name not in self._collections:
             # Create a new collection to hold the variable
-            self._collections[collection_name] = xr.Dataset()
+            self._collections[collection_name] = Dataset()
 
         # Combine the group and variable name
         group_variable_name = group_name + '::' + variable_name

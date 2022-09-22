@@ -20,6 +20,7 @@ import yaml
 from eva.eva_path import return_eva_path
 from eva.utilities.config import Config
 from eva.utilities.logger import Logger
+from eva.utilities.timing import Timing
 from eva.utilities.utils import camelcase_to_underscore, load_yaml_file
 from eva.data.data_collections import DataCollections
 
@@ -30,7 +31,7 @@ from eva.data.data_collections import DataCollections
 class EvaBase(ABC):
 
     # Base class constructor
-    def __init__(self, eva_class_name, config, eva_logger):
+    def __init__(self, eva_class_name, config, eva_logger, timing):
 
         # Replace logger
         # --------------
@@ -52,7 +53,7 @@ class EvaBase(ABC):
         self.config = Config(config, self.logger)
 
     @abstractmethod
-    def execute(self, data_collections):
+    def execute(self, data_collections, timing):
         '''
         Each class must implement this method and it is where it will do all of its work.
         '''
@@ -64,7 +65,7 @@ class EvaBase(ABC):
 
 class EvaFactory():
 
-    def create_eva_object(self, eva_class_name, eva_group_name, config, eva_logger):
+    def create_eva_object(self, eva_class_name, eva_group_name, config, eva_logger, timing):
 
         # Create temporary logger
         logger = Logger('EvaFactory')
@@ -91,19 +92,21 @@ class EvaFactory():
 
         # Import class based on user selected task
         # ----------------------------------------
+        module_to_import = "eva."+eva_group_name+"."+eva_module_name
+        #timing.start(f'EvaFactory import: {eva_class_name} from {module_to_import}')
         try:
-            eva_class = getattr(importlib.import_module("eva."+eva_group_name+"."+eva_module_name),
-                                eva_class_name)
+            eva_class = getattr(importlib.import_module(module_to_import), eva_class_name)
         except Exception as e:
             logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
                          'called ' + os.path.join(return_eva_path(),
                                                   eva_group_name,
                                                   eva_module_name)
                          + '.py but no such class was found or an error occurred.')
+        #timing.stop(f'EvaFactory import: {eva_class_name} from {module_to_import}')
 
         # Return implementation of the class (calls base class constructor that is above)
         # -------------------------------------------------------------------------------
-        return eva_class(eva_class_name, config, eva_logger)
+        return eva_class(eva_class_name, config, eva_logger, timing)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -111,12 +114,16 @@ class EvaFactory():
 
 def eva(eva_config, eva_logger=None):
 
+    # Create timing object
+    timing = Timing()
+
     # Create temporary logger
     logger = Logger('EvaSetup')
 
     logger.info('Starting Eva')
 
     # Convert incoming config (either dictionary or file) to dictionary
+    timing.start('Generate Dictionary')
     if isinstance(eva_config, dict):
         eva_dict = eva_config
     else:
@@ -132,6 +139,7 @@ def eva(eva_config, eva_logger=None):
 
     if not isinstance(diagnostic_configs, list):
         raise TypeError(f'diagnostics should be a list, it was type: {type(diagnostic_configs)}')
+    timing.stop('Generate Dictionary')
 
     # Loop over the applications and run
     for diagnostic_config in diagnostic_configs:
@@ -155,33 +163,50 @@ def eva(eva_config, eva_logger=None):
 
         # Create the data object
         creator = EvaFactory()
+        timing.start('DataObjectConstructor')
         eva_data_object = creator.create_eva_object(eva_data_class_name,
                                                     'data',
                                                     diagnostic_config['data'],
-                                                    eva_logger)
+                                                    eva_logger,
+                                                    timing)
+        timing.stop('DataObjectConstructor')
 
         # Prepare diagnostic data
         logger.info(f'Running execute for {eva_data_object.name}')
-        eva_data_object.execute(data_collections)
+        timing.start('DataObjectExecute')
+        eva_data_object.execute(data_collections, timing)
+        timing.stop('DataObjectExecute')
 
         # Create the transforms
         if 'transforms' in diagnostic_config:
+            timing.start('TransformsConstructor')
             eva_transform_object = creator.create_eva_object('TransformDriver',
                                                              'transforms',
                                                              diagnostic_config,
-                                                             eva_logger)
+                                                             eva_logger,
+                                                             timing)
+            timing.stop('TransformsConstructor')
             logger.info(f'Running execute for {eva_transform_object.name}')
-            eva_transform_object.execute(data_collections)
+            timing.start('TransformsExecute')
+            eva_transform_object.execute(data_collections, timing)
+            timing.stop('TransformsExecute')
 
         # Create the figure object
+        timing.start('FigureDriverConstructor')
         eva_figure_object = creator.create_eva_object('FigureDriver',
                                                       'plot_tools',
                                                       diagnostic_config,
-                                                      eva_logger)
+                                                      eva_logger,
+                                                      timing)
+        timing.stop('FigureDriverConstructor')
 
         # Generate figure(s)
         logger.info(f'Running execute for {eva_figure_object.name}')
-        eva_figure_object.execute(data_collections)
+        timing.start('FigureDriverExecute')
+        eva_figure_object.execute(data_collections, timing)
+        timing.stop('FigureDriverExecute')
+
+    timing.finalize()
 
 
 # --------------------------------------------------------------------------------------------------

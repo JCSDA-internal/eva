@@ -23,7 +23,7 @@ import os
 
 class TransformDriver(EvaBase):
 
-    def execute(self, data_collections):
+    def execute(self, data_collections, timing):
 
         # Get list of transform dictionaries
         transforms = get(self.config, self.logger, 'transforms')
@@ -42,7 +42,9 @@ class TransformDriver(EvaBase):
                                        transform_type)
 
             # Call the transform
+            timing.start(f'Transform: {transform_type}')
             transform_method(transform, data_collections)
+            timing.stop(f'Transform: {transform_type}')
 
         # Display the contents of the collections after updating with transforms
         if transforms:
