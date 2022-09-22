@@ -76,6 +76,10 @@ class IodaObsSpace(EvaBase):
             # -----------------------------------------
             filenames = get(dataset, self.logger, 'filenames')
 
+            # Get missing value threshold
+            # ---------------------------
+            threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
+
             # Get the groups to be read
             # -------------------------
             groups = get(dataset, self.logger, 'groups')
@@ -170,7 +174,7 @@ class IodaObsSpace(EvaBase):
                 data_collections.create_or_add_to_collection(collection_name, ds_groups, 'nlocs')
 
         # Nan out unphysical values
-        data_collections.nan_float_values_outside_threshold(1.0e10)
+        data_collections.nan_float_values_outside_threshold(threshold)
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
