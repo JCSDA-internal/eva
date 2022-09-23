@@ -102,9 +102,24 @@ class Density():
 
         self.data = data
 
-        self.weights = None
-        self.cumulative = False
         self.color = 'tab:blue'
+        self.fill = False
+        self.multiple = 'layer'
+        self.common_norm = True
+        self.common_grid = False
+        self.cumulative = False
+        self.bw_method = 'scott'
+        self.bw_adjust = 1
+        self.warn_singular = True
+        self.log_scale = False
+        self.levels = 10
+        self.thresh = 0.05
+        self.gridsize = 200
+        self.cut = 3
+        self.legend = False
+        self.cbar = False
+        self.cbar_ax = None
+        self.cbar_kws = None
         self.label = f'n={np.count_nonzero(~np.isnan(data))}'
         self.alpha = None
 

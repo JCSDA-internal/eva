@@ -303,9 +303,9 @@ class CreateFigure:
         skipvars = ['plottype', 'plot_ax', 'data']
         inputs = self._get_inputs_dict(skipvars, plotobj)
 
-        print(inputs)
-
         sns.kdeplot(data=plotobj.data, ax=ax, **inputs)
+
+        ax.axvline(x=0, color='k', ls=':', alpha = 0.2)
 
         #plt.show()
 
