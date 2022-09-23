@@ -316,6 +316,7 @@ diagnostics:
             color: 'blue'
             label: 'GSI omb (all obs)'
             alpha: 0.5
+            bw_adjust: 1.0  # Reduce this value to fit the data more closely
           - type: Density
             data:
               variable: experiment::ObsValueMinusHofx::${variable}
@@ -323,6 +324,7 @@ diagnostics:
             color: 'red'
             label: 'JEDI omb (all obs)'
             alpha: 0.5
+            bw_adjust: 1.0  # Reduce this value to fit the data more closely
 
     # Map plots
     # ---------
