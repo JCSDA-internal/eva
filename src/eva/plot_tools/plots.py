@@ -1,7 +1,7 @@
 # This work developed by NOAA/NWS/EMC under the Apache 2.0 license.
 import numpy as np
 
-__all__ = ['Scatter', 'Histogram', 'LinePlot' 'VerticalLine',
+__all__ = ['Scatter', 'Histogram', 'Density', 'LinePlot' 'VerticalLine',
            'HorizontalLine', 'BarPlot' 'HorizontalBar',
            'MapScatter', 'MapGridded', 'MapContour']
 
@@ -31,6 +31,7 @@ class Scatter():
         self.linewidths = 1.5
         self.edgecolors = None
         self.label = f'n={np.count_nonzero(~np.isnan(x))}'
+        self.do_linear_regression = True
 
     def add_linear_regression(self):
         """
@@ -77,6 +78,36 @@ class Histogram():
         self.cumulative = False
         self.bottom = None
         self.histtype = 'bar'
+        self.align = 'mid'
+        self.orientation = 'vertical'
+        self.rwidth = None
+        self.log = False
+        self.color = 'tab:blue'
+        self.label = f'n={np.count_nonzero(~np.isnan(data))}'
+        self.stacked = False
+        self.alpha = None
+
+
+class Density():
+
+    def __init__(self, data):
+        """
+        Constructor for Density.
+        Args:
+            data : (array type)
+        """
+
+        super().__init__()
+        self.plottype = 'density'
+
+        self.data = data
+
+        self.bins = 10
+        self.range = None
+        self.density = False
+        self.weights = None
+        self.cumulative = False
+        self.bottom = None
         self.align = 'mid'
         self.orientation = 'vertical'
         self.rwidth = None
