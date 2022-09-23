@@ -303,7 +303,11 @@ class CreateFigure:
         skipvars = ['plottype', 'plot_ax', 'data']
         inputs = self._get_inputs_dict(skipvars, plotobj)
 
-        sns.displot(data=plotobj.data, kind="kde")
+        print(inputs)
+
+        sns.kdeplot(data=plotobj.data, ax=ax, **inputs)
+
+        #plt.show()
 
     def _verticalline(self, plotobj, ax):
         """

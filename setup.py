@@ -36,7 +36,7 @@ setuptools.setup(
         'pycodestyle>=2.8.0',
         'netCDF4>=1.5.3',
         'matplotlib>=3.5.2',
-        'cartopy>=0.20.2',
+        'cartopy>=0.18.0',
         'scikit-learn>=1.0.2',
         'xarray>=0.11.3',
         'seaborn>=0.12',

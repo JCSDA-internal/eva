@@ -315,7 +315,6 @@ diagnostics:
               channel: ${channel}
             color: 'blue'
             label: 'GSI omb (all obs)'
-            bins: 100
             alpha: 0.5
           - type: Density
             data:
@@ -323,7 +322,6 @@ diagnostics:
               channel: ${channel}
             color: 'red'
             label: 'JEDI omb (all obs)'
-            bins: 100
             alpha: 0.5
 
     # Map plots

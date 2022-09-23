@@ -1,13 +1,6 @@
 # Density class default schema
-range:
 weights:
 cumulative: false
-bottom:
-align: 'mid'
-orientation: 'vertical'
-rwidth:
-log: false
 color: 'tab:blue'
 label:
-stacked: false
 alpha:

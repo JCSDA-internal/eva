@@ -102,19 +102,10 @@ class Density():
 
         self.data = data
 
-        self.bins = 10
-        self.range = None
-        self.density = False
         self.weights = None
         self.cumulative = False
-        self.bottom = None
-        self.align = 'mid'
-        self.orientation = 'vertical'
-        self.rwidth = None
-        self.log = False
         self.color = 'tab:blue'
         self.label = f'n={np.count_nonzero(~np.isnan(data))}'
-        self.stacked = False
         self.alpha = None
 
 
