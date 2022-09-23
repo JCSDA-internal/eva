@@ -294,6 +294,9 @@ class CreateFigure:
 
         ax.hist(plotobj.data, **inputs)
 
+        # Plot vertical line at x=0
+        ax.axvline(x=0, color='k', ls=':', alpha=0.2)
+
     def _density(self, plotobj, ax):
         """
         Uses Density object to plot on axis.
@@ -305,9 +308,8 @@ class CreateFigure:
 
         sns.kdeplot(data=plotobj.data, ax=ax, **inputs)
 
-        ax.axvline(x=0, color='k', ls=':', alpha = 0.2)
-
-        #plt.show()
+        # Plot vertical line at x=0
+        ax.axvline(x=0, color='k', ls=':', alpha=0.2)
 
     def _verticalline(self, plotobj, ax):
         """
