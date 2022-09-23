@@ -21,6 +21,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import Config
 from eva.utilities.logger import Logger
 from eva.utilities.utils import camelcase_to_underscore, load_yaml_file
+from eva.data.data_collections import DataCollections
 
 
 # --------------------------------------------------------------------------------------------------
@@ -150,7 +151,6 @@ def eva(eva_config, eva_logger=None):
 
         # Create the data collections
         # ---------------------------
-        from eva.data.data_collections import DataCollections
         data_collections = DataCollections()
 
         # Create the data object
