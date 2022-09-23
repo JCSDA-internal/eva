@@ -125,10 +125,10 @@ class IodaObsSpace(EvaBase):
                     collection_name = dataset['name']
 
                     # Read the group
-                    timing.start(f'IodaObsSpace: open_dataset')
+                    timing.start(f'IodaObsSpace: open_dataset {os.path.basename(filename)}')
                     ds = open_dataset(filename, group=group_name, mask_and_scale=False,
                                       decode_times=False)
-                    timing.stop(f'IodaObsSpace: open_dataset')
+                    timing.stop(f'IodaObsSpace: open_dataset {os.path.basename(filename)}')
 
                     # If user specifies all variables set to group list
                     if group_vars == 'all':

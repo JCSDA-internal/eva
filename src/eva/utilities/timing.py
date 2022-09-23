@@ -12,6 +12,7 @@
 # --------------------------------------------------------------------------------------------------
 
 
+import textwrap
 import time
 
 from eva.utilities.logger import Logger
@@ -41,6 +42,7 @@ class Timing():
         if timer_name not in self.timing_dict.keys():
             self.timing_dict[timer_name] = {}
             self.timing_dict[timer_name]['count'] = 0
+            self.timing_dict[timer_name]['total_time'] = 0.0
 
         # Check that timer is not already running
         if 'running' in self.timing_dict[timer_name].keys():
@@ -73,8 +75,10 @@ class Timing():
 
         # Record the final time
         elapsed = time.perf_counter() - self.timing_dict[timer_name]['start_time']
-        self.timing_dict[timer_name]['total_time'] = elapsed
+        self.timing_dict[timer_name]['total_time'] = self.timing_dict[timer_name]['total_time'] + \
+            elapsed
 
+        # Set running back to false
         self.timing_dict[timer_name]['running'] = False
 
         return
@@ -85,10 +89,8 @@ class Timing():
 
         import time
 
-        # Get the longest timer name
-        name_len = 0
-        for key in self.timing_dict.keys():
-            name_len = max(name_len, len(key))
+        # Maximum length of a line with timer name
+        max_len = 35
 
         # Total time
         total_time = time.perf_counter() - self.start_time
@@ -103,33 +105,42 @@ class Timing():
                 self.logger.abort('Timer \'{key}\' is still running. Make sure it was stopped.')
 
             name = key
+
+            name_list = textwrap.wrap(key, max_len, break_long_words=True)
+            for i in range(0, len(name_list)-1):
+                name_list[i] = name_list[i] + ' ...'
+
             time = self.timing_dict[key]['total_time']
             count = self.timing_dict[key]['count']
             time_per_count = time / count
             time_percent = 100.0 * time / total_time
 
-            name_formatted = name.ljust(name_len)
+            name_formatted = name_list[0].ljust(max_len+6)
             time_formatted = '{:8.2f}'.format(time)
             count_formatted = f'{count:03}'
             time_per_count_formatted = '{:8.2f}'.format(time_per_count)
             time_percent_formatted = '{:4.1f}'.format(time_percent)
 
-            write_string = f'Time taken by \'{name_formatted}\': {time_formatted} seconds | ' + \
-                           f'Number of instances: {count_formatted} | ' + \
-                           f'Time per instance: {time_per_count_formatted} | ' + \
-                           f'Percent of total time: {time_percent_formatted}%'
+            write_string = f'{name_formatted} {time_formatted} seconds | ' + \
+                           f'Instances count: {count_formatted} | ' + \
+                           f'Per instance: {time_per_count_formatted} | ' + \
+                           f'Percent of total: {time_percent_formatted}%'
 
             if first:
                 write_str_len = len(write_string)
                 self.logger.info(' ')
                 self.logger.info('-' * write_str_len)
                 self.logger.info(' ')
-                self.logger.info('TIMING INFORMATION'.center(write_str_len))
+                self.logger.info('TIMING INFORMATION (seconds)'.center(write_str_len))
+                self.logger.info('----------------------------'.center(write_str_len))
                 self.logger.info(' ')
                 first = False
 
             # Write timer info
             self.logger.info(write_string)
+
+            for i in range(1, len(name_list)):
+                self.logger.info('  ' + name_list[i].ljust(max_len+4))
 
         self.logger.info(' ')
         self.logger.info(f'Total time taken {total_time_formatted} seconds.')
