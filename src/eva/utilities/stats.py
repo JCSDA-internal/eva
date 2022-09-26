@@ -11,7 +11,7 @@ from scipy.stats import t as _t
 from sklearn.linear_model import LinearRegression
 
 
-def stats_helper(logger, plotobj, data_collections, config):
+def stats_helper(logger, plotobj, data_collections, stats_configs):
     """
     Add specified statistics to a plot
     Args:
@@ -21,59 +21,73 @@ def stats_helper(logger, plotobj, data_collections, config):
         config : input configuration dictionary
     """
     from eva.utilities.utils import slice_var_from_str
-    # get the variable to compute statistics for and place on the plot
-    varstr = config['data']['variable']
-    var_cgv = varstr.split('::')
-    if len(var_cgv) != 3:
-        logger.abort('In stats_helper the variable \'var_cgv\' does not appear to ' +
-                     'be in the required format of collection::group::variable.')
-
-    # Optionally get the channel to plot
-    channel = None
-    if 'channel' in config['data']:
-        channel = config['data'].get('channel')
-
-    data = data_collections.get_variable_data(var_cgv[0], var_cgv[1], var_cgv[2], channel)
-
-    # See if we need to slice data
-    data = slice_var_from_str(config['data'], data, logger)
-
-    # flatten and mask missing data
-    data = data.flatten()
-    mask = ~_np.isnan(data)
-    data = data[mask]
-
-    # do we round
-    digits = config.get('round', 4)
 
     # get an empty stats dict
     stats_dict = {}
+    stats_dict['stats'] = []
 
-    # loop through stats list in config
-    if len(data) > 0:
-        for stat in config['statistic list']:
-            if stat in ['n']:
-                stats_dict[stat] = f'{len(data)}'
-            elif stat in ['min', 'max', 'mean', 'median', 'std', 'var']:
-                statvalue = eval(f'_np.nan{stat}(data)')
-                statvalue = eval(f'_np.round(statvalue, {digits})')
-                stats_dict[stat] = str(statvalue)
-            elif stat in ['name']:
-                stats_dict[stat] = varstr
-            else:
-                logger.abort(f'In stats_helper the statistic {stat} is not supported.')
-    else:
-        logger.debug('In stats_helper, len(data) == 0')
+    yloc = -0.1
 
-    # get additional config
-    xloc = config.get('xloc', 0.5)
-    yloc = config.get('yloc', -0.1)
-    ha = config.get('ha', 'center')
-    kwargs = config.get('kwargs', {})
+    for stats_config in stats_configs:
+
+        # get the variable to compute statistics for and place on the plot
+        varstr = stats_config['data']['variable']
+        var_cgv = varstr.split('::')
+        if len(var_cgv) != 3:
+            logger.abort('In stats_helper the variable \'var_cgv\' does not appear to ' +
+                         'be in the required format of collection::group::variable.')
+
+        # Optionally get the channel to plot
+        channel = None
+        if 'channel' in stats_config['data']:
+            channel = stats_config['data'].get('channel')
+
+        data = data_collections.get_variable_data(var_cgv[0], var_cgv[1], var_cgv[2], channel)
+
+        # See if we need to slice data
+        data = slice_var_from_str(stats_config['data'], data, logger)
+
+        # flatten and mask missing data
+        data = data.flatten()
+        mask = ~_np.isnan(data)
+        data = data[mask]
+
+        # do we round
+        digits = stats_config.get('round', 4)
+
+        # get an empty stats dict
+        stat_dict = {}
+        stat_dict['stats'] = {}
+
+        # loop through stats list in config
+        if len(data) > 0:
+            for stat in stats_config['statistic list']:
+                if stat in ['n']:
+                    stat_dict['stats'][stat] = f'{len(data)}'
+                elif stat in ['min', 'max', 'mean', 'median', 'std', 'var']:
+                    statvalue = eval(f'_np.nan{stat}(data)')
+                    statvalue = eval(f'_np.round(statvalue, {digits})')
+                    stat_dict['stats'][stat] = str(statvalue)
+                elif stat in ['name']:
+                    stat_dict['stats'][stat] = varstr
+                else:
+                    logger.abort(f'In stats_helper the statistic {stat} is not supported.')
+        else:
+            logger.debug('In stats_helper, len(data) == 0')
+
+        # get additional config
+        stat_dict['xloc'] = stats_config.get('xloc', 0.0)
+        stat_dict['yloc'] = stats_config.get('yloc', yloc)
+        stat_dict['ha'] = stats_config.get('ha', 'left')
+        stat_dict['kwargs'] = stats_config.get('kwargs', {})
+
+        # change yloc
+        yloc = yloc - 0.025
+
+        stats_dict['stats'].append(stat_dict)
 
     # call plot object method
-    plotobj.add_stats_dict(stats_dict=stats_dict, xloc=xloc,
-                           yloc=yloc, ha=ha, **kwargs)
+    plotobj.add_stats_dict(stats_dict=stats_dict)
 
 
 def lregress(x, y, ci=95.0):

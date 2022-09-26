@@ -404,13 +404,15 @@ class CreateFigure:
         Add annotated stats on specified ax.
         """
         # loop through the dictionary and create the sting to annotate
-        outstr = ''
-        for key, value in stats['stats'].items():
-            outstr = outstr + f'{key}: {value}    '
+        for stat_dict in stats['stats']:
 
-        ax.annotate(outstr, xy=(stats['xloc'], stats['yloc']),
-                    xycoords='axes fraction', ha=stats['ha'],
-                    **stats['kwargs'])
+            outstr = ''
+            for key, value in stat_dict['stats'].items():
+                outstr = outstr + f'{key}: {value}    '
+
+            ax.annotate(outstr, xy=(stat_dict['xloc'], stat_dict['yloc']),
+                        xycoords='axes fraction', ha=stat_dict['ha'],
+                        **stat_dict['kwargs'])
 
     def _plot_legend(self, ax, legend):
         """
@@ -631,16 +633,9 @@ class CreatePlot():
             'kwargs': kwargs
         }
 
-    def add_stats_dict(self, stats_dict={}, xloc=0.5,
-                       yloc=-0.1, ha='center', **kwargs):
+    def add_stats_dict(self, stats_dict={}):
 
-        self.stats = {
-            'stats': stats_dict,
-            'xloc': xloc,
-            'yloc': yloc,
-            'ha': ha,
-            'kwargs': kwargs
-        }
+        self.stats = stats_dict
 
     def add_legend(self, **kwargs):
 
