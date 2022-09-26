@@ -26,7 +26,7 @@ import os
 
 class FigureDriver(EvaBase):
 
-    def execute(self, data_collections):
+    def execute(self, data_collections, timing):
 
         # Make copy of config
         # -------------------
@@ -38,6 +38,7 @@ class FigureDriver(EvaBase):
 
         # Loop through specified graphics
         # -------------------
+        timing.start('Graphics Loop')
         for graphic in graphics:
 
             # Parse configuration for this graphic
@@ -96,6 +97,7 @@ class FigureDriver(EvaBase):
             else:
                 # make just one figure per configuration
                 self.make_figure(figure_conf, plots_conf, dynamic_options_conf, data_collections)
+        timing.stop('Graphics Loop')
 
     def make_figure(self, figure_conf, plots, dynamic_options, data_collections):
 
