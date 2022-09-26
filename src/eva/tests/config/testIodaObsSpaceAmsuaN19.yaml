@@ -279,6 +279,53 @@ diagnostics:
             bins: 100
             alpha: 0.5
 
+    # Density plots
+    # -------------
+
+    # OmB Jedi and OmB GSI
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      figure:
+        layout: [1,1]
+        title: 'JEDI omb vs. GSI omb | AMSU-A NOAA-19 | ${variable_title}'
+        output name: density/amsua_n19/${variable}/${channel}/gsi_omb_jedi_omb_density_amsua_n19_${variable}_${channel}.png
+      plots:
+        - add_xlabel: 'Observation minus h(x)'
+          add_ylabel: 'Count'
+          add_legend:
+            loc: 'upper left'
+          statistics:
+            data:
+              variable: experiment::ObsValueMinusHofx::${variable}
+              channel: ${channel}
+            statistic list:
+            - n
+            - min
+            - mean
+            - max
+            - std
+            - name
+            kwargs:
+              fontsize: 6
+          layers:
+          - type: Density
+            data:
+              variable: experiment::ObsValueMinusGsiHofXBc::${variable}
+              channel: ${channel}
+            color: 'blue'
+            label: 'GSI omb (all obs)'
+            alpha: 0.5
+            bw_adjust: 1.0  # Reduce this value to fit the data more closely
+          - type: Density
+            data:
+              variable: experiment::ObsValueMinusHofx::${variable}
+              channel: ${channel}
+            color: 'red'
+            label: 'JEDI omb (all obs)'
+            alpha: 0.5
+            bw_adjust: 1.0  # Reduce this value to fit the data more closely
+
     # Map plots
     # ---------
 

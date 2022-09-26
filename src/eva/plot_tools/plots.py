@@ -1,7 +1,7 @@
 # This work developed by NOAA/NWS/EMC under the Apache 2.0 license.
 import numpy as np
 
-__all__ = ['Scatter', 'Histogram', 'LinePlot' 'VerticalLine',
+__all__ = ['Scatter', 'Histogram', 'Density', 'LinePlot' 'VerticalLine',
            'HorizontalLine', 'BarPlot' 'HorizontalBar',
            'MapScatter', 'MapGridded', 'MapContour']
 
@@ -31,6 +31,7 @@ class Scatter():
         self.linewidths = 1.5
         self.edgecolors = None
         self.label = f'n={np.count_nonzero(~np.isnan(x))}'
+        self.do_linear_regression = True
 
     def add_linear_regression(self):
         """
@@ -84,6 +85,42 @@ class Histogram():
         self.color = 'tab:blue'
         self.label = f'n={np.count_nonzero(~np.isnan(data))}'
         self.stacked = False
+        self.alpha = None
+
+
+class Density():
+
+    def __init__(self, data):
+        """
+        Constructor for Density.
+        Args:
+            data : (array type)
+        """
+
+        super().__init__()
+        self.plottype = 'density'
+
+        self.data = data
+
+        self.color = 'tab:blue'
+        self.fill = False
+        self.multiple = 'layer'
+        self.common_norm = True
+        self.common_grid = False
+        self.cumulative = False
+        self.bw_method = 'scott'
+        self.bw_adjust = 1
+        self.warn_singular = True
+        self.log_scale = False
+        self.levels = 10
+        self.thresh = 0.05
+        self.gridsize = 200
+        self.cut = 3
+        self.legend = False
+        self.cbar = False
+        self.cbar_ax = None
+        self.cbar_kws = None
+        self.label = f'n={np.count_nonzero(~np.isnan(data))}'
         self.alpha = None
 
 

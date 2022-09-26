@@ -5,3 +5,4 @@ matplotlib==3.5.2
 cartopy==0.18.0
 scikit-learn==1.1.2
 xarray==2022.6.0
+seaborn==0.12

@@ -8,6 +8,7 @@ alpha:
 linewidths: 1.5
 edgecolors:
 label: 'Points'
+do_linear_regression: True
 linear_regression:
   color: 'black'
   linewidth: 1

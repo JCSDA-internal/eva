@@ -1,0 +1,25 @@
+# Density class default schema
+
+# seaborn.kdeplot options (https://seaborn.pydata.org/generated/seaborn.kdeplot.html)
+color: 'tab:blue'
+fill: False
+multiple: 'layer'
+common_norm: True
+common_grid: False
+cumulative: False
+bw_method: 'scott'
+bw_adjust: 1
+warn_singular: True
+log_scale: False
+levels: 10
+thresh: 0.05
+gridsize: 200
+cut: 3
+legend: False
+cbar: False
+cbar_ax: None
+cbar_kws: None
+
+# Options passed to Matplotlib
+label:
+alpha:

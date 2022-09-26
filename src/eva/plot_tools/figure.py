@@ -66,6 +66,7 @@ class CreateFigure:
         plot_dict = {
             'scatter': self._scatter,
             'histogram': self._histogram,
+            'density': self._density,
             'line_plot': self._lineplot,
             'vertical_line': self._verticalline,
             'horizontal_line': self._horizontalline,
@@ -255,14 +256,14 @@ class CreateFigure:
             self._density_scatter(plotobj, ax)
         else:
             skipvars = ['plottype', 'plot_ax', 'x', 'y',
-                        'markersize', 'linear_regression',
+                        'markersize', 'do_linear_regression', 'linear_regression',
                         'density', 'channel']
             inputs = self._get_inputs_dict(skipvars, plotobj)
             s = ax.scatter(plotobj.x, plotobj.y, s=plotobj.markersize,
                            **inputs)
 
         # checks to see if linear regression attribute
-        if hasattr(plotobj, 'linear_regression'):
+        if plotobj.do_linear_regression:
 
             # Assert that plotobj contains nonzero-length data
             if len(plotobj.x) != 0 and len(plotobj.y) != 0:
@@ -292,6 +293,23 @@ class CreateFigure:
         inputs = self._get_inputs_dict(skipvars, plotobj)
 
         ax.hist(plotobj.data, **inputs)
+
+        # Plot vertical line at x=0
+        ax.axvline(x=0, color='k', ls=':', alpha=0.2)
+
+    def _density(self, plotobj, ax):
+        """
+        Uses Density object to plot on axis.
+        """
+        import seaborn as sns
+
+        skipvars = ['plottype', 'plot_ax', 'data']
+        inputs = self._get_inputs_dict(skipvars, plotobj)
+
+        sns.kdeplot(data=plotobj.data, ax=ax, **inputs)
+
+        # Plot vertical line at x=0
+        ax.axvline(x=0, color='k', ls=':', alpha=0.2)
 
     def _verticalline(self, plotobj, ax):
         """
@@ -545,7 +563,7 @@ class CreateFigure:
 class CreatePlot():
     """
     Creates a figure to plot data as a scatter plot,
-    histogram, or line plot.
+    histogram, density or line plot.
     """
     def __init__(self, plot_layers=[], projection=None,
                  domain=None):
