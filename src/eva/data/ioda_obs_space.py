@@ -9,7 +9,7 @@
 # --------------------------------------------------------------------------------------------------
 
 import os
-import xarray as xr
+from xarray import Dataset, open_dataset
 
 from eva.eva_base import EvaBase
 from eva.utilities.config import get
@@ -57,7 +57,7 @@ class IodaObsSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def execute(self, data_collections):
+    def execute(self, data_collections, timing):
 
         # Loop over the datasets
         # ----------------------
@@ -93,13 +93,13 @@ class IodaObsSpace(EvaBase):
                     logger.abort(f'In IodaObsSpace file \'{filename}\' does not exist')
 
                 # Get file header
-                ds_header = xr.open_dataset(filename)
+                ds_header = open_dataset(filename)
 
                 # fix nlocs if they are all zeros
                 ds_header['nlocs'] = check_nlocs(ds_header['nlocs'])
 
                 # Read header part of the file to get coordinates
-                ds_groups = xr.Dataset()
+                ds_groups = Dataset()
 
                 # Save sensor_channels for later
                 nchans_present = False
@@ -125,8 +125,10 @@ class IodaObsSpace(EvaBase):
                     collection_name = dataset['name']
 
                     # Read the group
-                    ds = xr.open_dataset(filename, group=group_name, mask_and_scale=False,
-                                         decode_times=False)
+                    timing.start(f'IodaObsSpace: open_dataset {os.path.basename(filename)}')
+                    ds = open_dataset(filename, group=group_name, mask_and_scale=False,
+                                      decode_times=False)
+                    timing.stop(f'IodaObsSpace: open_dataset {os.path.basename(filename)}')
 
                     # If user specifies all variables set to group list
                     if group_vars == 'all':
