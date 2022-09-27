@@ -28,6 +28,12 @@ def stats_helper(logger, plotobj, data_collections, stats_configs):
 
     yloc = -0.1
 
+    xloc = 0.5
+    ha = 'center'
+    if len(stats_configs) > 1:
+        xloc = 0.0
+        ha = 'left'
+
     for stats_config in stats_configs:
 
         # get the variable to compute statistics for and place on the plot
@@ -76,9 +82,9 @@ def stats_helper(logger, plotobj, data_collections, stats_configs):
             logger.debug('In stats_helper, len(data) == 0')
 
         # get additional config
-        stat_dict['xloc'] = stats_config.get('xloc', 0.0)
+        stat_dict['xloc'] = stats_config.get('xloc', xloc)
         stat_dict['yloc'] = stats_config.get('yloc', yloc)
-        stat_dict['ha'] = stats_config.get('ha', 'left')
+        stat_dict['ha'] = stats_config.get('ha', ha)
         stat_dict['kwargs'] = stats_config.get('kwargs', {})
 
         # change yloc
