@@ -39,6 +39,7 @@ setuptools.setup(
         'cartopy>=0.18.0',
         'scikit-learn>=1.0.2',
         'xarray>=0.11.3',
+        #'seaborn>=0.12',
     ],
     package_data={
         '': [

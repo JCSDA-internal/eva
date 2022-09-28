@@ -90,7 +90,7 @@ class IodaObsSpace(EvaBase):
 
                 # Assert that file exists
                 if not os.path.exists(filename):
-                    logger.abort(f'In IodaObsSpace file \'{filename}\' does not exist')
+                    self.logger.abort(f'In IodaObsSpace file \'{filename}\' does not exist')
 
                 # Get file header
                 ds_header = open_dataset(filename)
