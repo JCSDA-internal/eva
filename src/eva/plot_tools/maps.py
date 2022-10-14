@@ -16,6 +16,8 @@ class Domain:
 
         map_domains = {
             "global": self._global,
+            "north": self._north,
+            "south": self._south,   
             "north america": self._north_america,
             "europe": self._europe,
             "conus": self._conus,
@@ -52,6 +54,31 @@ class Domain:
                                         0, 60, 120, 180))
         self.yticks = dd.get('yticks', (-90, -60, -30, 0,
                                         30, 60, 90))
+    def _north(self, dd=dict()):
+        """
+        Sets extent, longitude xticks, and latitude yticks
+        for arctic domain.
+        """
+        self.extent = (-180, 180, 70, 90)
+        self.xticks = dd.get('xticks', (-180, -90, -30, 0,
+                                        30, 90, 180))
+        self.yticks = dd.get('yticks', (50, 75, 90))
+
+        self.cenlon = dd.get('cenlon', 0)
+        self.cenlat = dd.get('cenlat', 90)
+
+    def _south(self, dd=dict()):
+        """
+        Sets extent, longitude xticks, and latitude yticks
+        for arctic domain.
+        """
+        self.extent = (-180, 180, -90,  -50)
+        self.xticks = dd.get('xticks', (-180, -90, -30, 0,
+                                        30, 90, 180))
+        self.yticks = dd.get('yticks', (-90, -75, -50))
+
+        self.cenlon = dd.get('cenlon', 0)
+        self.cenlat = dd.get('cenlat', 90)
 
     def _north_america(self, dd=dict()):
         """

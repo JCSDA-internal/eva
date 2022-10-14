@@ -164,7 +164,7 @@ class CreateFigure:
 
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             s=plotobj.markersize, **inputs,
-                            transform=self.projection.projection)
+                            transform=ccrs.PlateCarree())
         else:
             skipvars = ['plottype', 'longitude', 'latitude',
                         'data', 'markersize', 'colorbar', 'normalize', 'integer_field']
@@ -182,7 +182,7 @@ class CreateFigure:
 
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             c=plotobj.data, s=plotobj.markersize,
-                            **inputs, norm=norm, transform=self.projection.projection)
+                            **inputs, norm=norm, transform=ccrs.PlateCarree())
         if plotobj.colorbar:
             self.cs = cs
 
@@ -194,7 +194,7 @@ class CreateFigure:
 
         cs = ax.pcolormesh(plotobj.latitude, plotobj.longitude,
                            plotobj.data, **inputs,
-                           transform=self.projection.projection)
+                           transform=ccrs.PlateCarree())
 
         if plotobj.colorbar:
             self.cs = cs
@@ -207,7 +207,7 @@ class CreateFigure:
 
         cs = ax.contour(plotobj.longitude, plotobj.latitude,
                         plot.data, **inputs,
-                        transform=self.projection.projection)
+                        transform=ccrs.PlateCarree())
 
         if plotobj.clabel:
             plt.clabel(cs, levels=plotobj.levels, use_clabeltext=True)
