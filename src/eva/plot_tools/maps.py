@@ -385,7 +385,7 @@ class MapProjection:
         Creates projection using Orthographic from Cartopy and
         orients it from central latitude 90 degrees.
         """
-        self.cenlon = -90 if self.cenlon is None else self.cenlon
+        self.cenlon = 0 if self.cenlon is None else self.cenlon
 
         self.projection = ccrs.Orthographic(central_longitude=self.cenlon,
                                             central_latitude=90,
