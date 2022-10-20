@@ -1,0 +1,3 @@
+[submodule "emcpy"]
+	path = emcpy
+	url = https://github.com/NOAA-EMC/emcpy.git
