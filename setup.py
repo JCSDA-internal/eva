@@ -20,8 +20,9 @@ setuptools.setup(
     author='Community owned code',
     description='Evaluation and Verification of an Analysis',
     url='https://github.com/danholdaway/eva',
-    package_dir={'': 'src'},
-    packages=setuptools.find_packages(where='src'),
+    package_dir={'emcpy': './emcpy/src/emcpy',
+                 '': 'src'},
+    packages=setuptools.find_packages(),
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Console',
