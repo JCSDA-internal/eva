@@ -17,7 +17,7 @@ class Domain:
         map_domains = {
             "global": self._global,
             "north": self._north,
-            "south": self._south,   
+            "south": self._south,
             "north america": self._north_america,
             "europe": self._europe,
             "conus": self._conus,
@@ -54,6 +54,7 @@ class Domain:
                                         0, 60, 120, 180))
         self.yticks = dd.get('yticks', (-90, -60, -30, 0,
                                         30, 60, 90))
+
     def _north(self, dd=dict()):
         """
         Sets extent, longitude xticks, and latitude yticks
@@ -362,12 +363,16 @@ class MapProjection:
         self.projection = ccrs.PlateCarree(central_longitude=self.cenlon,
                                            globe=self.globe)
 
+        self.transform = self.projection
+
     def _miller(self):
         """Creates projection using Miller from Cartopy."""
         self.cenlon = 0 if self.cenlon is None else self.cenlon
 
         self.projection = ccrs.Miller(central_longitude=self.cenlon,
                                       globe=self.globe)
+
+        self.transform = self.projection
 
     def _lambertconformal(self):
         """Creates projection using Lambert Conformal from Cartopy."""
@@ -380,6 +385,8 @@ class MapProjection:
         self.projection = ccrs.LambertConformal(central_longitude=self.cenlon,
                                                 central_latitude=self.cenlat)
 
+        self.transform = self.projection
+
     def _npstereo(self):
         """
         Creates projection using Orthographic from Cartopy and
@@ -390,6 +397,7 @@ class MapProjection:
         self.projection = ccrs.Orthographic(central_longitude=self.cenlon,
                                             central_latitude=90,
                                             globe=self.globe)
+        self.transform = ccrs.PlateCarree()
 
     def _spstereo(self):
         """
@@ -401,3 +409,4 @@ class MapProjection:
         self.projection = ccrs.Orthographic(central_longitude=self.cenlon,
                                             central_latitude=-90,
                                             globe=self.globe)
+        self.transform = ccrs.PlateCarree()

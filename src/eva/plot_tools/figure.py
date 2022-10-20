@@ -164,7 +164,7 @@ class CreateFigure:
 
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             s=plotobj.markersize, **inputs,
-                            transform=ccrs.PlateCarree())
+                            transform=self.projection.transform)
         else:
             skipvars = ['plottype', 'longitude', 'latitude',
                         'data', 'markersize', 'colorbar', 'normalize', 'integer_field']
@@ -179,10 +179,10 @@ class CreateFigure:
                     print("Abort: vmin and vmax must be set for integer fields")
                     exit()
                 norm = matplotlib.colors.BoundaryNorm(np.arange(vmin-0.5, vmax, 1), cmap.N)
-
             cs = ax.scatter(plotobj.longitude, plotobj.latitude,
                             c=plotobj.data, s=plotobj.markersize,
-                            **inputs, norm=norm, transform=ccrs.PlateCarree())
+                            **inputs, norm=norm,
+                            transform=self.projection.transform)
         if plotobj.colorbar:
             self.cs = cs
 
@@ -194,7 +194,7 @@ class CreateFigure:
 
         cs = ax.pcolormesh(plotobj.latitude, plotobj.longitude,
                            plotobj.data, **inputs,
-                           transform=ccrs.PlateCarree())
+                           transform=self.projection.transform)
 
         if plotobj.colorbar:
             self.cs = cs
@@ -207,7 +207,7 @@ class CreateFigure:
 
         cs = ax.contour(plotobj.longitude, plotobj.latitude,
                         plot.data, **inputs,
-                        transform=ccrs.PlateCarree())
+                        transform=self.projection.transform)
 
         if plotobj.clabel:
             plt.clabel(cs, levels=plotobj.levels, use_clabeltext=True)
