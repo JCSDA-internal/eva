@@ -16,12 +16,12 @@ import setuptools
 
 setuptools.setup(
     name='eva',
-    version='1.2.2',
+    version='1.3',
     author='Community owned code',
     description='Evaluation and Verification of an Analysis',
-    url='https://github.com/danholdaway/eva',
+    url='https://github.com/JCSDA-internal/eva',
     package_dir={'': 'src'},
-    packages=setuptools.find_packages(where='src'),
+    packages=setuptools.find_packages('src'),
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Console',
@@ -40,6 +40,8 @@ setuptools.setup(
         'scikit-learn>=1.0.2',
         'xarray>=0.11.3',
         #'seaborn>=0.12',
+        'emcpy @ git+https://github.com/NOAA-EMC/' +
+        'emcpy@8c1958e9ba8906a35a9677030ffa494519e11489#egg=emcpy',
     ],
     package_data={
         '': [
