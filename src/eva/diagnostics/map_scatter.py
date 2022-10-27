@@ -1,6 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-from emcpy.plots.plots import MapScatter
+import emcpy.plots.plots.MapScatter
 import os
 
 
