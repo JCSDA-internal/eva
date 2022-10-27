@@ -1,7 +1,7 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-import emcpy.plots.plots.Scatter
+from emcpy.plots.plots import Scatter as ScatterPlot
 import os
 import numpy as np
 
@@ -53,7 +53,7 @@ class Scatter():
 
         # Create declarative plotting Scatter object
         # ------------------------------------------
-        self.plotobj = emcpy.plots.plots.Scatter(xdata, ydata)
+        self.plotobj = ScatterPlot(xdata, ydata)
 
         # Get defaults from schema
         # ------------------------
