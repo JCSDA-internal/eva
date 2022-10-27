@@ -40,7 +40,7 @@ setuptools.setup(
         'scikit-learn>=1.0.2',
         'xarray>=0.11.3',
         'emcpy @ git+https://github.com/NOAA-EMC/' +
-        'emcpy@8c1958e9ba8906a35a9677030ffa494519e11489#egg=emcpy',
+        'emcpy@4fce929ea432e738aa7e3a2502bd0ead7d32ae0a#egg=emcpy',
     ],
     package_data={
         '': [
