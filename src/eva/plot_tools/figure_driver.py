@@ -16,7 +16,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.stats import stats_helper
 from eva.utilities.utils import get_schema, camelcase_to_underscore, parse_channel_list
 from eva.utilities.utils import replace_vars_dict
-from emcpy.plot.create_plots import CreatePlot, CreateFigure
+from emcpy.plots.create_plots import CreatePlot, CreateFigure
 import copy
 import importlib
 import os
