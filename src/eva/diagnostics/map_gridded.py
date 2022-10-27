@@ -1,6 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-from emcpy.plots.plots import MapGridded as MapGriddedPlot
+import emcpy.plots.plots
 import os
 
 
@@ -15,7 +15,7 @@ class MapGridded():
         datavar = dataobj.get_variable_data(config['data']['variable'])
         datavar = slice_var_from_str(config['data'], datavar, logger)
         # create declarative plotting MapGridded object
-        self.plotobj = MapGriddedPlot(lonvar, latvar, datavar)
+        self.plotobj = emcpy.plots.plots.MapGridded(lonvar, latvar, datavar)
         # get defaults from schema
         layer_schema = config.get("schema",
                                   os.path.join(return_eva_path(),

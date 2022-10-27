@@ -1,6 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-from emcpy.plots.plots import MapScatter as MapScatterPlot
+import emcpy.plots.plots
 import os
 
 
@@ -26,7 +26,7 @@ class MapScatter():
         latvar = latvar.flatten()
         datavar = datavar.flatten()
         # create declarative plotting MapScatter object
-        self.plotobj = MapScatterPlot(latvar, lonvar, datavar)
+        self.plotobj = emcpy.plots.plots.MapScatter(latvar, lonvar, datavar)
         # get defaults from schema
         layer_schema = config.get("schema",
                                   os.path.join(return_eva_path(),

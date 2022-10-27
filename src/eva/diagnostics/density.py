@@ -1,7 +1,7 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-from emcpy.plots.plots import Density as DensityPlot
+import emcpy.plots.plots
 import os
 import numpy as np
 
@@ -38,7 +38,7 @@ class Density():
 
         # Create declarative plotting density object
         # --------------------------------------------
-        self.plotobj = DensityPlot(data)
+        self.plotobj = emcpy.plots.plots.Density(data)
 
         # Get defaults from schema
         # ------------------------

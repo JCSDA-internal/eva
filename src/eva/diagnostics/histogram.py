@@ -1,7 +1,7 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-from emcpy.plots.plots import Histogram as HistogramPlot
+import emcpy.plots.plots
 import os
 import numpy as np
 
@@ -38,7 +38,7 @@ class Histogram():
 
         # Create declarative plotting histogram object
         # --------------------------------------------
-        self.plotobj = HistogramPlot(data)
+        self.plotobj = emcpy.plots.plots.Histogram(data)
 
         # Get defaults from schema
         # ------------------------
