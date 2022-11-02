@@ -132,7 +132,7 @@ class FigureDriver(EvaBase):
                 mapoptions = plot.get('mapping')
                 # TODO make this configurable and not hard coded
                 proj = mapoptions['projection']
-                domain = mapoptions['domain'] 
+                domain = mapoptions['domain']
 
             # create a subplot based on specified layers
             plotobj = CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
