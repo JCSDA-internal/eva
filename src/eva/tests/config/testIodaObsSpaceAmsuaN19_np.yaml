@@ -7,7 +7,7 @@ diagnostics:
     datasets:
       - name: experiment
         filenames:
-          - amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
+          - ${data_input_path}/amsua_n19.hofx.2020-12-14T21:00:00Z.nc4
         channels: &channels 3,8
         groups:
           - name: ObsValue
