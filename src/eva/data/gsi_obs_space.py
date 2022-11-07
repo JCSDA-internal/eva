@@ -196,7 +196,7 @@ class GsiObsSpace(EvaBase):
                     collection_name = dataset['name']
 
                     ds = open_dataset(filename, mask_and_scale=False,
-                                    decode_times=False)
+                                      decode_times=False)
 
                     # If user specifies all variables set to group list
                     if group_vars == 'all':
@@ -240,7 +240,7 @@ class GsiObsSpace(EvaBase):
             data_collections.create_or_add_to_collection(collection_name, ds, 'nobs')
 
         # Nan out unphysical values
-        data_collections.nan_float_values_outside_threshold(threshold)           
+        data_collections.nan_float_values_outside_threshold(threshold)
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
