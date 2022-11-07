@@ -1,0 +1,21 @@
+diagnostics:
+
+  # Data read
+  # ---------
+- data:
+    type: GsiObsSpace
+    datasets:
+      - name: experiment
+        satellite: metop-a
+        sensor: amsua
+        filenames:
+          - /scratch2/NCEPDEV/stmp1/Kevin.Dougherty/ncDiags/gdas.20200922/00/atmos/diag_amsua_metop-a_ges.2020092200.nc4
+        channels: &channels 3,8
+        groups:
+          - name: GsiNcDiag
+            variables: &variables [Obs_Minus_Forecast_adjusted,
+                                   Observation,
+                                   Latitude,
+                                   Longitude]
+
+  graphics:

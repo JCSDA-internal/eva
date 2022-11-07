@@ -1,0 +1,20 @@
+diagnostics:
+
+  # Data read
+  # ---------
+- data:
+    type: GsiObsSpace
+    datasets:
+      - name: experiment
+        variable: t
+        filenames:
+          - ${data_input_path}/diag_conv_t_ges.2020092000.nc4
+        groups:
+          - name: GsiNcDiag
+            variables: &variables [Obs_Minus_Forecast_adjusted,
+                                   Observation,
+                                   Latitude,
+                                   Longitude]
+
+  graphics:
+  
