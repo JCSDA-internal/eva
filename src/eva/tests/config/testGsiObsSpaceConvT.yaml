@@ -22,7 +22,7 @@ diagnostics:
 
     # Observations
     - batch figure:
-        variables: *variables
+        variables: Observation
       dynamic options:
         - type: vminvmaxcmap
           data variable: experiment::GsiNcDiag::Observation
