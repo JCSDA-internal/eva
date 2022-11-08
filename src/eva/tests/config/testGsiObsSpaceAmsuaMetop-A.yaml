@@ -24,13 +24,12 @@ diagnostics:
 
     # OmB Jedi and OmB GSI
     - batch figure:
-        variables: 
-          - Obs_Minus_Forecast_adjusted
+        variables: Obs_Minus_Forecast_adjusted
         channels: *channels
       figure:
         layout: [1,1]
         title: 'GSI omf | AMSU-A Metop-A | ${variable_title}'
-        output name: histograms/amsua_n19/${variable}/${channel}/gsi_omb_jedi_omb_histogram_amsua_n19_${variable}_${channel}.png
+        output name: histograms/amsua_n19/Obs_Minus_Forecast_adjusted/${channel}/gsi_omb_jedi_omb_histogram_amsua_n19_Obs_Minus_Forecast_adjusted_${channel}.png
       plots:
         - add_xlabel: 'Observation minus forecast'
           add_ylabel: 'Count'
@@ -38,7 +37,7 @@ diagnostics:
             loc: 'upper left'
           statistics:
             data:
-              variable: experiment::GsiNcDiag::${variable}
+              variable: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
               channel: ${channel}
             statistic list:
             - n
@@ -52,7 +51,7 @@ diagnostics:
           layers:
           - type: Histogram
             data:
-              variable: experiment::GsiNcDiag::${variable}
+              variable: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
               channel: ${channel}
             color: 'blue'
             label: 'GSI omb (all obs)'
