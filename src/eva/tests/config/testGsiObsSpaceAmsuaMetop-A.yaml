@@ -24,7 +24,8 @@ diagnostics:
 
     # OmB Jedi and OmB GSI
     - batch figure:
-        variables: Obs_Minus_Forecast_adjusted
+        variables: 
+          - Obs_Minus_Forecast_adjusted
         channels: *channels
       figure:
         layout: [1,1]
