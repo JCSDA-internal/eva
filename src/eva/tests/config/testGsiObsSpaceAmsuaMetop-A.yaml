@@ -23,37 +23,37 @@ diagnostics:
     # ---------------
 
     # OmB Jedi and OmB GSI
-    - batch figure:
-        variables: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
-        channels: *channels
-      figure:
-        layout: [1,1]
-        title: 'GSI omf | AMSU-A Metop-A | Omf'
-        output name: histograms/amsua_n19/Obs_Minus_Forecast_adjusted/${channel}/gsi_omb_histogram_amsua_n19_Obs_Minus_Forecast_adjusted_${channel}.png
-      plots:
-        - add_xlabel: 'Observation minus forecast'
-          add_ylabel: 'Count'
-          add_legend:
-            loc: 'upper left'
-          statistics:
-            data:
-              variable: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
-              channel: ${channel}
-            statistic list:
-            - n
-            - min
-            - mean
-            - max
-            - std
-            - name
-            kwargs:
-              fontsize: 6
-          layers:
-          - type: Histogram
-            data:
-              variable: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
-              channel: ${channel}
-            color: 'blue'
-            label: 'GSI omb (all obs)'
-            bins: 100
-            alpha: 0.5
+#     - batch figure:
+#         variables: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
+#         channels: *channels
+#       figure:
+#         layout: [1,1]
+#         title: 'GSI omf | AMSU-A Metop-A | Omf'
+#         output name: histograms/amsua_n19/Obs_Minus_Forecast_adjusted/${channel}/gsi_omb_histogram_amsua_n19_Obs_Minus_Forecast_adjusted_${channel}.png
+#       plots:
+#         - add_xlabel: 'Observation minus forecast'
+#           add_ylabel: 'Count'
+#           add_legend:
+#             loc: 'upper left'
+#           statistics:
+#             data:
+#               variable: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
+#               channel: ${channel}
+#             statistic list:
+#             - n
+#             - min
+#             - mean
+#             - max
+#             - std
+#             - name
+#             kwargs:
+#               fontsize: 6
+#           layers:
+#           - type: Histogram
+#             data:
+#               variable: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
+#               channel: ${channel}
+#             color: 'blue'
+#             label: 'GSI omb (all obs)'
+#             bins: 100
+#             alpha: 0.5
