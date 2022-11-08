@@ -28,8 +28,8 @@ diagnostics:
         channels: *channels
       figure:
         layout: [1,1]
-        title: 'GSI omf | AMSU-A Metop-A | ${variable_title}'
-        output name: histograms/amsua_n19/Obs_Minus_Forecast_adjusted/${channel}/gsi_omb_jedi_omb_histogram_amsua_n19_Obs_Minus_Forecast_adjusted_${channel}.png
+        title: 'GSI omf | AMSU-A Metop-A | Omf'
+        output name: histograms/amsua_n19/Obs_Minus_Forecast_adjusted/${channel}/gsi_omb_histogram_amsua_n19_Obs_Minus_Forecast_adjusted_${channel}.png
       plots:
         - add_xlabel: 'Observation minus forecast'
           add_ylabel: 'Count'
