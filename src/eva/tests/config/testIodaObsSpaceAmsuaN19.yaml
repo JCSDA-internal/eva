@@ -366,6 +366,43 @@ diagnostics:
             vmin: ${dynamic_vmin}
             vmax: ${dynamic_vmax}
 
+    # Observations over north polar region
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      dynamic options:
+        - type: vminvmaxcmap
+          channel: ${channel}
+          data variable: experiment::ObsValue::${variable}
+      figure:
+        figure size: [20,10]
+        layout: [1,1]
+        title: 'Observations | AMSU-A NOAA-19 | Obs Value'
+        output name: map_plots/amsua_n19/${variable}/${channel}/observations_amsua_n19_${variable}_${channel}_np.png
+      plots:
+        - mapping:
+            projection: npstere
+            domain: north
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: ObsValue
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::ObsValue::${variable}
+              channel: ${channel}
+            markersize: 2
+            label: ObsValue
+            colorbar: true
+            cmap: ${dynamic_cmap}
+            vmin: ${dynamic_vmin}
+            vmax: ${dynamic_vmax}
+
     # omb jedi
     - batch figure:
         variables: *variables
