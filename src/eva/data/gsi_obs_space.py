@@ -98,7 +98,7 @@ def satellite_dataset(ds):
     coords = {
         'nchans': (('nchans'), ds['sensor_chan']),
         'nobs': (('nobs'), np.arange(0, iters)),
-        'BC_angord_arr_dim': (('BC_angord_arr_dim'), np.arange(0,4))
+        'BC_angord_arr_dim': (('BC_angord_arr_dim'), np.arange(0, 4))
     }
 
     data_vars = {}
@@ -131,8 +131,8 @@ def satellite_dataset(ds):
                 data_vars[var] = (('nobs', 'nchans'), data)
 
     # create dataset
-    new_ds = Dataset(data_vars=data_vars, 
-                     coords=coords, 
+    new_ds = Dataset(data_vars=data_vars,
+                     coords=coords,
                      attrs=ds.attrs)
 
     return new_ds
