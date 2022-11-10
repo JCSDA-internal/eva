@@ -96,7 +96,7 @@ def satellite_dataset(ds):
     iters = int(ds.dims['nobs']/nchans)
 
     coords = {
-        'nchans': (('nchans'), ds['sensor_chan']),
+        'nchans': (('nchans'), ds['sensor_chan'].data),
         'nobs': (('nobs'), np.arange(0, iters)),
         'BC_angord_arr_dim': (('BC_angord_arr_dim'), np.arange(0, 4))
     }
