@@ -35,7 +35,7 @@ def all_equal(iterable):
 def uv(group_vars):
     """
     Adds 'uv' suffix to beginning of specified variables
-    if they are included input list of vars
+    if they are included in input list of vars
     """
     change_vars = ['Obs_Minus_Forecast_adjusted',
                    'Obs_Minus_Forecast_unadjusted',
