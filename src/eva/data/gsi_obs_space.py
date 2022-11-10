@@ -72,8 +72,7 @@ def subset_channels(ds, channels, logger, add_channels_variable=False):
             nchan_use = nchan_in_file
 
         if all(x in ds['sensor_chan'] for x in channels):
-            channel_idx = np.searchsorted(ds['sensor_chan'], np.array(channels))
-            ds = ds.sel(nchans=channel_idx)
+            ds = ds.sel(nchans=channels)
 
         else:
             bad_chans = [x for x in channels if x not in ds['sensor_chan']]
@@ -96,31 +95,25 @@ def satellite_dataset(ds):
     nchans = ds.dims['nchans']
     iters = int(ds.dims['nobs']/nchans)
 
-    # Create new dataset to return
-    new_ds = Dataset()
-
-    # Set attributes and dimensions
-    new_ds.attrs = ds.attrs
-
-    new_dims = {
-        'nchans': nchans,
-        'nobs': iters,
-        'BC_angord_arr_dim': ds.dims['BC_angord_arr_dim']
+    coords = {
+        'nchans': (('nchans'), ds['sensor_chan']),
+        'nobs': (('nobs'), np.arange(0, iters)),
+        'BC_angord_arr_dim': (('BC_angord_arr_dim'), np.arange(0,4))
     }
 
-    new_ds.expand_dims(new_dims)
-
+    data_vars = {}
     # Loop through each variable
     for var in ds.variables:
+
         # If variable has len of nchans, pass along data
         if len(ds[var]) == nchans:
-            new_ds[var] = (('nchans'), ds[var].data)
+            data_vars[var] = (('nchans'), ds[var].data)
 
         # If variable is BC_angord, reshape data
         elif var == 'BC_angord':
             data = np.reshape(ds['BC_angord'].data,
                               (iters, nchans, ds.dims['BC_angord_arr_dim']))
-            new_ds[var] = (('nobs', 'nchans', 'BC_angord_arr_dim'), data)
+            data_vars[var] = (('nobs', 'nchans', 'BC_angord_arr_dim'), data)
 
         # Deals with how to handle nobs data
         else:
@@ -130,12 +123,17 @@ def satellite_dataset(ds):
             # If values are repeating over nchan iterations, keep as nobs
             if condition:
                 data = ds[var].data[0::nchans]
-                new_ds[var] = (('nobs'), data)
+                data_vars[var] = (('nobs'), data)
 
             # Else, reshape to be a 2d array
             else:
                 data = np.reshape(ds[var].data, (iters, nchans))
-                new_ds[var] = (('nobs', 'nchans'), data)
+                data_vars[var] = (('nobs', 'nchans'), data)
+
+    # create dataset
+    new_ds = Dataset(data_vars=data_vars, 
+                     coords=coords, 
+                     attrs=ds.attrs)
 
     return new_ds
 
