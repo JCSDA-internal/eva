@@ -1,0 +1,55 @@
+diagnostics:
+
+  # Data read
+  # ---------
+- data:
+    type: GsiObsSpace
+    datasets:
+      - name: experiment
+        variable: t
+        filenames:
+          - ${data_input_path}/diag_conv_t_ges.2020092000.nc4
+        groups:
+          - name: GsiNcDiag
+            variables: &variables [Obs_Minus_Forecast_adjusted,
+                                   Observation,
+                                   Latitude,
+                                   Longitude]
+
+  graphics:
+    # Map plots
+    # ---------
+
+    # Observations
+    - batch figure:
+        variables: Observation
+      dynamic options:
+        - type: vminvmaxcmap
+          data variable: experiment::GsiNcDiag::Observation
+      figure:
+        figure size: [20,10]
+        layout: [1,1]
+        title: 'Observations | Conv T | Obs Value'
+        output name: map_plots/aircraft/observations/observations_aircraft_observation.png
+      plots:
+        - mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: Observation
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::GsiNcDiag::Longitude
+            latitude:
+              variable: experiment::GsiNcDiag::Latitude
+            data:
+              variable: experiment::GsiNcDiag::Observation
+            markersize: 2
+            label: Observation
+            colorbar: true
+            cmap: ${dynamic_cmap}
+            vmin: ${dynamic_vmin}
+            vmax: ${dynamic_vmax}
