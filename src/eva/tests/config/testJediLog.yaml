@@ -1,0 +1,59 @@
+diagnostics:
+
+  # Data read
+  # ---------
+- data:
+    type: JediLog
+    collection_name: jedi_log_test
+    jedi_log_to_parse: ${data_input_path}/jedi_var_log.txt
+    data_to_parse:
+      convergence: true
+
+  # Make plots
+  graphics:
+    - figure:
+        layout: [2,2]
+        figure size: [12,12]
+        title: 'Convergence of JEDI data assimilation'
+        output name: jedi_log/convergence/norm_reduction.png
+      plots:
+        - add_xlabel: 'Total innter iteration number'
+          add_ylabel: 'Gradient reduction'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::inner_loop
+            y:
+              variable: jedi_log_test::convergence::gradient_reduction
+            color: 'black'
+            label: 'JEDI h(x) versus obs (all obs)'
+        - add_xlabel: 'Total innter iteration number'
+          add_ylabel: 'Norm reduction'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::inner_loop
+            y:
+              variable: jedi_log_test::convergence::norm_reduction
+            color: 'black'
+            label: 'JEDI h(x) versus obs (all obs)'
+        - add_xlabel: 'Total innter iteration number'
+          add_ylabel: 'alpha'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::inner_loop
+            y:
+              variable: jedi_log_test::convergence::alpha
+            color: 'black'
+            label: 'JEDI h(x) versus obs (all obs)'
+        - add_xlabel: 'Total innter iteration number'
+          add_ylabel: 'beta'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::inner_loop
+            y:
+              variable: jedi_log_test::convergence::beta
+            color: 'black'
+            label: 'JEDI h(x) versus obs (all obs)'
