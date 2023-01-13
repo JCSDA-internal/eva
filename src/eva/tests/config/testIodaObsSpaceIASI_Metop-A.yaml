@@ -60,7 +60,6 @@ diagnostics:
         layout: [1,1]
         title: 'Mean HofX vs Channel'
         output name: hofx_vs_channel/iasi_metop-a/brightness_temperature/meanhofx_vs_channel.png
-        linear_regression:
       plots:
         - add_xlabel: 'Channel'
           add_ylabel: 'JEDI HofX'

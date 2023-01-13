@@ -18,7 +18,7 @@ import os
 
 # local imports
 from eva.eva_path import return_eva_path
-from eva.utilities.logger import Logger
+from eva.utilities.logger import Logger, textcolors
 from eva.utilities.utils import load_yaml_file, replace_vars_dict
 
 from eva.plot_tools import figure_driver
@@ -48,7 +48,7 @@ def application_tests(logger):
     for test in tests:
 
         # Write some information
-        logger.info(f'Running Eva application test with {test}')
+        logger.info(f'{textcolors.green}Running Eva application test with {test}{textcolors.end}')
 
         # Load the raw config into dictionary
         test_config = load_yaml_file(os.path.join(eva_path, 'tests', 'config', test), logger)
