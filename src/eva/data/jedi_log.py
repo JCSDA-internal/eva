@@ -50,10 +50,27 @@ class JediLog(EvaBase):
 
         # Read log file into a string
         with open(jedi_log_to_parse) as jedi_log_to_parse_open:
-            self.jedi_log_text = jedi_log_to_parse_open.read()
+            jedi_log_text = jedi_log_to_parse_open.read()
 
         # Split log into list of lines
-        self.jedi_log_lines = self.jedi_log_text.split('\n')
+        jedi_log_lines = jedi_log_text.split('\n')
+
+        # Check if this was a ctest and if so determine test prepend string
+        test_string = ''
+        for jedi_log_line in jedi_log_lines:
+            if jedi_log_line[0:4] == 'test':
+                test_string = jedi_log_line.split(' ')[1] + ': '
+
+        # Clean up lines
+        self.jedi_log_lines = []
+        for jedi_log_line in jedi_log_lines:
+            # Replace test number
+            new_line = jedi_log_line.replace(test_string, '')
+            # If new line is just spaces then set to empty string
+            if new_line.isspace():
+                new_line = ''
+            # Assemble new list of strings
+            self.jedi_log_lines.append(new_line)
 
         # Split log into list of strings. Each element is all lines between two empty lines in the
         # in the log file.
@@ -208,10 +225,16 @@ class JediLog(EvaBase):
         # Create a dataset to hold the convergence data
         convergence_ds = xr.Dataset()
 
+        # Add array for all iterations
+        gn = f'convergence::total_iteration'
+        convergence_ds[gn] = xr.DataArray(np.zeros(total_iter, dtype='int32'))
+        convergence_ds[gn].data[:] = range(1, total_iter+1)
+
         # Concatenate chunks to simplify search algorithm
         min_and_j_chunks = minimizer_chunks + j_chunks
 
         for var_ind, var in enumerate(var_names):
+            print(var_ind, var)
             var_array = []
             for min_and_j_chunk in min_and_j_chunks:
                 min_and_j_chunk_split = min_and_j_chunk.split('\n')
@@ -229,14 +252,42 @@ class JediLog(EvaBase):
         # Create special case variables
 
         # Outer iteration
+        # ---------------
+        outer_iteration = 0
+        outer_iterations = []
         if 'convergence::inner_iteration' in convergence_ds:
             inner_iterations = convergence_ds['convergence::inner_iteration'].data[:]
 
-            for
+            # Set outer iteration number
+            for inner_iteration in inner_iterations:
+                if inner_iteration == 1:
+                    outer_iteration = outer_iteration + 1
 
-            print(inner_iterations)
+                # Append vector of outer iterations
+                outer_iterations.append(outer_iteration)
 
-        exit()
+            gn = f'convergence::outer_iteration'
+            convergence_ds[gn] = xr.DataArray(np.zeros(total_iter, dtype='int32'))
+            convergence_ds[gn].data[:] = outer_iterations
+
+        # Normalized versions of data
+        # ---------------------------
+        normalize_var_names = ['gradient_reduction', 'norm_reduction', 'j', 'jb', 'jojc']
+
+        for normalize_var_name in normalize_var_names:
+            if normalize_var_name in var_names:
+                # Index in lists for the variable being normalized
+                var_ind = var_names.index(normalize_var_name)
+
+                # Extract existing data
+                gn = f'convergence::{var_names[var_ind]}'
+                var_array = convergence_ds[gn].data[:]
+
+                # Normalize and add back to the data
+                gn_nz = f'convergence::{var_names[var_ind]}_normalized'
+                var_array_nz = var_array / np.max(var_array)
+                convergence_ds[gn_nz] = xr.DataArray(np.zeros(total_iter, dtype=var_dtype[var_ind]))
+                convergence_ds[gn_nz].data[:] = var_array_nz
 
         return convergence_ds
 
