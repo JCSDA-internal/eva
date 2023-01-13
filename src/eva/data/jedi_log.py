@@ -30,7 +30,7 @@ space = ' '
 def get_data_from_line(jedi_log_line, search_term, separator, position):
 
     if search_term in jedi_log_line:
-        return  jedi_log_line.split(separator)[position]
+        return jedi_log_line.split(separator)[position]
 
 
 # --------------------------------------------------------------------------------------------------
@@ -98,11 +98,9 @@ class JediLog(EvaBase):
         # Write out all the collections
         data_collections.display_collections()
 
-
     # ----------------------------------------------------------------------------------------------
 
-
-    def get_from_log(self, search_term, separator, position, custom_log = None):
+    def get_from_log(self, search_term, separator, position, custom_log=None):
 
         # This method will search every line of the log for the search term
 
@@ -118,9 +116,7 @@ class JediLog(EvaBase):
                 return data_val
         return None
 
-
     # ----------------------------------------------------------------------------------------------
-
 
     def get_matching_chunks(self, search_terms):
 
@@ -141,10 +137,7 @@ class JediLog(EvaBase):
 
         return matching_chunks
 
-
-
     # ----------------------------------------------------------------------------------------------
-
 
     def parse_convergence(self):
 
@@ -158,7 +151,7 @@ class JediLog(EvaBase):
 
         # Get the chunks for the J, Jb, JoJc part
         j_chunks_strings = [f'Quadratic cost function: J ',
-                                    f'Quadratic cost function: Jb']
+                            f'Quadratic cost function: Jb']
         j_chunks = self.get_matching_chunks(j_chunks_strings)
 
         # Total number of inner iterations
@@ -221,7 +214,6 @@ class JediLog(EvaBase):
             var_position.append(1)
             var_dtype.append('float32')
 
-
         # Create a dataset to hold the convergence data
         convergence_ds = xr.Dataset()
 
@@ -245,7 +237,7 @@ class JediLog(EvaBase):
 
             # Add to the dataset if there is something to add
             if var_array:
-                gn = f'convergence::{var_names[var_ind]}' # group::variable name
+                gn = f'convergence::{var_names[var_ind]}'  # group::variable name
                 convergence_ds[gn] = xr.DataArray(np.zeros(total_iter, dtype=var_dtype[var_ind]))
                 convergence_ds[gn].data[:] = var_array
 
@@ -290,6 +282,5 @@ class JediLog(EvaBase):
                 convergence_ds[gn_nz].data[:] = var_array_nz
 
         return convergence_ds
-
 
     # ----------------------------------------------------------------------------------------------

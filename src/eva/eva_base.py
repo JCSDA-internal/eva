@@ -86,7 +86,7 @@ class EvaFactory():
         expected_file = os.path.join(return_eva_path(), eva_group_name, eva_module_name)
         if (eva_module_name not in valid_module):
             logger.abort(f'Expecting to find a class called \'{eva_class_name}\' in a file ' +
-                         f'called \'{expected_file}.py\'  but no such file was found.' )
+                         f'called \'{expected_file}.py\' but no such file was found.')
 
         # Import class based on user selected task
         # ----------------------------------------
