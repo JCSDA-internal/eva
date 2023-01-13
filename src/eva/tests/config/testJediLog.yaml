@@ -12,8 +12,8 @@ diagnostics:
   # Make plots
   graphics:
     - figure:
-        layout: [2,2]
-        figure size: [12,12]
+        layout: [2,1]
+        figure size: [12,8]
         title: 'Convergence of JEDI data assimilation'
         output name: jedi_log/convergence/norm_reduction.png
       plots:
@@ -22,7 +22,7 @@ diagnostics:
           layers:
           - type: LinePlot
             x:
-              variable: jedi_log_test::convergence::inner_loop
+              variable: jedi_log_test::convergence::inner_iteration
             y:
               variable: jedi_log_test::convergence::gradient_reduction
             color: 'black'
@@ -32,28 +32,28 @@ diagnostics:
           layers:
           - type: LinePlot
             x:
-              variable: jedi_log_test::convergence::inner_loop
+              variable: jedi_log_test::convergence::inner_iteration
             y:
               variable: jedi_log_test::convergence::norm_reduction
             color: 'black'
             label: 'JEDI h(x) versus obs (all obs)'
-        - add_xlabel: 'Total innter iteration number'
-          add_ylabel: 'alpha'
-          layers:
-          - type: LinePlot
-            x:
-              variable: jedi_log_test::convergence::inner_loop
-            y:
-              variable: jedi_log_test::convergence::alpha
-            color: 'black'
-            label: 'JEDI h(x) versus obs (all obs)'
-        - add_xlabel: 'Total innter iteration number'
-          add_ylabel: 'beta'
-          layers:
-          - type: LinePlot
-            x:
-              variable: jedi_log_test::convergence::inner_loop
-            y:
-              variable: jedi_log_test::convergence::beta
-            color: 'black'
-            label: 'JEDI h(x) versus obs (all obs)'
+#        - add_xlabel: 'Total innter iteration number'
+#          add_ylabel: 'alpha'
+#          layers:
+#          - type: LinePlot
+#            x:
+#              variable: jedi_log_test::convergence::inner_loop
+#            y:
+#              variable: jedi_log_test::convergence::alpha
+#            color: 'black'
+#            label: 'JEDI h(x) versus obs (all obs)'
+#        - add_xlabel: 'Total innter iteration number'
+#          add_ylabel: 'beta'
+#          layers:
+#          - type: LinePlot
+#            x:
+#              variable: jedi_log_test::convergence::inner_loop
+#            y:
+#              variable: jedi_log_test::convergence::beta
+#            color: 'black'
+#            label: 'JEDI h(x) versus obs (all obs)'

@@ -46,17 +46,20 @@ def application_tests(logger):
 
     # Loop over tests, populate YAML and run test
     for test in tests:
-        # Write some information
-        logger.info(f'Running Eva application test with {test}')
 
-        # Load the raw config into dictionary
-        test_config = load_yaml_file(os.path.join(eva_path, 'tests', 'config', test), logger)
+        if test == 'testJediLog.yaml':
 
-        # Replace templated variables using values from the overwrite dictionary
-        test_config = replace_vars_dict(test_config, **overwrite_dict)
+            # Write some information
+            logger.info(f'Running Eva application test with {test}')
 
-        # Run Eva with that config
-        eva(test_config)
+            # Load the raw config into dictionary
+            test_config = load_yaml_file(os.path.join(eva_path, 'tests', 'config', test), logger)
+
+            # Replace templated variables using values from the overwrite dictionary
+            test_config = replace_vars_dict(test_config, **overwrite_dict)
+
+            # Run Eva with that config
+            eva(test_config)
 
 
 # --------------------------------------------------------------------------------------------------

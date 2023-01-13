@@ -30,86 +30,7 @@ space = ' '
 def get_data_from_line(jedi_log_line, search_term, separator, position):
 
     if search_term in jedi_log_line:
-        return jedi_log_line.split(separator)[position]
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-def get_from_log(jedi_log_lines, search_term, separator, position):
-
-    # Loop over elements of string
-    for jedi_log_line in jedi_log_lines:
-        data_val = get_data_from_line(jedi_log_line, search_term, separator, position)
-        if data_val is not None:
-            return data_val
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-def parse_convergence(jedi_log_lines):
-
-    # Get the name of the minimizer
-    minimizer_algorithm = get_from_log(jedi_log_lines, 'Minimizer algorithm', '=', 1)
-
-    # Names of the variables to be extracted
-    var_names = ['alpha', 'beta', 'gradient_reduction', 'norm_reduction']
-
-    # Search criteria for each variable
-    search_strings = [minimizer_algorithm + space + 'alpha',
-                      minimizer_algorithm + space + 'beta',
-                      'Gradient reduction (',
-                      'Norm reduction (']
-
-    # Get the total number of inner iterations across all outer iterations
-    inner_iterations = []
-    for jedi_log_line in jedi_log_lines:
-        inner_iterations_outer = get_data_from_line(jedi_log_line, 'max iter =', space, 4)
-        if inner_iterations_outer is not None:
-            inner_iterations_outer = inner_iterations_outer.split(',')[0]
-            inner_iterations.append(int(inner_iterations_outer))
-    total_iterations = sum(inner_iterations)
-
-    # Create a dataset to hold the convergence data
-    convergence_ds = xr.Dataset()
-
-    # Add inner and outer loop arrays
-    convergence_ds['convergence::inner_loop'] = xr.DataArray(np.zeros(total_iterations, dtype='int32'))
-    convergence_ds['convergence::outer_loop'] = xr.DataArray(np.zeros(total_iterations, dtype='int32'))
-
-    # Add variables to the dataset
-    for var_name in var_names:
-        convergence_ds['convergence::'+var_name] = xr.DataArray(np.zeros(total_iterations,
-                                                                      dtype='float32'))
-
-    # Parse all the variables
-    outer_loop = 0
-    outer_loop_total = 0
-    for jedi_log_line in jedi_log_lines:
-
-        # Tick the outer loop
-        if 'Configuration for outer iteration' in jedi_log_line:
-            outer_loop = outer_loop + 1
-
-        # Tick the inner loop and total inner loop
-        inner_loop_this_outer = get_data_from_line(jedi_log_line,
-                                                   minimizer_algorithm + space + 'Starting Iteration',
-                                                   space, 3)
-
-        if inner_loop_this_outer is not None:
-            outer_loop_total = outer_loop_total + 1
-            # Add inner loop number to Dataset
-            convergence_ds['convergence::inner_loop'].data[outer_loop_total-1] = inner_loop_this_outer
-            convergence_ds['convergence::outer_loop'].data[outer_loop_total-1] = outer_loop
-
-        # Extract other things
-        for ind, var_name in enumerate(var_names):
-            data_found = get_data_from_line(jedi_log_line, search_strings[ind], '=', -1)
-            if data_found is not None:
-                convergence_ds['convergence::'+var_name].data[outer_loop_total-1] = data_found
-
-    return convergence_ds
+        return  jedi_log_line.split(separator)[position]
 
 
 # --------------------------------------------------------------------------------------------------
@@ -127,9 +48,25 @@ class JediLog(EvaBase):
         # Collection name to use
         collection_name = self.config.get('collection_name')
 
-        # Read log file into a list of srings
+        # Read log file into a string
         with open(jedi_log_to_parse) as jedi_log_to_parse_open:
-            jedi_log_lines = jedi_log_to_parse_open.read().split('\n')
+            self.jedi_log_text = jedi_log_to_parse_open.read()
+
+        # Split log into list of lines
+        self.jedi_log_lines = self.jedi_log_text.split('\n')
+
+        # Split log into list of strings. Each element is all lines between two empty lines in the
+        # in the log file.
+        chunk_start_points = [-1]
+        for jedi_log_line_ind, jedi_log_line in enumerate(self.jedi_log_lines):
+            if jedi_log_line == '':
+                chunk_start_points.append(jedi_log_line_ind)
+        chunk_start_points.append(len(self.jedi_log_lines)+1)
+
+        self.log_chunks = []
+        for i in range(len(chunk_start_points)-2):
+            chunk = self.jedi_log_lines[chunk_start_points[i]+1:chunk_start_points[i+1]]
+            self.log_chunks.append('\n'.join(chunk))
 
         # Get list of things to parse from the dictionary
         data_to_parse = self.config.get('data_to_parse')
@@ -137,9 +74,171 @@ class JediLog(EvaBase):
         # Loop and add to dataset
         for metric in data_to_parse:
             if metric == 'convergence' and data_to_parse[metric]:
-                convergence_ds = parse_convergence(jedi_log_lines)
+                convergence_ds = self.parse_convergence()
                 # Add to the Eva dataset
                 data_collections.create_or_add_to_collection(collection_name, convergence_ds)
 
         # Write out all the collections
         data_collections.display_collections()
+
+
+    # ----------------------------------------------------------------------------------------------
+
+
+    def get_from_log(self, search_term, separator, position, custom_log = None):
+
+        # This method will search every line of the log for the search term
+
+        if custom_log is None:
+            log = self.jedi_log_lines
+        else:
+            log = custom_log
+
+        # Loop over elements of string
+        for jedi_log_line in log:
+            data_val = get_data_from_line(jedi_log_line, search_term, separator, position)
+            if data_val is not None:
+                return data_val
+        return None
+
+
+    # ----------------------------------------------------------------------------------------------
+
+
+    def get_matching_chunks(self, search_terms):
+
+        # Create array to hold chunks that match
+        matching_chunks = []
+
+        # Loop over elements of string
+        for log_chunk in self.log_chunks:
+
+            # Build an array to check each match
+            search_terms_match = []
+            for search_term in search_terms:
+                search_terms_match.append(search_term in log_chunk)
+
+            # Append if all search terms are in the chunk
+            if all(search_terms_match):
+                matching_chunks.append(log_chunk)
+
+        return matching_chunks
+
+
+
+    # ----------------------------------------------------------------------------------------------
+
+
+    def parse_convergence(self):
+
+        # Get the name of the minimizer
+        minimizer_algorithm = self.get_from_log('Minimizer algorithm', '=', 1)
+
+        # Get the chunks for the minimizer part (Norm reduction etc)
+        minimizer_chunks_strings = [f'{minimizer_algorithm} Starting Iteration',
+                                    f'{minimizer_algorithm} end of iteration']
+        minimizer_chunks = self.get_matching_chunks(minimizer_chunks_strings)
+
+        # Get the chunks for the J, Jb, JoJc part
+        j_chunks_strings = [f'Quadratic cost function: J ',
+                                    f'Quadratic cost function: Jb']
+        j_chunks = self.get_matching_chunks(j_chunks_strings)
+
+        # Total number of inner iterations
+        total_iter = len(minimizer_chunks)
+
+        # Check that some minimizer chunks were found
+        if total_iter == 0:
+            self.logger.abort('The number of iterations found in the log is zero. Check the ' +
+                              'parsing of the log is correct.')
+
+        # Create list of variables that need to be built
+        var_names = []
+        var_search_criteria = []
+        var_split = []
+        var_position = []
+        var_dtype = []
+        if minimizer_chunks:
+
+            # Inner iteration number
+            var_names.append('inner_iteration')
+            var_search_criteria.append(f'{minimizer_algorithm} Starting Iteration')
+            var_split.append('Iteration')
+            var_position.append(1)
+            var_dtype.append('int32')
+
+            # Gradient reduction
+            var_names.append('gradient_reduction')
+            var_search_criteria.append('Gradient reduction (')
+            var_split.append('=')
+            var_position.append(1)
+            var_dtype.append('float32')
+
+            # Norm reduction
+            var_names.append('norm_reduction')
+            var_search_criteria.append('Norm reduction (')
+            var_split.append('=')
+            var_position.append(1)
+            var_dtype.append('float32')
+
+        if j_chunks:
+
+            # Inner iteration number
+            var_names.append('j')
+            var_search_criteria.append('Quadratic cost function: J ')
+            var_split.append('=')
+            var_position.append(1)
+            var_dtype.append('float32')
+
+            # Gradient reduction
+            var_names.append('jb')
+            var_search_criteria.append('Quadratic cost function: Jb')
+            var_split.append('=')
+            var_position.append(1)
+            var_dtype.append('float32')
+
+            # Norm reduction
+            var_names.append('jojc')
+            var_search_criteria.append('Quadratic cost function: JoJc')
+            var_split.append('=')
+            var_position.append(1)
+            var_dtype.append('float32')
+
+
+        # Create a dataset to hold the convergence data
+        convergence_ds = xr.Dataset()
+
+        # Concatenate chunks to simplify search algorithm
+        min_and_j_chunks = minimizer_chunks + j_chunks
+
+        for var_ind, var in enumerate(var_names):
+            var_array = []
+            for min_and_j_chunk in min_and_j_chunks:
+                min_and_j_chunk_split = min_and_j_chunk.split('\n')
+                var_found = self.get_from_log(var_search_criteria[var_ind], var_split[var_ind],
+                                              var_position[var_ind], min_and_j_chunk_split)
+                if var_found:
+                    var_array.append(var_found)
+
+            # Add to the dataset if there is something to add
+            if var_array:
+                gn = f'convergence::{var_names[var_ind]}' # group::variable name
+                convergence_ds[gn] = xr.DataArray(np.zeros(total_iter, dtype=var_dtype[var_ind]))
+                convergence_ds[gn].data[:] = var_array
+
+        # Create special case variables
+
+        # Outer iteration
+        if 'convergence::inner_iteration' in convergence_ds:
+            inner_iterations = convergence_ds['convergence::inner_iteration'].data[:]
+
+            for
+
+            print(inner_iterations)
+
+        exit()
+
+        return convergence_ds
+
+
+    # ----------------------------------------------------------------------------------------------
