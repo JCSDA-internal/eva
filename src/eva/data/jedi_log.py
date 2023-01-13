@@ -226,7 +226,6 @@ class JediLog(EvaBase):
         min_and_j_chunks = minimizer_chunks + j_chunks
 
         for var_ind, var in enumerate(var_names):
-            print(var_ind, var)
             var_array = []
             for min_and_j_chunk in min_and_j_chunks:
                 min_and_j_chunk_split = min_and_j_chunk.split('\n')
