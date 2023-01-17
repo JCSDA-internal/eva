@@ -83,12 +83,10 @@ class EvaFactory():
         # Remove trailing .py
         valid_module = [vm.replace(".py", "") for vm in valid_module]
         # Abort if not found
+        expected_file = os.path.join(return_eva_path(), eva_group_name, eva_module_name)
         if (eva_module_name not in valid_module):
-            logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
-                         'called ' + os.path.join(return_eva_path(),
-                                                  eva_group_name,
-                                                  eva_module_name)
-                         + '.py but no such file was found.')
+            logger.abort(f'Expecting to find a class called \'{eva_class_name}\' in a file ' +
+                         f'called \'{expected_file}.py\' but no such file was found.')
 
         # Import class based on user selected task
         # ----------------------------------------
@@ -97,11 +95,9 @@ class EvaFactory():
         try:
             eva_class = getattr(importlib.import_module(module_to_import), eva_class_name)
         except Exception as e:
-            logger.abort('Expecting to find a class called in ' + eva_class_name + ' in a file ' +
-                         'called ' + os.path.join(return_eva_path(),
-                                                  eva_group_name,
-                                                  eva_module_name)
-                         + '.py but no such class was found or an error occurred.')
+            logger.abort(f'Expecting to find a class called \'{eva_class_name}\' in a file ' +
+                         f'called \'{expected_file}.py\' but no such file was found or an error ' +
+                         f'occurred during import. \n Reported error: {e}.')
         timing.stop(f'EvaFactory import: {eva_class_name} from {module_to_import}')
 
         # Return implementation of the class (calls base class constructor that is above)

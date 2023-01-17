@@ -1,0 +1,154 @@
+diagnostics:
+
+  # Data read
+  # ---------
+- data:
+    type: JediLog
+    collection_name: jedi_log_test
+    jedi_log_to_parse: ${data_input_path}/jedi_var_log_rpcg.txt
+    data_to_parse:
+      convergence: true
+
+  graphics:
+      - figure:
+          layout: [3,1]
+          figure size: [12,10]
+          title: 'Gradient and Norm Reduction Plots RPCG'
+          output name: jedi_log/convergence/norm_gradient_reduction_rpcg.png
+        plots:
+          - add_xlabel: 'Total inner iteration number'
+            add_ylabel: 'Gradient reduction'
+            layers:
+            - type: LinePlot
+              x:
+                variable: jedi_log_test::convergence::total_iteration
+              y:
+                variable: jedi_log_test::convergence::gradient_reduction
+              color: 'black'
+
+          - add_xlabel: 'Total inner iteration number'
+            add_ylabel: 'Norm reduction'
+            layers:
+            - type: LinePlot
+              x:
+                variable: jedi_log_test::convergence::total_iteration
+              y:
+                variable: jedi_log_test::convergence::norm_reduction
+              color: 'black'
+
+          - add_xlabel: 'Total inner iteration number'
+            add_ylabel: 'Normalized Value'
+            add_legend:
+            layers:
+            - type: LinePlot
+              x:
+                variable: jedi_log_test::convergence::total_iteration
+              y:
+                variable: jedi_log_test::convergence::gradient_reduction_normalized
+              color: 'red'
+              label: 'Normalized gradient reduction'
+            - type: LinePlot
+              x:
+                variable: jedi_log_test::convergence::total_iteration
+              y:
+                variable: jedi_log_test::convergence::norm_reduction_normalized
+              color: 'blue'
+              label: 'Normalized norm reduction'
+
+- data:
+    type: JediLog
+    collection_name: jedi_log_test
+    jedi_log_to_parse: ${data_input_path}/jedi_var_log_dripcg_ctest.txt
+    data_to_parse:
+      convergence: true
+
+  # Make plots
+  graphics:
+    - figure:
+        layout: [3,1]
+        figure size: [12,10]
+        title: 'Gradient and Norm Reduction Plots DRIPCG'
+        output name: jedi_log/convergence/norm_gradient_reduction_dripcg_ctest.png
+      plots:
+
+
+        - add_xlabel: 'Total inner iteration number'
+          add_ylabel: 'Gradient reduction'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::total_iteration
+            y:
+              variable: jedi_log_test::convergence::gradient_reduction
+            color: 'black'
+
+
+        - add_xlabel: 'Total inner iteration number'
+          add_ylabel: 'Norm reduction'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::total_iteration
+            y:
+              variable: jedi_log_test::convergence::norm_reduction
+            color: 'black'
+
+
+        - add_xlabel: 'Total inner iteration number'
+          add_ylabel: 'Normalized Value'
+          add_legend:
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::total_iteration
+            y:
+              variable: jedi_log_test::convergence::gradient_reduction_normalized
+            color: 'red'
+            label: 'Normalized gradient reduction'
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::total_iteration
+            y:
+              variable: jedi_log_test::convergence::norm_reduction_normalized
+            color: 'blue'
+            label: 'Normalized norm reduction'
+
+    - figure:
+        layout: [3,1]
+        figure size: [12,10]
+        title: 'Cost Function Plots DRIPCG'
+        output name: jedi_log/convergence/cost_function_dripcg_ctest.png
+      plots:
+
+        - add_xlabel: 'Total inner iteration number'
+          add_ylabel: 'J (Normalized)'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::total_iteration
+            y:
+              variable: jedi_log_test::convergence::j_normalized
+            color: 'red'
+            label: 'J Normalized'
+
+        - add_xlabel: 'Total inner iteration number'
+          add_ylabel: 'Jb (Normalized)'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::total_iteration
+            y:
+              variable: jedi_log_test::convergence::jb_normalized
+            color: 'blue'
+            label: 'Jb Normalized'
+
+        - add_xlabel: 'Total inner iteration number'
+          add_ylabel: 'JoJc (Normalized)'
+          layers:
+          - type: LinePlot
+            x:
+              variable: jedi_log_test::convergence::total_iteration
+            y:
+              variable: jedi_log_test::convergence::jojc_normalized
+            color: 'green'
+            label: 'JoJc Normalized'

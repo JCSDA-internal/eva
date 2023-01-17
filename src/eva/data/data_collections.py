@@ -220,7 +220,9 @@ class DataCollections:
     def display_collections(self):
 
         minmaxrms_format_dict = {
+            'float64': '{:+.4e}',
             'float32': '{:+.4e}',
+            'int64': '{:+11d}',
             'int32': '{:+11d}',
         }
 
@@ -249,10 +251,11 @@ class DataCollections:
                     min_string = 'Min=' + minmaxrms_format.format(np.nanmin(data_var_value))
                     max_string = 'Max=' + minmaxrms_format.format(np.nanmax(data_var_value))
                     rms_string = ''
-                    if str(data_var_value.dtype) == 'float32':
+                    if str(data_var_value.dtype) == 'float32' or \
+                       str(data_var_value.dtype) == 'float64':
                         rms = np.sqrt(np.nanmean(data_var_value**2))
-                        rms_string = 'RMS=' + minmaxrms_format.format(rms)
-                    minmaxrms_string = ' | ' + min_string + ', ' + max_string + ', ' + rms_string
+                        rms_string = ', RMS=' + minmaxrms_format.format(rms)
+                    minmaxrms_string = ' | ' + min_string + ', ' + max_string + rms_string
                 self.logger.info('  ' + data_var.ljust(max_name_len) + ' (' +
                                  str(data_var_value.dtype).ljust(7) + ')' + minmaxrms_string)
         self.logger.info('-'*80)

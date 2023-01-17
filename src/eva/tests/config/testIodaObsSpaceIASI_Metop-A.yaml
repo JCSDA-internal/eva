@@ -4,7 +4,7 @@ diagnostics:
     datasets:
       - name: experiment
         filenames:
-          - ${data_input_path}/iasi_metop-a.hofx.2021-08-01T00:00:00Z.nc4
+          - ${data_input_path}/iasi_metop-a.hofx.2021-08-01T000000Z.nc4
         channels: [16, 29, 32, 35, 38, 41, 44, 47, 49, 50, 51, 53, 55, 56, 57, 59, 61, 62, 63, 66, 68,
                    70, 72, 74, 76, 78, 79, 81, 82, 83, 84, 85, 86, 87, 89, 92, 93, 95, 97, 99, 101, 103,
                    104, 106, 109, 110, 111, 113, 116, 119, 122, 125, 128, 131, 133, 135, 138, 141, 144,
@@ -60,7 +60,6 @@ diagnostics:
         layout: [1,1]
         title: 'Mean HofX vs Channel'
         output name: hofx_vs_channel/iasi_metop-a/brightness_temperature/meanhofx_vs_channel.png
-        linear_regression:
       plots:
         - add_xlabel: 'Channel'
           add_ylabel: 'JEDI HofX'

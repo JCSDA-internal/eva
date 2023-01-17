@@ -42,6 +42,7 @@ setuptools.setup(
         #  'seaborn==0.12',
         'emcpy @ git+https://github.com/NOAA-EMC/' +
         'emcpy@4f36baf1a2302fb0daa49bd8415bb7d2a65347bb#egg=emcpy',
+        # 'seaborn==0.12',
     ],
     package_data={
         '': [
