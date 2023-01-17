@@ -16,7 +16,7 @@ diagnostics:
           title: 'Gradient and Norm Reduction Plots RPCG'
           output name: jedi_log/convergence/norm_gradient_reduction_rpcg.png
         plots:
-          - add_xlabel: 'Total innter iteration number'
+          - add_xlabel: 'Total inner iteration number'
             add_ylabel: 'Gradient reduction'
             layers:
             - type: LinePlot
@@ -26,7 +26,7 @@ diagnostics:
                 variable: jedi_log_test::convergence::gradient_reduction
               color: 'black'
 
-          - add_xlabel: 'Total innter iteration number'
+          - add_xlabel: 'Total inner iteration number'
             add_ylabel: 'Norm reduction'
             layers:
             - type: LinePlot
@@ -36,7 +36,7 @@ diagnostics:
                 variable: jedi_log_test::convergence::norm_reduction
               color: 'black'
 
-          - add_xlabel: 'Total innter iteration number'
+          - add_xlabel: 'Total inner iteration number'
             add_ylabel: 'Normalized Value'
             add_legend:
             layers:
@@ -72,7 +72,7 @@ diagnostics:
       plots:
 
 
-        - add_xlabel: 'Total innter iteration number'
+        - add_xlabel: 'Total inner iteration number'
           add_ylabel: 'Gradient reduction'
           layers:
           - type: LinePlot
@@ -83,7 +83,7 @@ diagnostics:
             color: 'black'
 
 
-        - add_xlabel: 'Total innter iteration number'
+        - add_xlabel: 'Total inner iteration number'
           add_ylabel: 'Norm reduction'
           layers:
           - type: LinePlot
@@ -94,7 +94,7 @@ diagnostics:
             color: 'black'
 
 
-        - add_xlabel: 'Total innter iteration number'
+        - add_xlabel: 'Total inner iteration number'
           add_ylabel: 'Normalized Value'
           add_legend:
           layers:
@@ -120,7 +120,7 @@ diagnostics:
         output name: jedi_log/convergence/cost_function_dripcg_ctest.png
       plots:
 
-        - add_xlabel: 'Total innter iteration number'
+        - add_xlabel: 'Total inner iteration number'
           add_ylabel: 'J (Normalized)'
           layers:
           - type: LinePlot
@@ -131,7 +131,7 @@ diagnostics:
             color: 'red'
             label: 'J Normalized'
 
-        - add_xlabel: 'Total innter iteration number'
+        - add_xlabel: 'Total inner iteration number'
           add_ylabel: 'Jb (Normalized)'
           layers:
           - type: LinePlot
@@ -142,7 +142,7 @@ diagnostics:
             color: 'blue'
             label: 'Jb Normalized'
 
-        - add_xlabel: 'Total innter iteration number'
+        - add_xlabel: 'Total inner iteration number'
           add_ylabel: 'JoJc (Normalized)'
           layers:
           - type: LinePlot
