@@ -25,6 +25,17 @@ from eva.utilities.utils import remove_empty_from_list_of_strings
 # --------------------------------------------------------------------------------------------------
 
 
+def isfloat(a_string):
+    try:
+        float(a_string)
+        return True
+    except ValueError:
+        return False
+
+
+# --------------------------------------------------------------------------------------------------
+
+
 def arithmetic(config, data_collections):
 
     # Create a logger
@@ -58,16 +69,21 @@ def arithmetic(config, data_collections):
 
                 # Build the expression
                 vars = []
+                var_counter = 0
                 for n in range(len(expression_variables)):
-                    # Extract the data from the collections
-                    cgv = split_collectiongroupvariable(logger, expression_variables[n])
-                    exp_var_data = data_collections.get_variable_data_array(cgv[0], cgv[1], cgv[2])
-                    vars.append(exp_var_data)
-                    # Replace the name in the expression
-                    expression = expression.replace(expression_variables[n], 'vars['+str(n)+']')
+                    if not isfloat(expression_variables[n]):
+                        # Extract the data from the collections
+                        cgv = split_collectiongroupvariable(logger, expression_variables[n])
+                        exp_var_data = data_collections.get_variable_data_array(cgv[0], cgv[1],
+                                                                                cgv[2])
+                        vars.append(exp_var_data)
+                        # Replace the name in the expression
+                        expression = expression.replace(expression_variables[n],
+                                                        'vars['+str(var_counter)+']')
+                        var_counter = var_counter + 1
 
                 # Evaluate the expression
-                new_variable = eval(expression)
+                new_variable = eval(str(expression))
 
                 # Add the new field to the data collections
                 cgv = split_collectiongroupvariable(logger, new_name)
