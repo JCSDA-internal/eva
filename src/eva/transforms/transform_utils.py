@@ -62,7 +62,7 @@ def replace_cgv(logger, collection, group, variable, *argv):
         else:
             arg_replaced.append(arg)
 
-    # Assert that the lengts make sense
+    # Assert that the lengths make sense
     if len(arg_replaced) != len(argv):
         logger.abort("In replace_for_dict the length of the output and input is not equal.")
 
