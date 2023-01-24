@@ -8,7 +8,7 @@ diagnostics:
       - name: experiment
         variable: t
         filenames:
-          - ${data_input_path}/diag_conv_t_ges.2020092000.nc4
+          - ${data_input_path}/gsi_obs_space.conv_t_ges.2020092000.nc4
         groups:
           - name: GsiNcDiag
             variables: &variables [Obs_Minus_Forecast_adjusted,

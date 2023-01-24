@@ -21,21 +21,21 @@ from eva.utilities.utils import parse_channel_list
 
 def subset_channels(ds, channels, add_channels_variable=False):
 
-    if 'nchans' in list(ds.dims):
+    if 'channel' in list(ds.dims):
 
         # Number of user requested channels
-        nchan_use = len(channels)
+        channel_use = len(channels)
 
         # Number of channels in the file
-        nchan_in_file = ds.nchans.size
+        channel_in_file = ds.channel.size
 
         # If user provided no channels then use all channels
-        if nchan_use == 0:
-            nchan_use = nchan_in_file
+        if channel_use == 0:
+            channel_use = channel_in_file
 
         # Keep needed channels and reset dimension in Dataset
-        if nchan_use < nchan_in_file:
-            ds = ds.sel(nchans=channels)
+        if channel_use < channel_in_file:
+            ds = ds.sel(channel=channels)
 
     return ds
 
@@ -43,11 +43,11 @@ def subset_channels(ds, channels, add_channels_variable=False):
 # --------------------------------------------------------------------------------------------------
 
 
-def check_nlocs(nlocs):
-    if max(nlocs) == 0:
-        new_nlocs = range(nlocs.size)
-        nlocs = new_nlocs + nlocs
-    return nlocs
+def check_location(location):
+    if max(location) == 0:
+        new_location = range(location.size)
+        location = new_location + location
+    return location
 
 
 # --------------------------------------------------------------------------------------------------
@@ -95,17 +95,17 @@ class IodaObsSpace(EvaBase):
                 # Get file header
                 ds_header = open_dataset(filename)
 
-                # fix nlocs if they are all zeros
-                ds_header['nlocs'] = check_nlocs(ds_header['nlocs'])
+                # fix location if they are all zeros
+                ds_header['Location'] = check_location(ds_header['Location'])
 
                 # Read header part of the file to get coordinates
                 ds_groups = Dataset()
 
                 # Save sensor_channels for later
-                nchans_present = False
-                if 'nchans' in ds_header.keys():
-                    sensor_channels = ds_header['nchans']
-                    nchans_present = True
+                channel_present = False
+                if 'channel' in ds_header.keys():
+                    sensor_channels = ds_header['channel']
+                    channel_present = True
 
                 # Merge in the header and close
                 ds_groups = ds_groups.merge(ds_header)
@@ -152,8 +152,8 @@ class IodaObsSpace(EvaBase):
                     ds = ds.rename(rename_dict)
 
                     # Reset channel numbers from header
-                    if nchans_present:
-                        ds['nchans'] = sensor_channels
+                    if channel_present:
+                        ds['channel'] = sensor_channels
 
                     # Set channels
                     ds = subset_channels(ds, channels)
@@ -171,7 +171,7 @@ class IodaObsSpace(EvaBase):
                     ds.close()
 
                 # Add the dataset to the collections
-                data_collections.create_or_add_to_collection(collection_name, ds_groups, 'nlocs')
+                data_collections.create_or_add_to_collection(collection_name, ds_groups, 'Location')
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)

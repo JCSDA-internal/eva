@@ -42,6 +42,9 @@ def channel_stats(config, data_collections):
     # Parse config for the expression and new collection/group/variable naming
     variable_name_template = get(config, logger, 'variable_name')
 
+    # Parse config for the channel dimension name
+    stat_dim = get(config, logger, 'statistic_dimension', 'Location')
+
     # Loop over the templates
     for collection in collections:
         for group in groups:
@@ -57,7 +60,7 @@ def channel_stats(config, data_collections):
 
                 for stat_function in stat_functions:
                     function_name = getattr(exp_var_data, stat_function.lower())
-                    result = function_name(dim='nlocs')
+                    result = function_name(dim=stat_dim)
                     # Add the new field to the data collections
                     cgv = split_collectiongroupvariable(logger, variable_name)
                     data_collections.add_variable_to_collection(cgv[0], cgv[1]+stat_function,

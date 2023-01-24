@@ -240,5 +240,8 @@ class GsiObsSpace(EvaBase):
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
 
+        # Change the channel dimension name
+        data_collections.adjust_channel_dimension_name('nchans')
+
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
