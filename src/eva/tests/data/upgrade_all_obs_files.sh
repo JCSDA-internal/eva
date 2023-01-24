@@ -10,7 +10,7 @@ export code=/discover/nobackup/drholdaw/JediDev/develop/
 export upgrader=$build/bin/ioda-upgrade-v2-to-v3.x
 export config=$code/ioda/share/ioda/yaml/validation/ObsSpace.yaml
 
-for f in *.nc4
+for f in ioda_obs_space.*.nc4
 do
     echo "Updating " $f
     $upgrader $f $f.new $config
@@ -24,7 +24,7 @@ do
     fi
 
 done
-
+exit 0
 for f in *.nc
 do
     echo "Updating " $f

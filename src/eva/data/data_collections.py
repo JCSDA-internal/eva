@@ -81,6 +81,17 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
+    def adjust_channel_dimension_name(self, channel_dimension_name):
+
+        for collection in self._collections.keys():
+            if channel_dimension_name in list(self._collections[collection].dims):
+                self._collections[collection] = \
+                    self._collections[collection].rename_dims({channel_dimension_name: 'Channel'})
+                self._collections[collection] = \
+                    self._collections[collection].set_index({'Channel': channel_dimension_name})
+
+    # ----------------------------------------------------------------------------------------------
+
     def add_variable_to_collection(self, collection_name, group_name, variable_name, variable):
 
         # Assert that new variable is an xarray Dataarray
@@ -112,16 +123,16 @@ class DataCollections:
         if channels is None:
             return data_array
         elif isinstance(channels, int) or not any(not isinstance(c, int) for c in channels):
-            # nchans must be a dimension if it will be used for selection
-            if 'nchans' not in list(self._collections[collection_name].dims):
-                self.logger.abort('In get_variable_data_array channels is provided but nchans ' +
-                                  'is not a dimension of the Dataset')
+            # Channel must be a dimension if it will be used for selection
+            if 'Channel' not in list(self._collections[collection_name].dims):
+                self.logger.abort(f'In get_variable_data_array channels is provided but ' +
+                                  f'Channel is not a dimension in Dataset')
             # Make sure it is a list
             channels_sel = []
             channels_sel.append(channels)
 
             # Create a new DataArray with the requested channels
-            data_array_channels = data_array.sel(nchans=channels_sel)
+            data_array_channels = data_array.sel(Channel=channels_sel)
             return data_array_channels
 
         else:
@@ -230,6 +241,7 @@ class DataCollections:
         self.logger.info('-'*80)
         self.logger.info(fcol.bold + 'Collections available: ' + fcol.end)
         for collection in self._collections.keys():
+            print(self._collections[collection])
             self.logger.info('')
             self.logger.info('Collection name: ' + fcol.underline + collection + fcol.end)
             self.logger.info('\n Dimensions:')

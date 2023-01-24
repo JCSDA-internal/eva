@@ -19,11 +19,12 @@ diagnostics:
                    756, 797, 867, 906, 921, 1027, 1046, 1090, 1098, 1121, 1133, 1173]
         groups:
           - name: ObsValue
-            variables: &variables ['brightness_temperature']
+            variables: &variables ['brightnessTemperature']
           - name: GsiHofXBc
           - name: hofx
           - name: EffectiveQC
           - name: MetaData
+            variables: ['sensorChannelNumber']
           - name: GsiEffectiveQC
           - name: GsiFinalObsError
           - name: EffectiveError
@@ -31,6 +32,7 @@ diagnostics:
 
     # Stats for hofx
     - transform: channel_stats
+      channel_dimension_name: 'Location'  # Just an example since Channel is the default
       statistic list: ['Mean', 'Count']
       variable_name: experiment::hofx::${variable}
       for:
@@ -69,18 +71,18 @@ diagnostics:
           layers:
           - type: Scatter
             x:
-              variable: experiment::MetaData::sensor_channel
+              variable: experiment::MetaData::sensorChannelNumber
             y:
-              variable: experiment::hofxMean::brightness_temperature
+              variable: experiment::hofxMean::brightnessTemperature
             markersize: 5
             color: 'red'
             label: 'JEDI h(x) versus channels (all obs)'
             do_linear_regression: False
           - type: Scatter
             x:
-              variable: experiment::MetaData::sensor_channel
+              variable: experiment::MetaData::sensorChannelNumber
             y:
-              variable: experiment::hofxPassedGSIQcMean::brightness_temperature
+              variable: experiment::hofxPassedGSIQcMean::brightnessTemperature
             markersize: 5
             color: 'green'
             label: 'JEDI h(x) versus channels (passed GSI QC)'

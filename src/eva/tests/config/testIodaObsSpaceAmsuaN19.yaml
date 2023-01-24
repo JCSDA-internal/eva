@@ -11,7 +11,7 @@ diagnostics:
         channels: &channels 3,8
         groups:
           - name: ObsValue
-            variables: &variables [brightness_temperature]
+            variables: &variables [brightnessTemperature]
           - name: GsiHofXBc
           #- name: GsiEffectiveQC
           - name: hofx
