@@ -5,7 +5,7 @@ diagnostics:
 - data:
     type: JediLog
     collection_name: jedi_log_test
-    jedi_log_to_parse: ${data_input_path}/jedi_var_log_rpcg.txt
+    jedi_log_to_parse: ${data_input_path}/jedi_log.var_rpcg.txt
     data_to_parse:
       convergence: true
 
@@ -58,7 +58,7 @@ diagnostics:
 - data:
     type: JediLog
     collection_name: jedi_log_test
-    jedi_log_to_parse: ${data_input_path}/jedi_var_log_dripcg_ctest.txt
+    jedi_log_to_parse: ${data_input_path}/jedi_log.var_dripcg_ctest.txt
     data_to_parse:
       convergence: true
 
