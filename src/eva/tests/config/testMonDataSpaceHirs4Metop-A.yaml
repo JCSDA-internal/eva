@@ -1,0 +1,50 @@
+diagnostics:
+
+  # Data read
+  # ---------
+- data:
+    type: MonDataSpace
+    ctlfile:
+#      - ${data_input_path}/data/time.hirs4_metop-a.ctl
+      - ../data/time.hirs4_metop-a.ctl
+    datasets:
+      - name: experiment
+        satellite: metop-a
+        sensor: hirs4
+        ctlfile:
+#          - ${data_input_path}/diag_amsua_metop-a_ges.2020092200.nc4
+          - ../data/time.hirs4_metop-a.ctl
+        filenames:
+          - ../data/time.hirs4_metop-a.2015051418.ieee_d
+          - ../data/time.hirs4_metop-a.2015051500.ieee_d
+          - ../data/time.hirs4_metop-a.2015051506.ieee_d
+          - ../data/time.hirs4_metop-a.2015051512.ieee_d
+          - ../data/time.hirs4_metop-a.2015051518.ieee_d
+
+        channels: &channels 1
+        regions: &regions 1
+        groups:
+          - name: GsiIeee
+#            variables: &variables [count, penalty, omgnbc, total,
+#                                   omgbc, omgnbc2, total2, omgbc2]
+            variables: &variables [count]
+
+  graphics:
+    # Time series plots
+    # ---------------
+      - figure:
+          layout: [1,1]
+          figure size: [12,10]
+          title: 'hirs4_metop-a | Channel 1 | Obs Count'
+          output name: mon_log/hirs4_metop-a/hirs4_metop-a.0.count.png
+
+        plots:
+          - add_xlabel: 'Cycle Time'
+            add_ylabel: 'Observation Count'
+            layers:
+            - type: LinePlot
+#              x:
+#                variable: experiment::GsiIeee::time
+              y:
+                variable: experiment::GsiIeee::count
+              color: 'black'
