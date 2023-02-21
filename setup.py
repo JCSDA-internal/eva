@@ -16,7 +16,7 @@ import setuptools
 
 setuptools.setup(
     name='eva',
-    version='1.3.1',
+    version='1.3.2',
     author='Community owned code',
     description='Evaluation and Verification of an Analysis',
     url='https://github.com/JCSDA-internal/eva',
