@@ -166,11 +166,11 @@ def parse_channel_list(channels_str_or_list, logger):
                 channel_list.append(lnum)
 
         return channel_list
-    
+
     elif isinstance(channels_str_or_list, int):
 
-        # Convert int to list 
-        channel_list= [channels_str_or_list]
+        # Convert int to list
+        channel_list = [channels_str_or_list]
         return channel_list
 
     else:
