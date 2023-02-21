@@ -12,9 +12,10 @@
 
 import os
 import numpy as np
-from xarray import Dataset, concat
 
+from xarray import Dataset, concat
 from scipy.io import FortranFile
+from datetime import datetime
 
 from eva.eva_base import EvaBase
 from eva.utilities.config import get
@@ -34,14 +35,8 @@ class MonDataSpace(EvaBase):
         mystr=""
         for x in ctlfile:
             mystr += ' ' + x
-        self.logger.info('ctlfile: ' + mystr)
 
         channo, nchans, nregion, satellite, sensor = self.get_ctl_stats(ctlfile[0])
-        self.logger.info('channo  = ' + str(channo))
-        self.logger.info('nchans  = ' + str(nchans))
-        self.logger.info('nregion = ' + str(nregion))
-        self.logger.info('satellite = ' + str(satellite))
-        self.logger.info('sensor = ' + str(sensor))
 
         # Loop over the datasets
         # ----------------------
@@ -58,50 +53,22 @@ class MonDataSpace(EvaBase):
             # Get requested channels, convert to list
             # ---------------------------------------
             channels_str_or_list = get(dataset, self.logger, 'channels')
-            self.logger.info(' channels_str_or_list = ' + str(channels_str_or_list))
-
-            #  See regions below for explanation of str() conversion here.
-
-            # yaml file with no specified channels = use all channels
             drop_channels = False
             requested_channels = []
 
             if channels_str_or_list is not None: 
-                self.logger.info(' inside not None')
 
                 if len(str(channels_str_or_list)) > 0:
-                    self.logger.info(' inside len check ')
                     requested_channels = parse_channel_list(str(channels_str_or_list), self.logger)
                     drop_channels = True
 
             # Get requested regions, convert to list
             # --------------------------------------
             regions_str_or_list = get(dataset, self.logger, 'regions', [])
-            self.logger.info(' regions_str_or_list = ' + str(regions_str_or_list))
-
-            #  Note:  use of regions_str_or_list is lifted directly from gsi_obs_space.py but it 
-            #         has a problem.  The get() function returns a variety of types:
-            #
-            #         yaml file input                   return value   type
-            #         ---------------                   ------------   ----
-            #  	      regions: &regions 2,4             2,4            str
-            #         regions: &regions 1               1              int
-            #         regions: &regions                 None           None
-            #         regions: &regions all	        ---            ---   execution aborts
-            #         regions: &regions [2,4]           ---            ---   execution aborts
-            #
-            #         Is the variable return type a bug or feature?   And note that the last 2 are valid
-            #         when parcing the desired variable values.  This behavior should be consistent, no?
-            #
-            #         Also worth noting -- a request for region without a region entry in the 
-            #         the yaml file causes an abort.  I guess that's ok, but it seems like no value should 
-            #         be equivalent to all.
-
             requested_regions = []
             drop_regions = False
 
             if regions_str_or_list is not None: 
-                self.logger.info(' inside not None')
 
                 if len(str(regions_str_or_list)) > 0:
                     requested_regions = parse_channel_list(str(regions_str_or_list), self.logger)
@@ -110,13 +77,19 @@ class MonDataSpace(EvaBase):
             # Filenames to be read into this collection
             # -----------------------------------------
             filenames = get(dataset, self.logger, 'filenames')
+# I don't like individual_files -- try something else
             individual_files = []
 
             for filename in filenames:
+                # read data file
                 count_tmp, penalty_tmp, omgnbc_sum_tmp, total_sum_tmp, \
                 omgbc_sum_tmp, omgnbc_sum2_tmp, total_sum2_tmp, omgbc_sum2_tmp, cycle_tm = \
                 self.read_radmon_ieee(filename, nchans, nregion)
 
+                # add cycle as a variable in dataset
+                cycle_tmp = [[cycle_tm] * nregion] * nchans 
+
+                # create dataset from file contents
                 timestep_ds = Dataset(
                     {
                         "count": (("channels", "regions"), count_tmp),
@@ -127,16 +100,19 @@ class MonDataSpace(EvaBase):
                         "omgnbc2": (("channels", "regions"), omgnbc_sum2_tmp),
                         "total2": (("channels", "regions"), total_sum2_tmp),
                         "omgbc2": (("channels", "regions"), omgbc_sum2_tmp),
+                        "cycle": (("channels", "regions"), cycle_tmp),
                     },
                     coords={"channels": channo, "regions": np.arange(1,nregion+1)},
                     attrs = {'satellite': satellite, 'sensor': sensor},
                 )
                 timestep_ds['times'] = cycle_tm
 
-                # Add the dataset to the list
+                # Add this dataset to the list of individual_files
                 individual_files.append(timestep_ds)
 
+            # Concatenate datasets from individual_files into a single dataset 
             ds = concat(individual_files, dim='times')
+
 
             # Group name and variables
             # ------------------------
@@ -163,12 +139,12 @@ class MonDataSpace(EvaBase):
                 # ---------------------------------------------------
                 vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
                 ds = ds.drop_vars(vars_to_remove)
-                self.logger.info('ds: ' + str(ds))
 
                 # Rename variables with group
                 rename_dict = {}
                 for group_var in group_vars:
                     rename_dict[group_var] = group_name + '::' + group_var
+                
                 ds = ds.rename(rename_dict)
 
                 # Assert that the collection contains at least one variable
@@ -273,16 +249,16 @@ class MonDataSpace(EvaBase):
             cycle_tm = None
             return count, penalty, omgnbc_sum, omgnbc_sum, total_sum, \
                  omgbc_sum, omgnbc_sum2, omgbc_sum2, cycle_tm
-        self.logger.info( 'filename = ' + filename)
 
-        #  extract cycle time from filename
+        # find cycle time in filename and create cycle_tm as datetime object 
+        cycle_tm = None
         cycstrs = filename.split('.')
 
-        cycle_tm = None
         for cycstr in cycstrs:
            if cycstr.isnumeric() == True: 
-               cycle_tm = int(cycstr)
+               cycle_tm = datetime(int(cycstr[0:4]), int(cycstr[4:6]), int(cycstr[6:8]), int(cycstr[8:]))
 
+        # read binary Fortran file
         f=FortranFile(filename,'r','>u4')
 
         count=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
