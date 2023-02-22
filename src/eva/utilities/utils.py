@@ -167,6 +167,12 @@ def parse_channel_list(channels_str_or_list, logger):
 
         return channel_list
 
+    elif isinstance(channels_str_or_list, int):
+
+        # Convert int to list
+        channel_list = [channels_str_or_list]
+        return channel_list
+
     else:
 
         logger.abort('In parse_channel_list the input is neither a list of integers or a string ' +
