@@ -23,6 +23,7 @@ from eva.utilities.utils import parse_channel_list
 
 # --------------------------------------------------------------------------------------------------
 
+
 class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
@@ -32,7 +33,7 @@ class MonDataSpace(EvaBase):
         # Get name of the control file to parse
         # -------------------------------------
         ctlfile = self.config.get('ctlfile')
-        mystr=""
+        mystr = ""
         for x in ctlfile:
             mystr += ' ' + x
 
@@ -56,7 +57,7 @@ class MonDataSpace(EvaBase):
             drop_channels = False
             requested_channels = []
 
-            if channels_str_or_list is not None: 
+            if channels_str_or_list is not None:
 
                 if len(str(channels_str_or_list)) > 0:
                     requested_channels = parse_channel_list(str(channels_str_or_list), self.logger)
@@ -68,7 +69,7 @@ class MonDataSpace(EvaBase):
             requested_regions = []
             drop_regions = False
 
-            if regions_str_or_list is not None: 
+            if regions_str_or_list is not None:
 
                 if len(str(regions_str_or_list)) > 0:
                     requested_regions = parse_channel_list(str(regions_str_or_list), self.logger)
@@ -77,17 +78,21 @@ class MonDataSpace(EvaBase):
             # Filenames to be read into this collection
             # -----------------------------------------
             filenames = get(dataset, self.logger, 'filenames')
-# I don't like individual_files -- try something else
-            individual_files = []
+            ds_list = []
+
+            # Get missing value threshold
+            # ---------------------------
+            threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
 
             for filename in filenames:
+
                 # read data file
                 count_tmp, penalty_tmp, omgnbc_sum_tmp, total_sum_tmp, \
-                omgbc_sum_tmp, omgnbc_sum2_tmp, total_sum2_tmp, omgbc_sum2_tmp, cycle_tm = \
-                self.read_radmon_ieee(filename, nchans, nregion)
+                    omgbc_sum_tmp, omgnbc_sum2_tmp, total_sum2_tmp, omgbc_sum2_tmp, cycle_tm = \
+                    self.read_radmon_ieee(filename, nchans, nregion)
 
                 # add cycle as a variable in dataset
-                cycle_tmp = [[cycle_tm] * nregion] * nchans 
+                cycle_tmp = [[cycle_tm] * nregion] * nchans
 
                 # create dataset from file contents
                 timestep_ds = Dataset(
@@ -102,17 +107,16 @@ class MonDataSpace(EvaBase):
                         "omgbc2": (("channels", "regions"), omgbc_sum2_tmp),
                         "cycle": (("channels", "regions"), cycle_tmp),
                     },
-                    coords={"channels": channo, "regions": np.arange(1,nregion+1)},
-                    attrs = {'satellite': satellite, 'sensor': sensor},
+                    coords={"channels": channo, "regions": np.arange(1, nregion+1)},
+                    attrs={'satellite': satellite, 'sensor': sensor},
                 )
                 timestep_ds['times'] = cycle_tm
 
-                # Add this dataset to the list of individual_files
-                individual_files.append(timestep_ds)
+                # Add this dataset to the list of ds_list
+                ds_list.append(timestep_ds)
 
-            # Concatenate datasets from individual_files into a single dataset 
-            ds = concat(individual_files, dim='times')
-
+            # Concatenate datasets from ds_list into a single dataset
+            ds = concat(ds_list, dim='times')
 
             # Group name and variables
             # ------------------------
@@ -122,12 +126,12 @@ class MonDataSpace(EvaBase):
 
                 # Drop channels not in user requested list
                 # ----------------------------------------
-                if drop_channels == True:
+                if drop_channels:
                     ds = self.subset_coordinate(ds, 'channels', requested_channels)
-             
+
                 # Drop regions not in user requested list
                 # ---------------------------------------
-                if drop_regions == True:
+                if drop_regions:
                     ds = self.subset_coordinate(ds, 'regions', requested_regions)
 
                 # If user specifies all variables set to group list
@@ -144,7 +148,7 @@ class MonDataSpace(EvaBase):
                 rename_dict = {}
                 for group_var in group_vars:
                     rename_dict[group_var] = group_name + '::' + group_var
-                
+
                 ds = ds.rename(rename_dict)
 
                 # Assert that the collection contains at least one variable
@@ -156,17 +160,16 @@ class MonDataSpace(EvaBase):
             # Add the dataset to the collections
             data_collections.create_or_add_to_collection(collection_name, ds, 'count')
 
-#        # Nan out unphysical values
-#        data_collections.nan_float_values_outside_threshold(threshold)
+        # Nan out unphysical values
+        data_collections.nan_float_values_outside_threshold(threshold)
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
 
-
     # ----------------------------------------------------------------------------------------------
 
     def subset_coordinate(self, ds, coordinate, requested_subset):
- 
+
         if coordinate in list(ds.dims):
 
             # Number of entries in requested_subset
@@ -176,18 +179,19 @@ class MonDataSpace(EvaBase):
             num_specified_coordinate_in_ds = len(ds.coords[coordinate])
 
             if all(x in ds[coordinate] for x in requested_subset):
-                ds = ds.sel( **{coordinate : requested_subset})  
+                ds = ds.sel(**{coordinate: requested_subset})
 
             else:
                 bad_coordinates = [x for x in requested_subset if x not in ds[coordinate]]
 
-                self.logger.abort(f"{', '.join(str(i) for i in bad_coordinates)} was inputted as a selected value " + 
-                             "of the coordinate " + str(coordinate) + ", but that is not a valid value. \n" + 
-                             "Valid values for " + str(coordinate) + " are: \n" +
-                             f"{', '.join(str(i) for i in ds[coordinate].data)}")
+                self.logger.abort(f"{', '.join(str(i) for i in bad_coordinates)} was inputted" +
+                                  " as a selected value of the coordinate " + str(coordinate) +
+                                  ", but that is not a valid value. \n" +
+                                  "Valid values for " + str(coordinate) + " are: \n" +
+                                  f"{', '.join(str(i) for i in ds[coordinate].data)}")
         else:
-            self.logger.abort('requested coordinate, ' + str(coordinate) + ' is not in dataset dimensions ' + 
-                          'valid dimensions include ' + str(ds.dims)) 
+            self.logger.abort('requested coordinate, ' + str(coordinate) + ' is not in ' +
+                              ' dataset dimensions valid dimensions include ' + str(ds.dims))
 
         return ds
 
@@ -199,32 +203,32 @@ class MonDataSpace(EvaBase):
         nregion = None
         satellite = None
         sensor = None
-        
+
         with open(ctlfile, 'r') as fp:
             lines = fp.readlines()
 
             for line in lines:
                 if line.find('xdef') != -1:
-                    strs = line.split( )
+                    strs = line.split()
                     for st in strs:
                         if st.isdigit():
-                            nchans=int(st)
+                            nchans = int(st)
 
                 if line.find('ydef') != -1:
-                    strs = line.split( )
+                    strs = line.split()
                     for st in strs:
                         if st.isdigit():
-                            nregion=int(st)
+                            nregion = int(st)
 
                 if line.find('channel=') != -1:
-                    strs = line.split( )
+                    strs = line.split()
                     chans.append(strs[4])
 
                 if line.find('title') != -1:
-                    strs = line.split( )
+                    strs = line.split()
                     sensor = strs[1]
                     satellite = strs[2]
-              
+
             channo = np.array(chans, dtype=int)
         return channo, nchans, nregion, satellite, sensor
 
@@ -233,7 +237,7 @@ class MonDataSpace(EvaBase):
     def read_radmon_ieee(self, file_name, nchans, nregion, file_path=None):
 
         if file_path:
-            filename = os.path.join( file_path, file_name )
+            filename = os.path.join(file_path, file_name)
         else:
             filename = file_name
         if not os.path.isfile(filename):
@@ -248,31 +252,32 @@ class MonDataSpace(EvaBase):
             total_sum2 = None
             cycle_tm = None
             return count, penalty, omgnbc_sum, omgnbc_sum, total_sum, \
-                 omgbc_sum, omgnbc_sum2, omgbc_sum2, cycle_tm
+                omgbc_sum, omgnbc_sum2, omgbc_sum2, cycle_tm
 
-        # find cycle time in filename and create cycle_tm as datetime object 
+        # find cycle time in filename and create cycle_tm as datetime object
         cycle_tm = None
         cycstrs = filename.split('.')
 
         for cycstr in cycstrs:
-           if cycstr.isnumeric() == True: 
-               cycle_tm = datetime(int(cycstr[0:4]), int(cycstr[4:6]), int(cycstr[6:8]), int(cycstr[8:]))
+            if cycstr.isnumeric():
+                cycle_tm = datetime(int(cycstr[0:4]), int(cycstr[4:6]),
+                                    int(cycstr[6:8]), int(cycstr[8:]))
 
         # read binary Fortran file
-        f=FortranFile(filename,'r','>u4')
+        f = FortranFile(filename, 'r', '>u4')
 
-        count=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
-        penalty=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
-        omgnbc_sum=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
-        total_sum=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
-        omgbc_sum=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
-        omgnbc_sum2=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
-        total_sum2=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
-        omgbc_sum2=f.read_reals(dtype=np.dtype('>f4')).reshape(nchans,nregion)
+        count = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
+        penalty = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
+        omgnbc_sum = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
+        total_sum = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
+        omgbc_sum = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
+        omgnbc_sum2 = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
+        total_sum2 = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
+        omgbc_sum2 = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
 
         f.close()
 
         return count, penalty, omgnbc_sum, total_sum, omgbc_sum, \
-               omgnbc_sum2, total_sum2, omgbc_sum2, cycle_tm
+            omgnbc_sum2, total_sum2, omgbc_sum2, cycle_tm
 
     # ----------------------------------------------------------------------------------------------
