@@ -30,15 +30,6 @@ class MonDataSpace(EvaBase):
 
     def execute(self, data_collections, timing):
 
-        # Get name of the control file to parse
-        # -------------------------------------
-        ctlfile = self.config.get('ctlfile')
-        mystr = ""
-        for x in ctlfile:
-            mystr += ' ' + x
-
-        channo, nchans, nregion, satellite, sensor = self.get_ctl_stats(ctlfile[0])
-
         # Loop over the datasets
         # ----------------------
         for dataset in self.config.get('datasets'):
@@ -46,6 +37,11 @@ class MonDataSpace(EvaBase):
             # Set the collection name
             # -----------------------
             collection_name = get(dataset, self.logger, 'name')
+
+            # Get control file and parse
+            # --------------------------
+            control_file = get(dataset, self.logger, 'control_file')
+            channo, nchans, nregion, satellite, sensor = self.get_ctl_stats(control_file[0])
 
             # Get the groups to be read
             # -------------------------
@@ -197,14 +193,14 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_ctl_stats(self, ctlfile):
+    def get_ctl_stats(self, control_file):
         chans = []
         nchans = None
         nregion = None
         satellite = None
         sensor = None
 
-        with open(ctlfile, 'r') as fp:
+        with open(control_file, 'r') as fp:
             lines = fp.readlines()
 
             for line in lines:
