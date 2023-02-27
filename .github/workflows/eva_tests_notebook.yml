@@ -44,10 +44,6 @@ jobs:
     - name: Put eva in the path
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-    # Install hvplot
-    - name: Install hvplot
-      run: conda install hvplot
-
     # Run the eva test suite
     - name: Run eva notebook tests
       run: eva_tests notebook
