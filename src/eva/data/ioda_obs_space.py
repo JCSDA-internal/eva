@@ -43,16 +43,6 @@ def subset_channels(ds, channels, add_channels_variable=False):
 # --------------------------------------------------------------------------------------------------
 
 
-def check_location(location):
-    if max(location) == 0:
-        new_location = range(location.size)
-        location = new_location + location
-    return location
-
-
-# --------------------------------------------------------------------------------------------------
-
-
 class IodaObsSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
@@ -86,6 +76,7 @@ class IodaObsSpace(EvaBase):
 
             # Loop over filenames
             # -------------------
+            total_loc = 0
             for filename in filenames:
 
                 # Assert that file exists
@@ -95,8 +86,10 @@ class IodaObsSpace(EvaBase):
                 # Get file header
                 ds_header = open_dataset(filename)
 
-                # fix location if they are all zeros
-                ds_header['Location'] = check_location(ds_header['Location'])
+                # Fix location in case ioda did not set it
+                locations_this_file = range(total_loc, total_loc + ds_header['Location'].size)
+                ds_header = ds_header.assign_coords({"Location": locations_this_file})
+                total_loc = total_loc + ds_header['Location'].size
 
                 # Read header part of the file to get coordinates
                 ds_groups = Dataset()
