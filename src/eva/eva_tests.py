@@ -90,9 +90,6 @@ def notebook_tests(logger):
 
         # Replace variables in notebook
         updated_nb_in = replace_vars_notebook(nb_in, **overwrite_dict)
-        
-        # Figure out available kernels (debug)
-        os.system('jupyter kernelspec list')
 
         # Execute notebook
         ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
