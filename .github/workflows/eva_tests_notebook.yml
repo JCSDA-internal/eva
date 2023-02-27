@@ -1,4 +1,4 @@
-name: Eva Application Tests
+name: Eva Notebook Tests
 
 on:
   pull_request:
