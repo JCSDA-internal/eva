@@ -92,7 +92,7 @@ def notebook_tests(logger):
         updated_nb_in = replace_vars_notebook(nb_in, **overwrite_dict)
 
         # Execute notebook
-        ep = ExecutePreprocessor(timeout=600, kernel_name='pythoncrash')
+        ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
         nb_out = ep.preprocess(updated_nb_in)
 
         # Log completion
