@@ -23,16 +23,17 @@ from eva.transforms.accept_where import accept_where
 
 class EvaInteractive():
 
-    def __init__(self, filename):
+    def __init__(self):
         self.data_collection = DataCollections()
         self.logger = Logger('EvaInteractive')
         self.collection = 'interactive'
         self.timer = Timing()
-        self.filename = filename
+        self.filename = ''
         self.var_cache = []
 
-    def load_data_collection(self):
-        eva_dict = {'datasets': [{'filenames': [self.filename],
+    def load_ioda(self, filename):
+        self.filename = filename
+        eva_dict = {'datasets': [{'filenames': [filename],
                                   'groups': [],
                                   'missing_value_threshold': 1.0e06,
                                   'name': self.collection}]}
