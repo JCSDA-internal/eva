@@ -1,4 +1,15 @@
-# This work developed by NOAA/NWS/EMC under the Apache 2.0 license.
+# (C) Copyright 2021-2022 NOAA/NWS/EMC
+#
+# (C) Copyright 2021-2022 United States Government as represented by the Administrator of the
+# National Aeronautics and Space Administration. All Rights Reserved.
+#
+# This software is licensed under the terms of the Apache Licence Version 2.0
+# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+
+
+# --------------------------------------------------------------------------------------------------
+
+
 '''
 stats.py contains statistics utility functions
 '''
@@ -10,8 +21,13 @@ import numpy as _np
 from scipy.stats import t as _t
 from sklearn.linear_model import LinearRegression
 
+from eva.utilities.utils import slice_var_from_str
 
-def stats_helper(logger, plotobj, data_collections, config):
+
+# --------------------------------------------------------------------------------------------------
+
+
+def stats_helper(logger, plot_obj, data_collections, config):
     """
     Add specified statistics to a plot
     Args:
@@ -20,60 +36,77 @@ def stats_helper(logger, plotobj, data_collections, config):
         data_collections : eva data collections object
         config : input configuration dictionary
     """
-    from eva.utilities.utils import slice_var_from_str
-    # get the variable to compute statistics for and place on the plot
-    varstr = config['data']['variable']
-    var_cgv = varstr.split('::')
-    if len(var_cgv) != 3:
-        logger.abort('In stats_helper the variable \'var_cgv\' does not appear to ' +
-                     'be in the required format of collection::group::variable.')
 
-    # Optionally get the channel to plot
-    channel = None
-    if 'channel' in config['data']:
-        channel = config['data'].get('channel')
+    print(config)
 
-    data = data_collections.get_variable_data(var_cgv[0], var_cgv[1], var_cgv[2], channel)
+    # List of data to make stats for
+    fields = config['fields']
 
-    # See if we need to slice data
-    data = slice_var_from_str(config['data'], data, logger)
+    # List of statistics to include
+    statistics_variables = config['statistics_variables']
 
-    # flatten and mask missing data
-    data = data.flatten()
-    mask = ~_np.isnan(data)
-    data = data[mask]
-
-    # do we round
+    # Rounding
     digits = config.get('round', 4)
 
-    # get an empty stats dict
-    stats_dict = {}
+    # Loop over fields and assemble statistics as a string
+    for field in fields:
 
-    # loop through stats list in config
-    if len(data) > 0:
-        for stat in config['statistic list']:
-            if stat in ['n']:
-                stats_dict[stat] = f'{len(data)}'
-            elif stat in ['min', 'max', 'mean', 'median', 'std', 'var']:
-                statvalue = eval(f'_np.nan{stat}(data)')
-                statvalue = eval(f'_np.round(statvalue, {digits})')
-                stats_dict[stat] = str(statvalue)
-            elif stat in ['name']:
-                stats_dict[stat] = varstr
+        # Field name
+        field_name = field['field_name']
+
+        # Get collection, group, variable name for field
+        var_cgv = field_name.split('::')
+        if len(var_cgv) != 3:
+            logger.abort('In stats_helper the variable \'var_cgv\' does not appear to ' +
+                         'be in the required format of collection::group::variable.')
+
+        # Optionally get the channel to plot
+        channel = None
+        if 'channel' in field:
+            channel = field['channel']
+
+        # Get the field data
+        field_data = data_collections.get_variable_data(var_cgv[0], var_cgv[1], var_cgv[2], channel)
+
+        # See if we need to slice data
+        field_data = slice_var_from_str(field, field_data, logger)
+
+        # Flatten and mask missing data
+        field_data = field_data.flatten()
+        mask = ~_np.isnan(field_data)
+        field_data = field_data[mask]
+
+        # Start stats string
+        stats_string = field_name + '| '
+
+        # Loop over statistics list and assemble string
+        for statistics_variable in statistics_variables:
+
+            if statistics_variable in ['n']:
+                stat_value = len(field_data)
+            elif statistics_variable in ['min', 'max', 'mean', 'median', 'std', 'var']:
+                stat_value = eval(f'_np.nan{statistics_variable}(field_data)')
+                stat_value = eval(f'_np.round(stat_value, {digits})')
             else:
-                logger.abort(f'In stats_helper the statistic {stat} is not supported.')
-    else:
-        logger.debug('In stats_helper, len(data) == 0')
+                logger.abort(f'In stats_helper the statistic {statistics_variable} is not supported.')
 
-    # get additional config
-    xloc = config.get('xloc', 0.5)
-    yloc = config.get('yloc', -0.1)
-    ha = config.get('ha', 'center')
+            stats_string = stats_string + f'{statistics_variable}: {stat_value} | '
+
+        # Start new line for next data
+        stats_string = stats_string + '\n'
+
+    # Get the location for the annotation
+    x_loc = config.get('xloc', 0)
+    y_loc = config.get('yloc', 0)
+
+    # Get any additional kwargs
     kwargs = config.get('kwargs', {})
 
     # call plot object method
-    plotobj.add_stats_dict(stats_dict=stats_dict, xloc=xloc,
-                           yloc=yloc, ha=ha, **kwargs)
+    plot_obj.add_text(x_loc, y_loc, stats_string, **kwargs)
+
+
+# --------------------------------------------------------------------------------------------------
 
 
 def lregress(x, y, ci=95.0):
@@ -118,6 +151,9 @@ def lregress(x, y, ci=95.0):
     ssig = True if (_np.abs(rc) - _np.abs(eb)) > 0.0 else False
 
     return rc, sb, ssig
+
+
+# --------------------------------------------------------------------------------------------------
 
 
 def ttest(x, y=None, ci=95.0, paired=True, scale=False):
@@ -171,6 +207,9 @@ def ttest(x, y=None, ci=95.0, paired=True, scale=False):
     return diffmean, errorbar
 
 
+# --------------------------------------------------------------------------------------------------
+
+
 def get_weights(lats):
     '''
     Get weights for latitudes to do weighted mean
@@ -180,6 +219,9 @@ def get_weights(lats):
         An array of weights for latitudes
     '''
     return _np.cos((_np.pi / 180.0) * lats)
+
+
+# --------------------------------------------------------------------------------------------------
 
 
 def get_weighted_mean(data, weights, axis=None):
@@ -199,6 +241,9 @@ def get_weighted_mean(data, weights, axis=None):
         'data and weights mis-match array size')
 
     return _np.average(data, weights=weights, axis=axis)
+
+
+# --------------------------------------------------------------------------------------------------
 
 
 def get_linear_regression(x, y):
@@ -225,6 +270,9 @@ def get_linear_regression(x, y):
     # by y_pred = slope * x + intercept
     y_pred = model.predict(x)
     return y_pred, r_sq, intercept, slope
+
+
+# --------------------------------------------------------------------------------------------------
 
 
 def bootstrap(insample, level=.95, estimator='mean', nrepl=10000):
@@ -261,3 +309,6 @@ def bootstrap(insample, level=.95, estimator='mean', nrepl=10000):
     ci_upper = _np.percentile(deltas, upper_pctile)
 
     return ci_lower, ci_upper
+
+
+# --------------------------------------------------------------------------------------------------
