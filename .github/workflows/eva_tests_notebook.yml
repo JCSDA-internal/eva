@@ -1,0 +1,53 @@
+name: Eva Notebook Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+
+jobs:
+  evaapp:
+    name: Run eva notebook tests
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Setup Python
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    # Update conda
+    - name: Update conda
+      run: conda update -n base -c defaults conda
+
+    # Install pip
+    - name: Install pip
+      run: conda install pip
+
+    # Install cartopy
+    - name: Install cartopy
+      run: conda install -c conda-forge cartopy
+
+    # Clone the eva code
+    - name: Clone eva repo
+      uses: actions/checkout@v2
+      with:
+        lfs: true
+
+    # Install eva
+    - name: Upgrade pip
+      run: $CONDA/bin/pip3 install --upgrade pip
+    - name: Install eva and dependencies
+      run: $CONDA/bin/pip3 install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
+    - name: Put eva in the path
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    # Install ipykernel
+    - name: Install ipykernel
+      run: $CONDA/bin/pip3 install ipykernel
+
+    # Run the eva test suite
+    - name: Run eva notebook tests
+      run: eva_tests notebook
