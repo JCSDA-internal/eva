@@ -15,6 +15,7 @@ from eva.eva_base import EvaBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list
 
+import netCDF4 as nc
 
 # --------------------------------------------------------------------------------------------------
 
@@ -78,7 +79,6 @@ class IodaObsSpace(EvaBase):
             # -------------------
             total_loc = 0
             for filename in filenames:
-
                 # Assert that file exists
                 if not os.path.exists(filename):
                     logger.abort(f'In IodaObsSpace file \'{filename}\' does not exist')
@@ -107,12 +107,24 @@ class IodaObsSpace(EvaBase):
                 # Set the channels based on user selection and add channels variable
                 ds_groups = subset_channels(ds_groups, channels, True)
 
+                # If groups is empty, read in file to retrieve group list
+                groups_present = True
+                if not groups:
+                    groups_present = False
+                    nc_ds = nc.Dataset(filename)
+                    groups = list(nc_ds.groups.keys())
+                    nc_ds.close()
+
                 # Loop over groups
                 for group in groups:
 
                     # Group name and variables
-                    group_name = get(group, self.logger, 'name')
-                    group_vars = get(group, self.logger, 'variables', 'all')
+                    if groups_present:
+                        group_name = get(group, self.logger, 'name')
+                        group_vars = get(group, self.logger, 'variables', 'all')
+                    else:
+                        group_name = group
+                        group_vars = 'all'
 
                     # Set the collection name
                     collection_name = dataset['name']
