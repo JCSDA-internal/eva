@@ -41,7 +41,7 @@ setuptools.setup(
         'xarray>=0.11.3',
         #  'seaborn==0.12',
         'emcpy @ git+https://github.com/NOAA-EMC/' +
-        'emcpy@4f36baf1a2302fb0daa49bd8415bb7d2a65347bb#egg=emcpy',
+        'emcpy@dcdc868e7f48bb1ff55507f34c0548742af8bec1#egg=emcpy',
         # 'seaborn==0.12',
     ],
     package_data={
