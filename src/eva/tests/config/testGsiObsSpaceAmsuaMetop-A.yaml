@@ -36,18 +36,21 @@ diagnostics:
           add_legend:
             loc: 'upper left'
           statistics:
-            data:
-              variable: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
-              channel: ${channel}
-            statistic list:
+            fields:
+              - field_name: experiment::GsiNcDiag::Obs_Minus_Forecast_adjusted
+                channel: ${channel}
+                xloc: 0.5
+                yloc: -0.10
+                kwargs:
+                  color: 'black'
+                  fontsize: 8
+                  fontfamily: monospace
+            statistics_variables:
             - n
             - min
             - mean
             - max
             - std
-            - name
-            kwargs:
-              fontsize: 6
           layers:
           - type: Histogram
             data:
