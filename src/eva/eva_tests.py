@@ -11,15 +11,16 @@
 
 # --------------------------------------------------------------------------------------------------
 
-
 # imports
 import argparse
 import os
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor
 
 # local imports
 from eva.eva_path import return_eva_path
 from eva.utilities.logger import Logger, textcolors
-from eva.utilities.utils import load_yaml_file, replace_vars_dict
+from eva.utilities.utils import load_yaml_file, replace_vars_dict, replace_vars_notebook
 
 from eva.plot_tools import figure_driver
 from eva.plot_tools.figure_driver import FigureDriver
@@ -60,6 +61,44 @@ def application_tests(logger):
         eva(test_config)
 
 
+def notebook_tests(logger):
+
+    from eva.eva_base import eva
+
+    # Write some messaging
+    logger.info(f'Running Eva notebook tests ...')
+
+    # Path to eva install
+    eva_path = return_eva_path()
+
+    # List of notebooks
+    notebooks = os.listdir(os.path.join(eva_path, 'tests', 'notebooks'))
+
+    # Create dictionary that contains overwrite
+    overwrite_dict = {}
+    overwrite_dict['data_input_path'] = os.path.join(eva_path, 'tests', 'data')
+
+    # Loop over tests, populate YAML and run test
+    for notebook in notebooks:
+
+        # Write some information
+        logger.info(f'{textcolors.green}Running Eva notebook test with {notebook}{textcolors.end}')
+
+        # Open notebook using nbconvert
+        with open(os.path.join(eva_path, 'tests', 'notebooks', notebook)) as file:
+            nb_in = nbformat.read(file, nbformat.NO_CONVERT)
+
+        # Replace variables in notebook
+        updated_nb_in = replace_vars_notebook(nb_in, **overwrite_dict)
+
+        # Execute notebook
+        ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
+        nb_out = ep.preprocess(updated_nb_in)
+
+        # Log completion
+        logger.info(f'{textcolors.green}Completed Eva notebook test' +
+                    f' with {notebook}{textcolors.end}')
+
 # --------------------------------------------------------------------------------------------------
 
 
@@ -80,7 +119,7 @@ def main():
     # Check for valid test type
     # -------------------------
     test_type = test_type.lower()  # Convert to always be lower case
-    valid_test_types = ['application']
+    valid_test_types = ['application', 'notebook']
     if test_type not in valid_test_types:
         logger.abort(f'Requested test \'{test_type}\' is not valid. Options are {valid_test_types}')
 
@@ -88,7 +127,8 @@ def main():
     # -------------------------
     if test_type == 'application':
         application_tests(logger)
-
+    if test_type == 'notebook':
+        notebook_tests(logger)
 
 # --------------------------------------------------------------------------------------------------
 

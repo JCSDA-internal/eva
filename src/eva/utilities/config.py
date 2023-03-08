@@ -46,7 +46,7 @@ class Config(dict):
 
             else:
 
-                self.logger.abort("Configuraiton does not have the key")
+                self.logger.abort("Configuration does not have the key")
 
         else:
 

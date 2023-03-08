@@ -254,6 +254,38 @@ def replace_vars_dict(d, **defs):
 
     return d_interp
 
+# --------------------------------------------------------------------------------------------------
+
+
+def replace_vars_notebook(nb, **defs):
+
+    """
+    Parameters
+    ----------
+    nb : NotebookNode, required
+        nbconvert dict-like NotebookNode to be modified
+    defs: dictionary, required
+          Dictionary of definitions for resolving variables expressed as key-word arguments.
+
+    Returns
+    -------
+    nb : NotebookNode
+              nbconvert NotebookNode with definitions resolved
+    """
+
+    # Iterate through notebook cells, skipping notebook metadata
+    for idx, cell in enumerate(nb['cells'][1:]):
+        source = str(cell['source'])
+        for key, value in defs.items():
+            overwrite_found = source.find(key)
+            if (overwrite_found > 0):
+                # Only pass subsection from dictionary that's needed
+                d = {key: value}
+                new_source = replace_vars_str(source, **d)
+                # Update notebook cell
+                nb['cells'][idx+1]['source'] = new_source
+    return nb
+
 
 # --------------------------------------------------------------------------------------------------
 

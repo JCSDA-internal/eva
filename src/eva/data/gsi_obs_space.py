@@ -234,8 +234,8 @@ class GsiObsSpace(EvaBase):
                                           group_name + '\' in file ' + filename +
                                           ' does not have any variables.')
 
-            # Add the dataset to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds, 'nobs')
+                # Add the dataset to the collections
+                data_collections.create_or_add_to_collection(collection_name, ds, 'nobs')
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)

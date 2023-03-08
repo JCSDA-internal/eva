@@ -48,6 +48,7 @@ setuptools.setup(
         '': [
                'tests/config/*',
                'tests/data/*',
+               'tests/notebooks/*',
                'defaults/*.yaml'
              ],
     },
