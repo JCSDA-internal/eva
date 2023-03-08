@@ -361,188 +361,185 @@ diagnostics:
 
     # Map plots
     # ---------
+    # Observations
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      dynamic options:
+        - type: vminvmaxcmap
+          channel: ${channel}
+          data variable: experiment::ObsValue::${variable}
+      figure:
+        figure size: [20,10]
+        layout: [1,1]
+        title: 'Observations | AMSU-A NOAA-19 | Obs Value'
+        output name: map_plots/amsua_n19/${variable}/${channel}/observations_amsua_n19_${variable}_${channel}.png
+      plots:
+        - mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: ObsValue
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::ObsValue::${variable}
+              channel: ${channel}
+            markersize: 2
+            label: ObsValue
+            colorbar: true
+            cmap: ${dynamic_cmap}
+            vmin: ${dynamic_vmin}
+            vmax: ${dynamic_vmax}
+    # Observations over north polar region
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      dynamic options:
+        - type: vminvmaxcmap
+          channel: ${channel}
+          data variable: experiment::ObsValue::${variable}
+      figure:
+        figure size: [20,10]
+        layout: [1,1]
+        title: 'Observations | AMSU-A NOAA-19 | Obs Value'
+        output name: map_plots/amsua_n19/${variable}/${channel}/observations_amsua_n19_${variable}_${channel}_np.png
+      plots:
+        - mapping:
+            projection: npstere
+            domain: north
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: ObsValue
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::ObsValue::${variable}
+              channel: ${channel}
+            markersize: 2
+            label: ObsValue
+            colorbar: true
+            cmap: ${dynamic_cmap}
+            vmin: ${dynamic_vmin}
+            vmax: ${dynamic_vmax}
+    # omb jedi
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      dynamic options:
+        - type: vminvmaxcmap
+          channel: ${channel}
+          data variable: experiment::ObsValueMinusHofx::${variable}
+      figure:
+        figure size: [20,10]
+        layout: [1,1]
+        title: 'JEDI OmB | AMSU-A NOAA-19 | ${variable_title}'
+        output name: map_plots/amsua_n19/${variable}/${channel}/omb_jedi_amsua_n19_${variable}_${channel}.png
+      plots:
+        - mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::ObsValueMinusHofx::${variable}
+              channel: ${channel}
+            markersize: 2
+            label: '${variable}'
+            colorbar: true
+            cmap: ${dynamic_cmap}
+            vmin: ${dynamic_vmin}
+            vmax: ${dynamic_vmax}
 
-#    # Observations
-#    - batch figure:
-#        variables: *variables
-#        channels: *channels
-#      dynamic options:
-#        - type: vminvmaxcmap
-#          channel: ${channel}
-#          data variable: experiment::ObsValue::${variable}
-#      figure:
-#        figure size: [20,10]
-#        layout: [1,1]
-#        title: 'Observations | AMSU-A NOAA-19 | Obs Value'
-#        output name: map_plots/amsua_n19/${variable}/${channel}/observations_amsua_n19_${variable}_${channel}.png
-#      plots:
-#        - mapping:
-#            projection: plcarr
-#            domain: global
-#          add_map_features: ['coastline']
-#          add_colorbar:
-#            label: ObsValue
-#          add_grid:
-#          layers:
-#          - type: MapScatter
-#            longitude:
-#              variable: experiment::MetaData::longitude
-#            latitude:
-#              variable: experiment::MetaData::latitude
-#            data:
-#              variable: experiment::ObsValue::${variable}
-#              channel: ${channel}
-#            markersize: 2
-#            label: ObsValue
-#            colorbar: true
-#            cmap: ${dynamic_cmap}
-#            vmin: ${dynamic_vmin}
-#            vmax: ${dynamic_vmax}
+    # omb gsi
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      dynamic options:
+        - type: vminvmaxcmap
+          channel: ${channel}
+          data variable: experiment::ObsValueMinusGsiHofXBc::${variable}
+      figure:
+        figure size: [20,10]
+        layout: [1,1]
+        title: 'GSI OmB | AMSU-A NOAA-19 | ${variable_title}'
+        output name: map_plots/amsua_n19/${variable}/${channel}/omb_gsi_amsua_n19_${variable}_${channel}.png
+      plots:
+        - mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::ObsValueMinusGsiHofXBc::${variable}
+              channel: ${channel}
+            markersize: 2
+            label: '${variable}'
+            colorbar: true
+            cmap: ${dynamic_cmap}
+            vmin: ${dynamic_vmin}
+            vmax: ${dynamic_vmax}
 
-#    # Observations over north polar region
-#    - batch figure:
-#        variables: *variables
-#        channels: *channels
-#      dynamic options:
-#        - type: vminvmaxcmap
-#          channel: ${channel}
-#          data variable: experiment::ObsValue::${variable}
-#      figure:
-#        figure size: [20,10]
-#        layout: [1,1]
-#        title: 'Observations | AMSU-A NOAA-19 | Obs Value'
-#        output name: map_plots/amsua_n19/${variable}/${channel}/observations_amsua_n19_${variable}_${channel}_np.png
-#      plots:
-#        - mapping:
-#            projection: npstere
-#            domain: north
-#          add_map_features: ['coastline']
-#          add_colorbar:
-#            label: ObsValue
-#          add_grid:
-#          layers:
-#          - type: MapScatter
-#            longitude:
-#              variable: experiment::MetaData::longitude
-#            latitude:
-#              variable: experiment::MetaData::latitude
-#            data:
-#              variable: experiment::ObsValue::${variable}
-#              channel: ${channel}
-#            markersize: 2
-#            label: ObsValue
-#            colorbar: true
-#            cmap: ${dynamic_cmap}
-#            vmin: ${dynamic_vmin}
-#            vmax: ${dynamic_vmax}
-
-#    # omb jedi
-#    - batch figure:
-#        variables: *variables
-#        channels: *channels
-#      dynamic options:
-#        - type: vminvmaxcmap
-#          channel: ${channel}
-#          data variable: experiment::ObsValueMinusHofx::${variable}
-#      figure:
-#        figure size: [20,10]
-#        layout: [1,1]
-#        title: 'JEDI OmB | AMSU-A NOAA-19 | ${variable_title}'
-#        output name: map_plots/amsua_n19/${variable}/${channel}/omb_jedi_amsua_n19_${variable}_${channel}.png
-#      plots:
-#        - mapping:
-#            projection: plcarr
-#            domain: global
-#          add_map_features: ['coastline']
-#          add_colorbar:
-#            label: '${variable}'
-#          add_grid:
-#          layers:
-#          - type: MapScatter
-#            longitude:
-#              variable: experiment::MetaData::longitude
-#            latitude:
-#              variable: experiment::MetaData::latitude
-#            data:
-#              variable: experiment::ObsValueMinusHofx::${variable}
-#              channel: ${channel}
-#            markersize: 2
-#            label: '${variable}'
-#            colorbar: true
-#            cmap: ${dynamic_cmap}
-#            vmin: ${dynamic_vmin}
-#            vmax: ${dynamic_vmax}
-#
-#    # omb gsi
-#    - batch figure:
-#        variables: *variables
-#        channels: *channels
-#      dynamic options:
-#        - type: vminvmaxcmap
-#          channel: ${channel}
-#          data variable: experiment::ObsValueMinusGsiHofXBc::${variable}
-#      figure:
-#        figure size: [20,10]
-#        layout: [1,1]
-#        title: 'GSI OmB | AMSU-A NOAA-19 | ${variable_title}'
-#        output name: map_plots/amsua_n19/${variable}/${channel}/omb_gsi_amsua_n19_${variable}_${channel}.png
-#      plots:
-#        - mapping:
-#            projection: plcarr
-#            domain: global
-#          add_map_features: ['coastline']
-#          add_colorbar:
-#            label: '${variable}'
-#          add_grid:
-#          layers:
-#          - type: MapScatter
-#            longitude:
-#              variable: experiment::MetaData::longitude
-#            latitude:
-#              variable: experiment::MetaData::latitude
-#            data:
-#              variable: experiment::ObsValueMinusGsiHofXBc::${variable}
-#              channel: ${channel}
-#            markersize: 2
-#            label: '${variable}'
-#            colorbar: true
-#            cmap: ${dynamic_cmap}
-#            vmin: ${dynamic_vmin}
-#            vmax: ${dynamic_vmax}
-#
-#    # hofx difference
-#    - batch figure:
-#        variables: *variables
-#        channels: *channels
-#      dynamic options:
-#        - type: vminvmaxcmap
-#          channel: ${channel}
-#          data variable: experiment::HofxMinusGsiHofXBc::${variable}
-#      figure:
-#        figure size: [20,10]
-#        layout: [1,1]
-#        title: 'Hofx Difference | AMSU-A NOAA-19 | ${variable_title}'
-#        output name: map_plots/amsua_n19/${variable}/${channel}/hofx_difference_amsua_n19_${variable}_${channel}.png
-#      plots:
-#        - mapping:
-#            projection: plcarr
-#            domain: global
-#          add_map_features: ['coastline']
-#          add_colorbar:
-#            label: '${variable}'
-#          add_grid:
-#          layers:
-#          - type: MapScatter
-#            longitude:
-#              variable: experiment::MetaData::longitude
-#            latitude:
-#              variable: experiment::MetaData::latitude
-#            data:
-#              variable: experiment::HofxMinusGsiHofXBc::${variable}
-#              channel: ${channel}
-#            markersize: 2
-#            label: '${variable}'
-#            colorbar: true
-#            cmap: ${dynamic_cmap}
-#            vmin: ${dynamic_vmin}
-#            vmax: ${dynamic_vmax}
+    # hofx difference
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      dynamic options:
+        - type: vminvmaxcmap
+          channel: ${channel}
+          data variable: experiment::HofxMinusGsiHofXBc::${variable}
+      figure:
+        figure size: [20,10]
+        layout: [1,1]
+        title: 'Hofx Difference | AMSU-A NOAA-19 | ${variable_title}'
+        output name: map_plots/amsua_n19/${variable}/${channel}/hofx_difference_amsua_n19_${variable}_${channel}.png
+      plots:
+        - mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: '${variable}'
+          add_grid:
+          layers:
+          - type: MapScatter
+            longitude:
+              variable: experiment::MetaData::longitude
+            latitude:
+              variable: experiment::MetaData::latitude
+            data:
+              variable: experiment::HofxMinusGsiHofXBc::${variable}
+              channel: ${channel}
+            markersize: 2
+            label: '${variable}'
+            colorbar: true
+            cmap: ${dynamic_cmap}
+            vmin: ${dynamic_vmin}
+            vmax: ${dynamic_vmax}
