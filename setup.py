@@ -42,7 +42,7 @@ setuptools.setup(
         'emcpy @ git+https://github.com/NOAA-EMC/' +
         'emcpy@668fab9dcfdd8885cd2cd971478368782cc5db6f#egg=emcpy',
         # Option dependency for making density plots
-        #'seaborn==0.12',
+        # 'seaborn==0.12',
     ],
     package_data={
         '': [

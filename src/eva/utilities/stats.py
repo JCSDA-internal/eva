@@ -113,8 +113,8 @@ def stats_helper(logger, plot_obj, data_collections, config):
             else:
                 logger.abort(f'In stats_helper the statistic {stats_variable} is not supported.')
 
-            stats_string = stats_string + f'{stats_variable} = ' + \
-                           format_dict[stats_variable].format(stat_value)
+            stat_formatted = format_dict[stats_variable].format(stat_value)
+            stats_string = stats_string + f'{stats_variable} = ' + stat_formatted
 
             if index < len(stats_variables) - 1:
                 stats_string = stats_string + ' | '
