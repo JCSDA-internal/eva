@@ -40,7 +40,7 @@ setuptools.setup(
         'scikit-learn>=1.0.2',
         'xarray>=0.11.3',
         'emcpy @ git+https://github.com/NOAA-EMC/' +
-        'emcpy@668fab9dcfdd8885cd2cd971478368782cc5db6f#egg=emcpy',
+        'emcpy@471cb60c44c51a7e07dfbd0173c276ecdc1b46f1#egg=emcpy',
         # Option dependency for making density plots
         # 'seaborn==0.12',
     ],
