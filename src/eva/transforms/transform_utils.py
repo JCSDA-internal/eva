@@ -47,11 +47,11 @@ def replace_cgv(logger, collection, group, variable, *argv):
 
     # Create dictionary with templates
     tmplt_dict = {}
-    if collection is not 'none':
+    if collection != 'none':
         tmplt_dict['collection'] = collection
-    if group is not 'none':
+    if group != 'none':
         tmplt_dict['group'] = group
-    if variable is not 'none':
+    if variable != 'none':
         tmplt_dict['variable'] = variable
 
     # Perform replace for the argument list
