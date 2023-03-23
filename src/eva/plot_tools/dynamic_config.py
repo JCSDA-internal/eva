@@ -54,8 +54,14 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
 
     # Find minimum and maximum values
     cmap = option_dict.get('sequential colormap', 'viridis')
-    vmax = np.nanmax(datavar_check)
-    vmin = np.nanmin(datavar_check)
+
+    # If everything is nan plot some large min/max (plotting code should do the same)
+    if np.isnan(datavar_check).all():
+        vmax = 1.0e38
+        vmin = 1.0e38
+    else:
+        vmax = np.nanmax(datavar_check)
+        vmin = np.nanmin(datavar_check)
 
     # If positive and negative values are present then a diverging colormap centered on zero should
     # be used.
