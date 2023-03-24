@@ -88,8 +88,7 @@ class MonDataSpace(EvaBase):
                     self.read_radmon_ieee(filename, nchans, nregion)
 
                 # add cycle as a variable in dataset
-                add_cycle = cycle_tm.strftime("%Y%m%d%H")
-                cycle_tmp = [[add_cycle] * nregion] * nchans
+                cycle_tmp = [[cycle_tm] * nregion] * nchans
 
                 # create dataset from file contents
                 timestep_ds = Dataset(

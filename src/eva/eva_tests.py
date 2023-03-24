@@ -14,14 +14,11 @@
 # imports
 import argparse
 import os
-import nbformat
-from nbconvert.preprocessors import ExecutePreprocessor
 
 # local imports
 from eva.eva_path import return_eva_path
 from eva.utilities.logger import Logger, textcolors
 from eva.utilities.utils import load_yaml_file, replace_vars_dict, replace_vars_notebook
-
 from eva.plot_tools import figure_driver
 from eva.plot_tools.figure_driver import FigureDriver
 
@@ -64,6 +61,8 @@ def application_tests(logger):
 def notebook_tests(logger):
 
     from eva.eva_base import eva
+    import nbformat
+    from nbconvert.preprocessors import ExecutePreprocessor
 
     # Write some messaging
     logger.info(f'Running Eva notebook tests ...')

@@ -39,10 +39,7 @@ def select_time(config, data_collections):
 
     # Get cycles from yaml file and confirm there are 1 or 2 times
     cyc = get(config, logger, 'cycles')
-    if type(cyc) is list:
-        cycles = cyc
-    else:
-        cycles = [cyc]
+    cycles = cyc if type(cyc) is list else [cyc]
 
     if None in cycles:
         logger.abort('cycles: for transformation not specified in yaml file. ' +
