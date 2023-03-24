@@ -16,7 +16,7 @@ import setuptools
 
 setuptools.setup(
     name='eva',
-    version='1.3.2',
+    version='1.3.3',
     author='Community owned code',
     description='Evaluation and Verification of an Analysis',
     url='https://github.com/JCSDA-internal/eva',
@@ -39,9 +39,9 @@ setuptools.setup(
         'cartopy>=0.18.0',
         'scikit-learn>=1.0.2',
         'xarray>=0.11.3',
-        #  'seaborn==0.12',
         'emcpy @ git+https://github.com/NOAA-EMC/' +
-        'emcpy@dcdc868e7f48bb1ff55507f34c0548742af8bec1#egg=emcpy',
+        'emcpy@471cb60c44c51a7e07dfbd0173c276ecdc1b46f1#egg=emcpy',
+        # Option dependency for making density plots
         # 'seaborn==0.12',
     ],
     package_data={
