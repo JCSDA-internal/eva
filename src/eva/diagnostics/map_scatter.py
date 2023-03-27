@@ -2,6 +2,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import emcpy.plots.map_plots
 import os
+import numpy as np
 
 
 class MapScatter():
@@ -25,6 +26,11 @@ class MapScatter():
         lonvar = lonvar.flatten()
         latvar = latvar.flatten()
         datavar = datavar.flatten()
+
+        # If everything is nan plotting will fail so just plot some large values
+        if np.isnan(datavar).all():
+            datavar[np.isnan(datavar)] = 1.0e38
+
         # create declarative plotting MapScatter object
         self.plotobj = emcpy.plots.map_plots.MapScatter(latvar, lonvar, datavar)
         # get defaults from schema

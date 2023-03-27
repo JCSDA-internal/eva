@@ -34,28 +34,28 @@ diagnostics:
     - transform: select time
       new name: experiment::GsiIeee::count1
       starting field: experiment::GsiIeee::count
-      cycles: 2015051418
+      cycle: 2015051418
       for:
         variable: [none]
 
     - transform: select time
       new name: experiment::GsiIeee::count2
       starting field: experiment::GsiIeee::count
-      cycles: 2015051500
+      cycle: 2015051500
       for:
         variable: [none]
 
     - transform: select time
       new name: experiment::GsiIeee::count3
       starting field: experiment::GsiIeee::count
-      cycles: 2015051506
+      cycle: 2015051506
       for:
         variable: [none]
 
     - transform: select time
       new name: experiment::GsiIeee::count4
       starting field: experiment::GsiIeee::count
-      cycles: 2015051512
+      cycle: 2015051512
       for:
         variable: [none]
 
@@ -71,7 +71,7 @@ diagnostics:
     - transform: select time
       new name: experiment::GsiIeee::total_1cyc
       starting field: experiment::GsiIeee::total_avg
-      cycles: 2015051512
+      cycle: 2015051512
       for:
         variable: [none]
 
@@ -79,7 +79,8 @@ diagnostics:
     - transform: select time
       new name: experiment::GsiIeee::total_4cyc
       starting field: experiment::GsiIeee::total_avg
-      cycles: [2015051418, 2015051512]
+      start cycle: 2015051418
+      end cycle: 2015051512
       for:
         variable: [none]
 
@@ -124,7 +125,7 @@ diagnostics:
               x:
                 variable: experiment::GsiIeee::channel
               y:
-                variable: experiment::GsiIeee::count4
+               variable: experiment::GsiIeee::count4
               color: 'red'
               label: '2015051512'
 

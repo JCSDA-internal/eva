@@ -56,7 +56,7 @@ class Config(dict):
 # --------------------------------------------------------------------------------------------------
 
 
-def get(dict, logger, key, default=None):
+def get(dict, logger, key, default=None, abort_on_failure=True):
 
     if default is None:
 
@@ -64,7 +64,7 @@ def get(dict, logger, key, default=None):
 
             return dict.get(key)
 
-        else:
+        elif abort_on_failure:
 
             logger.abort(f'Configuration does not have the key {key}')
 
