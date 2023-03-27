@@ -37,14 +37,21 @@ def select_time(config, data_collections):
     new_name_template = get(config, logger, 'new name')
     starting_field_template = get(config, logger, 'starting field')
 
-    # Get cycles from yaml file and confirm there are 1 or 2 times
-    cyc = get(config, logger, 'cycles')
-    cycles = cyc if type(cyc) is list else [cyc]
+    # Get cycle or start cycle and end cycle from yaml file
+    cycles = [None]
+    cyc = get(config, logger, 'cycle', abort_on_failure=False)
+    if cyc is not None:
+        cycles = cyc if type(cyc) is list else [cyc]
+    else:
+        start_cyc = get(config, logger, 'start cycle', abort_on_failure=False)
+        end_cyc = get(config, logger, 'end cycle', abort_on_failure=False)
+        if start_cyc is not None and end_cyc is not None:
+            cycles = [start_cyc, end_cyc]
 
     if None in cycles:
-        logger.abort('cycles: for transformation not specified in yaml file. ' +
-                     'This should be cycles: followed by 1 or 2 cycle times ' +
-                     'in YYYYMMDDHH format.')
+        logger.abort('cycle time(s) for transformation not specified in yaml file.  '
+                     'This should be either cycle: YYYYMMDDHH or '
+                     'start_cycle: YYYYMMDDHH and end_cycle: YYYYMMDDHH')
     if len(cycles) > 2:
         logger.info('WARNING:  more than 2 cycles specified in yaml file. ' +
                     'Only the first 2 times will be used.')
