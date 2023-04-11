@@ -253,10 +253,12 @@ class DataCollections:
             self.logger.info('\n Data (group::variable):')
             data_vars = list(self._collections[collection].data_vars)
             max_name_len = len(max(data_vars, key=len))
+
             for data_var in data_vars:
                 group_var = data_var.split('::')
                 data_var_value = self.get_variable_data(collection, group_var[0], group_var[1])
                 minmaxrms = ''
+                minmaxrms_string = ''
                 if str(data_var_value.dtype) in minmaxrms_format_dict:
                     minmaxrms_format = minmaxrms_format_dict[str(data_var_value.dtype)]
                     min_string = 'Min=' + minmaxrms_format.format(np.nanmin(data_var_value))

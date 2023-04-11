@@ -19,7 +19,7 @@ from datetime import datetime
 
 from eva.eva_base import EvaBase
 from eva.utilities.config import get
-from eva.utilities.utils import parse_channel_list
+from eva.utilities.utils import parse_channel_list, is_number
 
 # --------------------------------------------------------------------------------------------------
 
@@ -41,7 +41,8 @@ class MonDataSpace(EvaBase):
             # Get control file and parse
             # --------------------------
             control_file = get(dataset, self.logger, 'control_file')
-            channo, nchans, nregion, satellite, sensor = self.get_ctl_stats(control_file[0])
+            coords, dims, attribs, nvars, vars, channo = self.get_ctl_dict(control_file[0])
+            ndims_used = self.get_ndims_used(dims)
 
             # Get the groups to be read
             # -------------------------
@@ -71,6 +72,13 @@ class MonDataSpace(EvaBase):
                     requested_regions = parse_channel_list(str(regions_str_or_list), self.logger)
                     drop_regions = True
 
+            # Need to add levels to the potential drop list
+            # ---------------------------------------------
+
+            # Set coordinate ranges
+            # ---------------------
+            x_range, y_range, z_range = self.get_dim_ranges(coords, dims, channo)
+
             # Filenames to be read into this collection
             # -----------------------------------------
             filenames = get(dataset, self.logger, 'filenames')
@@ -83,29 +91,27 @@ class MonDataSpace(EvaBase):
             for filename in filenames:
 
                 # read data file
-                count_tmp, penalty_tmp, omgnbc_sum_tmp, total_sum_tmp, \
-                    omgbc_sum_tmp, omgnbc_sum2_tmp, total_sum2_tmp, omgbc_sum2_tmp, cycle_tm = \
-                    self.read_radmon_ieee(filename, nchans, nregion)
+                darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used, nvars, vars)
 
-                # add cycle as a variable in dataset
-                cycle_tmp = [[cycle_tm] * nregion] * nchans
+                # add cycle as a variable in data array
+                cyc_darr = self.cycle_to_np_array(dims, ndims_used, cycle_tm)
+
+                # conditionally add 'scan' as a variable
+                if 'Scan' in coords:
+                    self.logger.info('Need to add scan')
 
                 # create dataset from file contents
-                timestep_ds = Dataset(
-                    {
-                        "count": (("channels", "regions"), count_tmp),
-                        "penalty": (("channels", "regions"), penalty_tmp),
-                        "omgnbc": (("channels", "regions"), omgnbc_sum_tmp),
-                        "total": (("channels", "regions"), total_sum_tmp),
-                        "omgbc": (("channels", "regions"), omgbc_sum_tmp),
-                        "omgnbc2": (("channels", "regions"), omgnbc_sum2_tmp),
-                        "total2": (("channels", "regions"), total_sum2_tmp),
-                        "omgbc2": (("channels", "regions"), omgbc_sum2_tmp),
-                        "cycle": (("channels", "regions"), cycle_tmp),
-                    },
-                    coords={"channels": channo, "regions": np.arange(1, nregion+1)},
-                    attrs={'satellite': satellite, 'sensor': sensor},
-                )
+                timestep_ds = None
+
+                timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
+                                             x_range, y_range, z_range, cyc_darr)
+
+                if attribs['sat']:
+                    timestep_ds.attrs['satellite'] = attribs['sat']
+                if attribs['sensor']:
+                    timestep_ds.attrs['sensor'] = attribs['sensor']
+
+                # add cycle_tm dim for concat
                 timestep_ds['times'] = cycle_tm
 
                 # Add this dataset to the list of ds_list
@@ -123,12 +129,12 @@ class MonDataSpace(EvaBase):
                 # Drop channels not in user requested list
                 # ----------------------------------------
                 if drop_channels:
-                    ds = self.subset_coordinate(ds, 'channels', requested_channels)
+                    ds = self.subset_coordinate(ds, 'Channel', requested_channels)
 
                 # Drop regions not in user requested list
                 # ---------------------------------------
                 if drop_regions:
-                    ds = self.subset_coordinate(ds, 'regions', requested_regions)
+                    ds = self.subset_coordinate(ds, 'Region', requested_regions)
 
                 # If user specifies all variables set to group list
                 # -------------------------------------------------
@@ -154,7 +160,7 @@ class MonDataSpace(EvaBase):
                                       ' does not have any variables.')
 
             # Add the dataset to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds, 'count')
+            data_collections.create_or_add_to_collection(collection_name, ds, 'times')
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
@@ -193,87 +199,299 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_ctl_stats(self, control_file):
-        chans = []
-        nchans = None
-        nregion = None
-        satellite = None
-        sensor = None
+    def get_ctl_dict(self, control_file):
+
+        coords = {'xdef': None, 'ydef': None, 'zdef': None}
+        dims = {'xdef': 0, 'ydef': 0, 'zdef': 0}
+        attribs = {'sensor': None, 'sat': None}
+        vars = []
+        nvars = 0
+        channo = []
+        scan_info = []
 
         with open(control_file, 'r') as fp:
             lines = fp.readlines()
 
             for line in lines:
+                if line.find('XDEF') != -1:
+                    if line.find('channel') != -1:
+                        coords['xdef'] = 'Channel'
+                    elif line.find("scan") != -1:
+                        coords['xdef'] = 'Scan'
+
+                if line.find('YDEF') != -1:
+                    if line.find('region') != -1:
+                        coords['ydef'] = 'Region'
+                    elif line.find('channel') != -1:
+                        coords['ydef'] = 'Channel'
+
+                if line.find('ZDEF') != -1:
+                    if line.find('region') != -1:
+                        coords['zdef'] = 'Region'
+
                 if line.find('xdef') != -1:
                     strs = line.split()
+                    ld_scan = 'Scan' in coords.values()
+                    self.logger.info('ld_scan: ' + str(ld_scan))
+                    self.logger.info('strs: ' + str(strs))
+
                     for st in strs:
-                        if st.isdigit():
-                            nchans = int(st)
+                        if is_number(st):
+                            self.logger.info('is_number true for ' + str(st))
+                            if 'xdef' not in dims:
+                                dims['xdef'] = int(st)
+                            if ld_scan: scan_info.append(st)
+                            else: break                            
+                      
 
                 if line.find('ydef') != -1:
                     strs = line.split()
                     for st in strs:
                         if st.isdigit():
-                            nregion = int(st)
+                            dims['ydef'] = int(st)
 
-                if line.find('channel=') != -1:
+                if line.find('zdef') != -1:
                     strs = line.split()
-                    chans.append(strs[4])
+                    for st in strs:
+                        if st.isdigit():
+                            dims['zdef'] = int(st)
+
+                if line.find('vars') != -1:
+                    strs = line.split()
+                    for st in strs:
+                        if st.isdigit():
+                            nvars = int(st)
 
                 if line.find('title') != -1:
-                    strs = line.split()
-                    sensor = strs[1]
-                    satellite = strs[2]
+                    if line.find('conventional') == -1 and line.find('gsistat') == -1:
+                        strs = line.split()
+                        attribs['sensor'] = strs[1]
+                        attribs['sat'] = strs[2]
 
-            channo = np.array(chans, dtype=int)
-        return channo, nchans, nregion, satellite, sensor
+                # Note we need to extract the actual channel numbers.  We have the
+                # number of channels via the xdef line, but they are not necessarily
+                # ordered consecutively.
+                if line.find('channel=') != -1:
+                    strs = line.split()
+                    if strs[4].isdigit():
+                        channo.append(int(strs[4]))
+
+            # The list of variables is at the end of the file between the lines
+            # "vars" and "end vars".
+            start = len(lines) - (nvars + 1)
+            for x in range(start, start + nvars):
+                strs = lines[x].split()
+                vars.append(strs[-1])
+
+            self.logger.info('scan_info = ' + str(scan_info))
+            self.logger.info('coords: ' + str(coords))
+ 
+        return coords, dims, attribs, nvars, vars, channo
 
     # ----------------------------------------------------------------------------------------------
 
-    def read_radmon_ieee(self, file_name, nchans, nregion, file_path=None):
-
-        if file_path:
-            filename = os.path.join(file_path, file_name)
-        else:
-            filename = file_name
-        if not os.path.isfile(filename):
-            count = None
-            penalty = None
-            omgnbc_sum = None
-            omgnbc_sum = None
-            total_sum = None
-            omgbc_sum = None
-            omgnbc_sum2 = None
-            omgbc_sum2 = None
-            total_sum2 = None
-            cycle_tm = None
-            return count, penalty, omgnbc_sum, omgnbc_sum, total_sum, \
-                omgbc_sum, omgnbc_sum2, omgbc_sum2, cycle_tm
+    def read_ieee(self, file_name, coords, dims, ndims_used, nvars, vars, file_path=None):
 
         # find cycle time in filename and create cycle_tm as datetime object
         cycle_tm = None
-        cycstrs = filename.split('.')
+        cycstrs = file_name.split('.')
 
         for cycstr in cycstrs:
             if cycstr.isnumeric():
                 cycle_tm = datetime(int(cycstr[0:4]), int(cycstr[4:6]),
                                     int(cycstr[6:8]), int(cycstr[8:]))
 
+        filename = os.path.join(file_path, file_name) if file_path else file_name
+
+        if not os.path.isfile(filename):
+            rtn_array = None
+            return rtn_array
+
         # read binary Fortran file
         f = FortranFile(filename, 'r', '>u4')
 
-        count = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
-        penalty = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
-        omgnbc_sum = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
-        total_sum = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
-        omgbc_sum = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
-        omgnbc_sum2 = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
-        total_sum2 = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
-        omgbc_sum2 = f.read_reals(dtype=np.dtype('>f4')).reshape(nchans, nregion)
+        if ndims_used == 1:
+            rtn_array = np.empty((0, dims['xdef']), float)
+            for x in range(nvars):
+                arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'])
+                arr = np.array(arr, dtype=np.float)
+                rtn_array = np.append(rtn_array, [arr], axis=0)
+
+        if ndims_used == 2:
+            rtn_array = np.empty((0, dims['xdef'], dims['ydef']), float)
+            for x in range(nvars):
+                arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
+                                                                  dims['ydef'])
+                arr = np.array(arr, dtype=np.float)
+                rtn_array = np.append(rtn_array, [arr], axis=0)
+
+        if ndims_used == 3:
+            rtn_array = np.empty((0, dims['xdef'], dims['ydef'], dims['zdef']), float)
+
+            for x in range(nvars):
+
+                self.logger.info('vars[x] = ' + str(vars[x]))
+
+                # satang variable is deprecated, not used, and a non-standard size
+                if vars[x] == 'satang':	
+                    skip = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
+                                                                       dims['ydef'])
+                    tarr = np.zeros((dims['xdef'], dims['ydef'], dims['zdef']), 
+                                     dtype=np.dtype('>f4'))
+                else:
+                    mylist = []
+                    for z in range(5):
+                        arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
+                                                                          dims['ydef'])
+                        mylist.append(arr)
+                    tarr = np.dstack(mylist)
+
+                rtn_array = np.append(rtn_array, [tarr], axis=0)
 
         f.close()
-
-        return count, penalty, omgnbc_sum, total_sum, omgbc_sum, \
-            omgnbc_sum2, total_sum2, omgbc_sum2, cycle_tm
+        return rtn_array, cycle_tm
 
     # ----------------------------------------------------------------------------------------------
+
+    def cycle_to_np_array(self, dims, ndims_used, cycle_tm):
+
+        # build array with requested dimensions
+        cycle_arr = None
+
+        if ndims_used == 3:
+            cycle_arr = np.reshape([[cycle_tm] * dims['xdef'] * dims['ydef'] * dims['zdef']],
+                                   (dims['xdef'], dims['ydef'], dims['zdef']))
+        elif ndims_used == 2:
+            cycle_arr = np.reshape([[cycle_tm] * dims['xdef']] * dims['ydef'],
+                                   (dims['xdef'], dims['ydef']))
+        elif ndims_used == 1:
+            cycle_arr = np.reshape([[cycle_tm] * dims['xdef']], (dims['xdef']))
+        else:
+            self.logger.abort(f'ndims_used must be in range of 1-3, value is {ndims_used}')
+        return cycle_arr
+
+    # ----------------------------------------------------------------------------------------------
+
+    def get_dim_ranges(self, coords, dims, channo):
+        x_range = None
+        y_range = None
+        z_range = None
+
+        # - Return None for a coordinate that is 0 or 1.
+        # - "Channel" can be either the x or y coordinate and can be
+        #      numbered non-consecutively, which has been captured in channo.
+        # - The z coordinate is never used for channel.
+    def get_dim_ranges(self, coords, dims, channo):
+        x_range = None
+        y_range = None
+        z_range = None
+
+        # - Return None for a coordinate that is 0 or 1.
+        # - "Channel" can be either the x or y coordinate and can be
+        #      numbered non-consecutively, which has been captured in channo.
+        # - The z coordinate is never used for channel.
+
+        if dims['xdef'] > 1:
+
+            if coords['xdef'] == 'Channel':
+                x_range = channo
+            else:
+                x_range = np.arange(1, dims['xdef']+1)
+
+        if dims['ydef'] > 1:
+            if coords['ydef'] == 'Channel':
+                y_range = channo
+            else:
+                y_range = np.arange(1, dims['ydef']+1)
+
+        if dims['zdef'] > 1:
+            z_range = np.arange(1, dims['zdef']+1)
+
+        return x_range, y_range, z_range
+
+    # ----------------------------------------------------------------------------------------------
+
+    def get_ndims_used(self, dims):
+
+        # Ignore dims with values of 0 or 1
+        ndims = len(dims)
+        for x in range(ndims):
+            if list(dims.values())[x] <= 1:
+                ndims -= 1
+
+        return ndims
+
+    # ----------------------------------------------------------------------------------------------
+
+    def load_dset(self, vars, nvars, coords, darr, dims, ndims_used,
+                  x_range, y_range, z_range, cyc_darr):
+
+        # create dataset from file components
+        rtn_ds = None
+
+        if ndims_used == 1:
+            for x in range(0, nvars):
+                new_ds = Dataset(
+                    {
+                        vars[x]: ((coords['xdef']), darr[x, :]),
+                    },
+                    coords={coords['xdef']: x_range},
+                )
+                rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
+
+            # tack on 'cycle' as a variable
+            new_cyc = Dataset(
+                {
+                    'cycle': ((coords['xdef']), cyc_darr),
+                },
+                coords={coords['xdef']: np.arange(1, dims['xdef']+1)},
+            )
+
+        if ndims_used == 2:
+            for x in range(0, nvars):
+                new_ds = Dataset(
+                    {
+                        vars[x]: ((coords['xdef'], coords['ydef']), darr[x, :, :]),
+                    },
+                    coords={coords['xdef']: x_range,
+                            coords['ydef']: y_range},
+                )
+                rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
+
+            # tack on 'cycle' as a variable
+            new_cyc = Dataset(
+                {
+                    'cycle': ((coords['xdef'], coords['ydef']), cyc_darr),
+                },
+                coords={coords['xdef']: np.arange(1, dims['xdef']+1),
+                        coords['ydef']: np.arange(1, dims['ydef']+1)},
+            )
+
+        if ndims_used == 3:
+            self.logger.info('x_range: ' + str(x_range))
+            self.logger.info('darr.shape: ' + str(darr.shape))
+
+            for x in range(0, nvars):
+                new_ds = Dataset(
+                    {
+                        vars[x]: ((coords['xdef'], coords['ydef'],
+                                   coords['zdef']), darr[x, :, :, :]),
+                    },
+                    coords={coords['xdef']: x_range,
+                            coords['ydef']: y_range,
+                            coords['zdef']: z_range},
+                )
+                rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
+
+            # tack on 'cycle' as a variable
+            new_cyc = Dataset(
+                {
+                    'cycle': ((coords['xdef'], coords['ydef'], coords['zdef']), cyc_darr),
+                },
+                coords={coords['xdef']: np.arange(1, dims['xdef']+1),
+                        coords['ydef']: np.arange(1, dims['ydef']+1),
+                        coords['zdef']: np.arange(1, dims['zdef']+1)},
+            )
+
+        rtn_ds = rtn_ds.merge(new_cyc)
+        return rtn_ds
