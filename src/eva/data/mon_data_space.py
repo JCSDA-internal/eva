@@ -83,8 +83,8 @@ class MonDataSpace(EvaBase):
             for filename in filenames:
 
                 # read data file
-                count_tmp, penalty_tmp, omgnbc_sum_tmp, total_sum_tmp, \
-                    omgbc_sum_tmp, omgnbc_sum2_tmp, total_sum2_tmp, omgbc_sum2_tmp, cycle_tm = \
+                count_tmp, penalty_tmp, omgnbc_sum_tmp, total_sum_tmp,\
+                    omgbc_sum_tmp, omgnbc_sum2_tmp, total_sum2_tmp, omgbc_sum2_tmp, cycle_tm =\
                     self.read_radmon_ieee(filename, nchans, nregion)
 
                 # add cycle as a variable in dataset
@@ -93,26 +93,26 @@ class MonDataSpace(EvaBase):
                 # create dataset from file contents
                 timestep_ds = Dataset(
                     {
-                        "count": (("channels", "regions"), count_tmp),
-                        "penalty": (("channels", "regions"), penalty_tmp),
-                        "omgnbc": (("channels", "regions"), omgnbc_sum_tmp),
-                        "total": (("channels", "regions"), total_sum_tmp),
-                        "omgbc": (("channels", "regions"), omgbc_sum_tmp),
-                        "omgnbc2": (("channels", "regions"), omgnbc_sum2_tmp),
-                        "total2": (("channels", "regions"), total_sum2_tmp),
-                        "omgbc2": (("channels", "regions"), omgbc_sum2_tmp),
-                        "cycle": (("channels", "regions"), cycle_tmp),
+                        "count": (("Channel", "Region"), count_tmp),
+                        "penalty": (("Channel", "Region"), penalty_tmp),
+                        "omgnbc": (("Channel", "Region"), omgnbc_sum_tmp),
+                        "total": (("Channel", "Region"), total_sum_tmp),
+                        "omgbc": (("Channel", "Region"), omgbc_sum_tmp),
+                        "omgnbc2": (("Channel", "Region"), omgnbc_sum2_tmp),
+                        "total2": (("Channel", "Region"), total_sum2_tmp),
+                        "omgbc2": (("Channel", "Region"), omgbc_sum2_tmp),
+                        "cycle": (("Channel", "Region"), cycle_tmp),
                     },
-                    coords={"channels": channo, "regions": np.arange(1, nregion+1)},
+                    coords={"Channel": channo, "Region": np.arange(1, nregion+1)},
                     attrs={'satellite': satellite, 'sensor': sensor},
                 )
-                timestep_ds['times'] = cycle_tm
+                timestep_ds['Time'] = cycle_tm.strftime("%Y%m%d%H")
 
                 # Add this dataset to the list of ds_list
                 ds_list.append(timestep_ds)
 
             # Concatenate datasets from ds_list into a single dataset
-            ds = concat(ds_list, dim='times')
+            ds = concat(ds_list, dim='Time')
 
             # Group name and variables
             # ------------------------
@@ -123,12 +123,12 @@ class MonDataSpace(EvaBase):
                 # Drop channels not in user requested list
                 # ----------------------------------------
                 if drop_channels:
-                    ds = self.subset_coordinate(ds, 'channels', requested_channels)
+                    ds = self.subset_coordinate(ds, 'Channel', requested_channels)
 
                 # Drop regions not in user requested list
                 # ---------------------------------------
                 if drop_regions:
-                    ds = self.subset_coordinate(ds, 'regions', requested_regions)
+                    ds = self.subset_coordinate(ds, 'Region', requested_regions)
 
                 # If user specifies all variables set to group list
                 # -------------------------------------------------
@@ -139,6 +139,13 @@ class MonDataSpace(EvaBase):
                 # ---------------------------------------------------
                 vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
                 ds = ds.drop_vars(vars_to_remove)
+
+                # Conditionally add channel as a variable using single dimension
+                if 'channel' in group_vars:
+                    chan_tmp = np.zeros([nchans])
+                    for x in range(nchans):
+                        chan_tmp[x] = channo[x]
+                    ds['channel'] = (['Channel'], chan_tmp)
 
                 # Rename variables with group
                 rename_dict = {}
