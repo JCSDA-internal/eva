@@ -42,13 +42,6 @@ class MonDataSpace(EvaBase):
             # --------------------------
             control_file = get(dataset, self.logger, 'control_file')
             coords, dims, attribs, nvars, vars, channo = self.get_ctl_dict(control_file[0])
-            self.logger.info('coords: ' + str(coords))
-            self.logger.info('dims: ' + str(dims))
-            self.logger.info('attribs: ' + str(attribs))
-            self.logger.info('nvars: ' + str(nvars))
-            self.logger.info('vars: ' + str(vars))
-            self.logger.info('channo: ' + str(channo))
-
             ndims_used = self.get_ndims_used(dims)
 
             # Get the groups to be read
@@ -78,11 +71,6 @@ class MonDataSpace(EvaBase):
                 if len(str(regions_str_or_list)) > 0:
                     requested_regions = parse_channel_list(str(regions_str_or_list), self.logger)
                     drop_regions = True
-            self.logger.info('drop_regions = ' + str(drop_regions))
-            self.logger.info('regions_str_or_list = ' + str(regions_str_or_list))
-
-            # Need to add levels to the potential drop list
-            # ---------------------------------------------
 
             # Set coordinate ranges
             # ---------------------
@@ -96,19 +84,14 @@ class MonDataSpace(EvaBase):
             # Get missing value threshold
             # ---------------------------
             threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
-            self.logger.info('threshold = ' + str(threshold))
 
             for filename in filenames:
 
                 # read data file
                 darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used, nvars, vars)
 
-                # add cycle as a variable in data array
+                # add cycle as a variable to data array
                 cyc_darr = self.cycle_to_np_array(dims, ndims_used, cycle_tm)
-
-                # conditionally add 'scan' as a variable
-                if 'Scan' in coords:
-                    self.logger.info('Need to add scan')
 
                 # create dataset from file contents
                 timestep_ds = None
@@ -122,7 +105,7 @@ class MonDataSpace(EvaBase):
                     timestep_ds.attrs['sensor'] = attribs['sensor']
 
                 # add cycle_tm dim for concat
-                timestep_ds['times'] = cycle_tm
+                timestep_ds['Time'] = cycle_tm.strftime("%Y%m%d%H")
 
                 # Add this dataset to the list of ds_list
                 ds_list.append(timestep_ds)
@@ -158,13 +141,7 @@ class MonDataSpace(EvaBase):
 
                 # Conditionally add channel as a variable using single dimension
                 if 'channel' in group_vars:
-
-                    # find channel dimension
-                    chan_dim = list(coords.keys()) [list(coords.values()).index('Channel')]
-                    if len(channo) == dims[chan_dim]:
-                        ds['channel'] = (['Channel'], channo)
-                    else:
-                        self.logger.abort(f"number of channels in yaml file does not match number of channels in control file") 
+                    ds['channel'] = (['Channel'], channo)
 
                 # Rename variables with group
                 rename_dict = {}
@@ -180,7 +157,7 @@ class MonDataSpace(EvaBase):
                                       ' does not have any variables.')
 
             # Add the dataset to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds, 'times')
+            data_collections.create_or_add_to_collection(collection_name, ds, 'cycle')
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
@@ -219,6 +196,7 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
+    # Parse control file and return elements in dictionaries
     def get_ctl_dict(self, control_file):
 
         coords = {'xdef': None, 'ydef': None, 'zdef': None}
@@ -254,7 +232,6 @@ class MonDataSpace(EvaBase):
                     for st in strs:
                         if st.isdigit():
                             dims['xdef'] = int(st)
-                      
 
                 if line.find('ydef') != -1:
                     strs = line.split()
@@ -295,9 +272,6 @@ class MonDataSpace(EvaBase):
                 strs = lines[x].split()
                 vars.append(strs[-1])
 
-            self.logger.info('scan_info = ' + str(scan_info))
-            self.logger.info('coords: ' + str(coords))
- 
         return coords, dims, attribs, nvars, vars, channo
 
     # ----------------------------------------------------------------------------------------------
@@ -344,12 +318,12 @@ class MonDataSpace(EvaBase):
 
                 self.logger.info('vars[x] = ' + str(vars[x]))
 
-                # satang variable is deprecated, not used, and a non-standard size
-                if vars[x] == 'satang':	
+                # satang variable is not used and a non-standard size
+                if vars[x] == 'satang':
                     skip = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
                                                                        dims['ydef'])
-                    tarr = np.zeros((dims['xdef'], dims['ydef'], dims['zdef']), 
-                                     dtype=np.dtype('>f4'))
+                    tarr = np.zeros((dims['xdef'], dims['ydef'], dims['zdef']),
+                                    dtype=np.dtype('>f4'))
                 else:
                     mylist = []
                     for z in range(5):
@@ -367,7 +341,7 @@ class MonDataSpace(EvaBase):
 
     def cycle_to_np_array(self, dims, ndims_used, cycle_tm):
 
-        # build array with requested dimensions
+        # build numpy array with requested dimensions
         cycle_arr = None
 
         if ndims_used == 3:
@@ -389,16 +363,7 @@ class MonDataSpace(EvaBase):
         y_range = None
         z_range = None
 
-        # - Return None for a coordinate that is 0 or 1.
-        # - "Channel" can be either the x or y coordinate and can be
-        #      numbered non-consecutively, which has been captured in channo.
-        # - The z coordinate is never used for channel.
-    def get_dim_ranges(self, coords, dims, channo):
-        x_range = None
-        y_range = None
-        z_range = None
-
-        # - Return None for a coordinate that is 0 or 1.
+        # - Return None for a coordinate that has value 0 or 1.
         # - "Channel" can be either the x or y coordinate and can be
         #      numbered non-consecutively, which has been captured in channo.
         # - The z coordinate is never used for channel.
@@ -451,7 +416,7 @@ class MonDataSpace(EvaBase):
                 )
                 rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
 
-            # tack on 'cycle' as a variable
+            # add 'cycle' as a variable
             new_cyc = Dataset(
                 {
                     'cycle': ((coords['xdef']), cyc_darr),

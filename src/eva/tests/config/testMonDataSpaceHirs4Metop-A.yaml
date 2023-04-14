@@ -9,19 +9,13 @@ diagnostics:
         satellite: metop-a
         sensor: hirs4
         control_file:
-#          - ${data_input_path}/time.hirs4_metop-a.ctl
-          - ../data/time.hirs4_metop-a.ctl
+          - ${data_input_path}/time.hirs4_metop-a.ctl
         filenames:
-#          - ${data_input_path}/time.hirs4_metop-a.2015051418.ieee_d
-          - ../data/time.hirs4_metop-a.2015051418.ieee_d
-#          - ${data_input_path}/time.hirs4_metop-a.2015051500.ieee_d
-          - ../data/time.hirs4_metop-a.2015051500.ieee_d
-#          - ${data_input_path}/time.hirs4_metop-a.2015051506.ieee_d
-          - ../data/time.hirs4_metop-a.2015051506.ieee_d
-#          - ${data_input_path}/time.hirs4_metop-a.2015051512.ieee_d
-          - ../data/time.hirs4_metop-a.2015051512.ieee_d
-#          - ${data_input_path}/time.hirs4_metop-a.2015051518.ieee_d
-          - ../data/time.hirs4_metop-a.2015051518.ieee_d
+          - ${data_input_path}/time.hirs4_metop-a.2015051418.ieee_d
+          - ${data_input_path}/time.hirs4_metop-a.2015051500.ieee_d
+          - ${data_input_path}/time.hirs4_metop-a.2015051506.ieee_d
+          - ${data_input_path}/time.hirs4_metop-a.2015051512.ieee_d
+          - ${data_input_path}/time.hirs4_metop-a.2015051518.ieee_d
 
         channels: &channels 1
         regions: &regions 1
