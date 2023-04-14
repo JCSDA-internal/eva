@@ -42,6 +42,13 @@ class MonDataSpace(EvaBase):
             # --------------------------
             control_file = get(dataset, self.logger, 'control_file')
             coords, dims, attribs, nvars, vars, channo = self.get_ctl_dict(control_file[0])
+            self.logger.info('coords: ' + str(coords))
+            self.logger.info('dims: ' + str(dims))
+            self.logger.info('attribs: ' + str(attribs))
+            self.logger.info('nvars: ' + str(nvars))
+            self.logger.info('vars: ' + str(vars))
+            self.logger.info('channo: ' + str(channo))
+
             ndims_used = self.get_ndims_used(dims)
 
             # Get the groups to be read
@@ -62,7 +69,7 @@ class MonDataSpace(EvaBase):
 
             # Get requested regions, convert to list
             # --------------------------------------
-            regions_str_or_list = get(dataset, self.logger, 'regions', [])
+            regions_str_or_list = get(dataset, self.logger, 'regions')
             requested_regions = []
             drop_regions = False
 
@@ -71,6 +78,8 @@ class MonDataSpace(EvaBase):
                 if len(str(regions_str_or_list)) > 0:
                     requested_regions = parse_channel_list(str(regions_str_or_list), self.logger)
                     drop_regions = True
+            self.logger.info('drop_regions = ' + str(drop_regions))
+            self.logger.info('regions_str_or_list = ' + str(regions_str_or_list))
 
             # Need to add levels to the potential drop list
             # ---------------------------------------------
@@ -87,6 +96,7 @@ class MonDataSpace(EvaBase):
             # Get missing value threshold
             # ---------------------------
             threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
+            self.logger.info('threshold = ' + str(threshold))
 
             for filename in filenames:
 
@@ -118,7 +128,7 @@ class MonDataSpace(EvaBase):
                 ds_list.append(timestep_ds)
 
             # Concatenate datasets from ds_list into a single dataset
-            ds = concat(ds_list, dim='times')
+            ds = concat(ds_list, dim='Time')
 
             # Group name and variables
             # ------------------------
@@ -145,6 +155,16 @@ class MonDataSpace(EvaBase):
                 # ---------------------------------------------------
                 vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
                 ds = ds.drop_vars(vars_to_remove)
+
+                # Conditionally add channel as a variable using single dimension
+                if 'channel' in group_vars:
+
+                    # find channel dimension
+                    chan_dim = list(coords.keys()) [list(coords.values()).index('Channel')]
+                    if len(channo) == dims[chan_dim]:
+                        ds['channel'] = (['Channel'], channo)
+                    else:
+                        self.logger.abort(f"number of channels in yaml file does not match number of channels in control file") 
 
                 # Rename variables with group
                 rename_dict = {}
@@ -231,17 +251,9 @@ class MonDataSpace(EvaBase):
 
                 if line.find('xdef') != -1:
                     strs = line.split()
-                    ld_scan = 'Scan' in coords.values()
-                    self.logger.info('ld_scan: ' + str(ld_scan))
-                    self.logger.info('strs: ' + str(strs))
-
                     for st in strs:
-                        if is_number(st):
-                            self.logger.info('is_number true for ' + str(st))
-                            if 'xdef' not in dims:
-                                dims['xdef'] = int(st)
-                            if ld_scan: scan_info.append(st)
-                            else: break                            
+                        if st.isdigit():
+                            dims['xdef'] = int(st)
                       
 
                 if line.find('ydef') != -1:
