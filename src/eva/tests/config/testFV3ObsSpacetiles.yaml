@@ -27,7 +27,7 @@ diagnostics:
             variables: &variables [geolon,
                                    geolat,
                                    t2m]
-                                   
+
   graphics:
     # Map plots
     # ---------

@@ -26,10 +26,10 @@ def read_nc(files, variable, resolution, logger):
     if len(files) != len(set(files)):
         logger.abort('Duplicate files were found in input file ' +
                      f'list: {files}. \nExiting ...')
-    
+
     # Create empty variable to store data in
     outvar = np.empty((resolution, resolution, len(files)))
-    
+
     # Loop through nc files and store variable data in outvar
     for i, file in enumerate(files):
 
@@ -40,10 +40,10 @@ def read_nc(files, variable, resolution, logger):
                 logger.abort(f"{variable} is not a valid variable. \nExiting ...")
 
             if variable in ['lon', 'geolon']:
-                var[np.where(var>180)] = var[np.where(var>180)]-360
-            
-            outvar[...,i] = var
-            
+                var[np.where(var>180)] = var[np.where(var > 180)] - 360
+
+            outvar[..., i] = var
+
     return outvar
 
 
@@ -92,11 +92,13 @@ class ModelObsSpace(EvaBase):
                 for var in group_vars:
                     if var in ['geolon', 'geolat']:
                         var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                             read_nc(orog_filenames, var, resolution, self.logger))
+                                                             read_nc(orog_filenames, var,
+                                                                     resolution, self.logger))
 
                     else:
                         var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                             read_nc(fv3_filenames, var, resolution, self.logger))
+                                                             read_nc(fv3_filenames, var,
+                                                                     resolution, self.logger))
 
                 # Create dataset from data dictionary
                 ds = xr.Dataset(var_dict)
