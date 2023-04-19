@@ -40,7 +40,7 @@ def read_nc(files, variable, resolution, logger):
                 logger.abort(f"{variable} is not a valid variable. \nExiting ...")
 
             if variable in ['lon', 'geolon']:
-                var[np.where(var>180)] = var[np.where(var > 180)] - 360
+                var[np.where(var > 180)] = var[np.where(var > 180)] - 360
 
             outvar[..., i] = var
 
