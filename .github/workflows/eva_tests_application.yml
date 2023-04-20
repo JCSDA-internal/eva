@@ -36,7 +36,7 @@ jobs:
         wget https://naturalearth.s3.amazonaws.com/110m_physical/ne_110m_coastline.zip
         unzip ne_110m_coastline.zip
         mkdir -p  ~/.local/share/cartopy/shapefiles/natural_earth/physical
-        cp -rf ne_110m_coastline/* ~/.local/share/cartopy/shapefiles/natural_earth/physical/.
+        cp -rf ne_110m_* ~/.local/share/cartopy/shapefiles/natural_earth/physical/.
 
     # Clone the eva code
     - name: Clone eva repo
