@@ -99,6 +99,10 @@ def stats_helper(logger, plot_obj, data_collections, config):
         # Get field data
         field_data = get_field_data(logger, field, data_collections)
 
+        # Stats will fail if the field_data list is empty
+        if not field_data.any():
+            field_data = [1.0e38, 1.0e38, 1.0e38]
+
         # Initialize the stats string
         stats_string = ''
 
