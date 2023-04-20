@@ -1,6 +1,6 @@
-# (C) Copyright 2021-2022 NOAA/NWS/EMC
+# (C) Copyright 20212-2023 NOAA/NWS/EMC
 #
-# (C) Copyright 2021-2022 United States Government as represented by the Administrator of the
+# (C) Copyright 2022-2023 United States Government as represented by the Administrator of the
 # National Aeronautics and Space Administration. All Rights Reserved.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
@@ -110,13 +110,10 @@ class CubedSphereRestart(EvaBase):
                                       ' does not have any variables.')
 
             # Add the dataset to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds, 'nobs')
+            data_collections.create_or_add_to_collection(collection_name, ds)
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
-
-        # Change the channel dimension name
-        data_collections.adjust_channel_dimension_name('nchans')
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()

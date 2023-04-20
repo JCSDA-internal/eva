@@ -23,7 +23,7 @@ diagnostics:
           - ${data_input_path}/C768_oro_data.tile5.nc
           - ${data_input_path}/C768_oro_data.tile6.nc
         groups:
-          - name: FV3NcDiag
+          - name: FV3Restart
             variables: &variables [geolon,
                                    geolat,
                                    t2m]
@@ -37,7 +37,7 @@ diagnostics:
         variables: [t2m]
       dynamic options:
         - type: vminvmaxcmap
-          data variable: experiment::FV3NcDiag::t2m
+          data variable: experiment::FV3Restart::t2m
       figure:
         figure size: [20,10]
         layout: [1,1]
@@ -54,11 +54,11 @@ diagnostics:
           layers:
           - type: MapGridded
             longitude:
-              variable: experiment::FV3NcDiag::geolon
+              variable: experiment::FV3Restart::geolon
             latitude:
-              variable: experiment::FV3NcDiag::geolat
+              variable: experiment::FV3Restart::geolat
             data:
-              variable: experiment::FV3NcDiag::t2m
+              variable: experiment::FV3Restart::t2m
             label: 2m T
             colorbar: true
             cmap: ${dynamic_cmap}
