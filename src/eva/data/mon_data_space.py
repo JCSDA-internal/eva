@@ -298,21 +298,15 @@ class MonDataSpace(EvaBase):
 
         if ndims_used == 1:
             rtn_array = np.empty((0, dims['xdef']), float)
-            for x in range(nvars):
-                arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'])
-                arr = np.array(arr, dtype=np.float)
-                rtn_array = np.append(rtn_array, [arr], axis=0)
+            dimensions = [dims['xdef']]
 
         if ndims_used == 2:
             rtn_array = np.empty((0, dims['xdef'], dims['ydef']), float)
-            for x in range(nvars):
-                arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
-                                                                  dims['ydef'])
-                arr = np.array(arr, dtype=np.float)
-                rtn_array = np.append(rtn_array, [arr], axis=0)
+            dimensions = [dims['xdef'], dims['ydef']]
 
         if ndims_used == 3:
             rtn_array = np.empty((0, dims['xdef'], dims['ydef'], dims['zdef']), float)
+            dimensions = [dims['xdef'], dims['ydef']]
 
             for x in range(nvars):
 
@@ -333,6 +327,12 @@ class MonDataSpace(EvaBase):
                     tarr = np.dstack(mylist)
 
                 rtn_array = np.append(rtn_array, [tarr], axis=0)
+
+        else:
+            for x in range(nvars):
+                arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions)
+                arr = np.array(arr, dtype=np.float)
+                rtn_array = np.append(rtn_array, [arr], axis=0)
 
         f.close()
         return rtn_array, cycle_tm
