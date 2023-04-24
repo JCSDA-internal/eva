@@ -290,6 +290,7 @@ class MonDataSpace(EvaBase):
         filename = os.path.join(file_path, file_name) if file_path else file_name
 
         if not os.path.isfile(filename):
+            self.logger.info(f"WARNING:  file {filename} is missing")
             rtn_array = None
             return rtn_array
 
@@ -342,18 +343,19 @@ class MonDataSpace(EvaBase):
     def cycle_to_np_array(self, dims, ndims_used, cycle_tm):
 
         # build numpy array with requested dimensions
-        cycle_arr = None
+        d = {
+            1: np.reshape([[cycle_tm] * dims['xdef']], (dims['xdef'])),
+            2: np.reshape([[cycle_tm] * dims['xdef']] * dims['ydef'],
+                          (dims['xdef'], dims['ydef'])),
+            3: np.reshape([[cycle_tm] * dims['xdef'] * dims['ydef'] * dims['zdef']],
+                          (dims['xdef'], dims['ydef'], dims['zdef']))
+        }
 
-        if ndims_used == 3:
-            cycle_arr = np.reshape([[cycle_tm] * dims['xdef'] * dims['ydef'] * dims['zdef']],
-                                   (dims['xdef'], dims['ydef'], dims['zdef']))
-        elif ndims_used == 2:
-            cycle_arr = np.reshape([[cycle_tm] * dims['xdef']] * dims['ydef'],
-                                   (dims['xdef'], dims['ydef']))
-        elif ndims_used == 1:
-            cycle_arr = np.reshape([[cycle_tm] * dims['xdef']], (dims['xdef']))
-        else:
+        try:
+            cycle_arr = d[ndims_used]
+        except KeyError:
             self.logger.abort(f'ndims_used must be in range of 1-3, value is {ndims_used}')
+
         return cycle_arr
 
     # ----------------------------------------------------------------------------------------------
@@ -369,17 +371,10 @@ class MonDataSpace(EvaBase):
         # - The z coordinate is never used for channel.
 
         if dims['xdef'] > 1:
-
-            if coords['xdef'] == 'Channel':
-                x_range = channo
-            else:
-                x_range = np.arange(1, dims['xdef']+1)
+            x_range = channo if coords['xdef'] == 'Channel' else np.arange(1, dims['xdef']+1)
 
         if dims['ydef'] > 1:
-            if coords['ydef'] == 'Channel':
-                y_range = channo
-            else:
-                y_range = np.arange(1, dims['ydef']+1)
+            y_range = channo if coords['ydef'] == 'Channel' else np.arange(1, dims['ydef']+1)
 
         if dims['zdef'] > 1:
             z_range = np.arange(1, dims['zdef']+1)
@@ -406,36 +401,35 @@ class MonDataSpace(EvaBase):
         # create dataset from file components
         rtn_ds = None
 
-        if ndims_used == 1:
-            for x in range(0, nvars):
-                new_ds = Dataset(
-                    {
-                        vars[x]: ((coords['xdef']), darr[x, :]),
-                    },
-                    coords={coords['xdef']: x_range},
-                )
-                rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
+        for x in range(0, nvars):
+            if ndims_used == 1:
+                d = {
+                    vars[x]: {"dims": (coords['xdef']), "data": darr[x, :, :]}
+                }
+            if ndims_used == 2:
+                d = {
+                    vars[x]: {"dims": (coords['xdef'], coords['ydef']),
+                              "data": darr[x, :, :]}
+                }
+            if ndims_used == 3:
+                d = {
+                    vars[x]: {"dims": (coords['xdef'], coords['ydef'], coords['zdef']),
+                              "data": darr[x, :, :]}
+                }
 
-            # add 'cycle' as a variable
+            new_ds = Dataset.from_dict(d)
+            rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
+
+        # tack on 'cycle' as a variable
+        # -----------------------------
+        if ndims_used == 1:
             new_cyc = Dataset(
                 {
                     'cycle': ((coords['xdef']), cyc_darr),
                 },
                 coords={coords['xdef']: np.arange(1, dims['xdef']+1)},
             )
-
         if ndims_used == 2:
-            for x in range(0, nvars):
-                new_ds = Dataset(
-                    {
-                        vars[x]: ((coords['xdef'], coords['ydef']), darr[x, :, :]),
-                    },
-                    coords={coords['xdef']: x_range,
-                            coords['ydef']: y_range},
-                )
-                rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
-
-            # tack on 'cycle' as a variable
             new_cyc = Dataset(
                 {
                     'cycle': ((coords['xdef'], coords['ydef']), cyc_darr),
@@ -443,24 +437,7 @@ class MonDataSpace(EvaBase):
                 coords={coords['xdef']: np.arange(1, dims['xdef']+1),
                         coords['ydef']: np.arange(1, dims['ydef']+1)},
             )
-
         if ndims_used == 3:
-            self.logger.info('x_range: ' + str(x_range))
-            self.logger.info('darr.shape: ' + str(darr.shape))
-
-            for x in range(0, nvars):
-                new_ds = Dataset(
-                    {
-                        vars[x]: ((coords['xdef'], coords['ydef'],
-                                   coords['zdef']), darr[x, :, :, :]),
-                    },
-                    coords={coords['xdef']: x_range,
-                            coords['ydef']: y_range,
-                            coords['zdef']: z_range},
-                )
-                rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
-
-            # tack on 'cycle' as a variable
             new_cyc = Dataset(
                 {
                     'cycle': ((coords['xdef'], coords['ydef'], coords['zdef']), cyc_darr),
