@@ -9,7 +9,7 @@
 
 # --------------------------------------------------------------------------------------------------
 
-
+import sys
 import os
 import numpy as np
 
@@ -41,8 +41,13 @@ class MonDataSpace(EvaBase):
             # Get control file and parse
             # --------------------------
             control_file = get(dataset, self.logger, 'control_file')
-            coords, dims, attribs, nvars, vars, channo = self.get_ctl_dict(control_file[0])
+            coords, dims, attribs, nvars, vars, channo, scanpo = self.get_ctl_dict(control_file[0])
             ndims_used = self.get_ndims_used(dims)
+
+#            scan_arr = None
+#            if scanpo is not None:
+#                a = np.repeat(np.array(scanpo)[:,np.newaxis],dims['ydef'],1) 
+#                scan_arr = np.repeat(a[:,:,np.newaxis],dims['zdef'],2)
 
             # Get the groups to be read
             # -------------------------
@@ -91,8 +96,11 @@ class MonDataSpace(EvaBase):
                 darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used, nvars, vars)
 
                 # add cycle as a variable to data array
-                cyc_darr = self.cycle_to_np_array(dims, ndims_used, cycle_tm)
+                cyc_darr = self.var_to_np_array(dims, ndims_used, cycle_tm)
 
+                if 'Scan' in coords.values():
+                    self.logger.info('BINGO')
+                
                 # create dataset from file contents
                 timestep_ds = None
 
@@ -127,6 +135,7 @@ class MonDataSpace(EvaBase):
                 # Drop regions not in user requested list
                 # ---------------------------------------
                 if drop_regions:
+                    self.logger.info('DROP regions, keeping ' + str(requested_regions))
                     ds = self.subset_coordinate(ds, 'Region', requested_regions)
 
                 # If user specifies all variables set to group list
@@ -142,6 +151,10 @@ class MonDataSpace(EvaBase):
                 # Conditionally add channel as a variable using single dimension
                 if 'channel' in group_vars:
                     ds['channel'] = (['Channel'], channo)
+
+                # Conditionally add scan position as a variable using single dimension
+                if 'scan' in group_vars:
+                    ds['scan'] = (['scan'], scanpo)
 
                 # Rename variables with group
                 rename_dict = {}
@@ -205,6 +218,7 @@ class MonDataSpace(EvaBase):
         vars = []
         nvars = 0
         channo = []
+        scanpo = None 
         scan_info = []
 
         with open(control_file, 'r') as fp:
@@ -227,11 +241,16 @@ class MonDataSpace(EvaBase):
                     if line.find('region') != -1:
                         coords['zdef'] = 'Region'
 
+                # Calculate the scan position values if Scan is in the
+                # coord list.  The xdef line gives us the
+                # number of steps, starting position and step size.
                 if line.find('xdef') != -1:
                     strs = line.split()
                     for st in strs:
                         if st.isdigit():
                             dims['xdef'] = int(st)
+                        if is_number(st):
+                            scan_info.append(st)
 
                 if line.find('ydef') != -1:
                     strs = line.split()
@@ -265,6 +284,7 @@ class MonDataSpace(EvaBase):
                     if strs[4].isdigit():
                         channo.append(int(strs[4]))
 
+
             # The list of variables is at the end of the file between the lines
             # "vars" and "end vars".
             start = len(lines) - (nvars + 1)
@@ -272,7 +292,13 @@ class MonDataSpace(EvaBase):
                 strs = lines[x].split()
                 vars.append(strs[-1])
 
-        return coords, dims, attribs, nvars, vars, channo
+            # If Scan is in the coords calculate the scan positions.
+            if 'Scan' in coords.values():
+                scanpo = [(float(scan_info[1]))]
+                for x in range(1, int(scan_info[0])):
+                    scanpo.append(float(scan_info[1])+(float(scan_info[2])*x))
+
+        return coords, dims, attribs, nvars, vars, channo, scanpo
 
     # ----------------------------------------------------------------------------------------------
 
@@ -309,6 +335,7 @@ class MonDataSpace(EvaBase):
             rtn_array = np.empty((0, dims['xdef'], dims['ydef'], dims['zdef']), float)
             dimensions = [dims['xdef'], dims['ydef']]
 
+            np.set_printoptions(threshold=sys.maxsize)
             for x in range(nvars):
 
                 self.logger.info('vars[x] = ' + str(vars[x]))
@@ -322,12 +349,22 @@ class MonDataSpace(EvaBase):
                 else:
                     mylist = []
                     for z in range(5):
-                        arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
-                                                                          dims['ydef'])
+                        arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['ydef'],
+                                                                          dims['xdef'])
+                        arr = np.transpose(arr)
+                        if vars[x] == 'count':
+                            self.logger.info('count arr.shape: ' + str(arr.shape))
+                            self.logger.info('count arr: ' + str(arr))
+                           
                         mylist.append(arr)
                     tarr = np.dstack(mylist)
+                    if vars[x] == 'count':
+                        self.logger.info('count tarr.shape:: ' + str(tarr.shape))
 
                 rtn_array = np.append(rtn_array, [tarr], axis=0)
+                if vars[x] == 'count':
+                    self.logger.info('rtn_array.shape : ' + str(rtn_array.shape))
+                    self.logger.info('rtn_array: ' + str(rtn_array))
 
         else:
             for x in range(nvars):
@@ -340,14 +377,14 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def cycle_to_np_array(self, dims, ndims_used, cycle_tm):
+    def var_to_np_array(self, dims, ndims_used, var):
 
         # build numpy array with requested dimensions
         d = {
-            1: np.reshape([[cycle_tm] * dims['xdef']], (dims['xdef'])),
-            2: np.reshape([[cycle_tm] * dims['xdef']] * dims['ydef'],
+            1: np.reshape([[var] * dims['xdef']], (dims['xdef'])),
+            2: np.reshape([[var] * dims['xdef']] * dims['ydef'],
                           (dims['xdef'], dims['ydef'])),
-            3: np.reshape([[cycle_tm] * dims['xdef'] * dims['ydef'] * dims['zdef']],
+            3: np.reshape([[var] * dims['xdef'] * dims['ydef'] * dims['zdef']],
                           (dims['xdef'], dims['ydef'], dims['zdef']))
         }
 
@@ -446,6 +483,6 @@ class MonDataSpace(EvaBase):
                         coords['ydef']: np.arange(1, dims['ydef']+1),
                         coords['zdef']: np.arange(1, dims['zdef']+1)},
             )
-
         rtn_ds = rtn_ds.merge(new_cyc)
+
         return rtn_ds

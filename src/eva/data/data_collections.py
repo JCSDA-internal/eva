@@ -270,6 +270,7 @@ class DataCollections:
                     minmaxrms_string = ' | ' + min_string + ', ' + max_string + rms_string
                 self.logger.info('  ' + data_var.ljust(max_name_len) + ' (' +
                                  str(data_var_value.dtype).ljust(7) + ')' + minmaxrms_string)
+                self.logger.info('        shape: ' + str(data_var_value.shape))
         self.logger.info('-'*80)
 
     # ----------------------------------------------------------------------------------------------
