@@ -7,21 +7,21 @@ diagnostics:
     datasets:
       - name: experiment
         variable: T
-        resolution: C768
+        resolution: C48
         fv3_filenames:
-          - ${data_input_path}/20210801.000000.sfc_data.tile1.nc
-          - ${data_input_path}/20210801.000000.sfc_data.tile2.nc
-          - ${data_input_path}/20210801.000000.sfc_data.tile3.nc
-          - ${data_input_path}/20210801.000000.sfc_data.tile4.nc
-          - ${data_input_path}/20210801.000000.sfc_data.tile5.nc
-          - ${data_input_path}/20210801.000000.sfc_data.tile6.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile1.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile2.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile3.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile4.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile5.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile6.nc
         orog_filenames:
-          - ${data_input_path}/C768_oro_data.tile1.nc
-          - ${data_input_path}/C768_oro_data.tile2.nc
-          - ${data_input_path}/C768_oro_data.tile3.nc
-          - ${data_input_path}/C768_oro_data.tile4.nc
-          - ${data_input_path}/C768_oro_data.tile5.nc
-          - ${data_input_path}/C768_oro_data.tile6.nc
+          - ${data_input_path}/C48_oro_data.tile1.nc
+          - ${data_input_path}/C48_oro_data.tile2.nc
+          - ${data_input_path}/C48_oro_data.tile3.nc
+          - ${data_input_path}/C48_oro_data.tile4.nc
+          - ${data_input_path}/C48_oro_data.tile5.nc
+          - ${data_input_path}/C48_oro_data.tile6.nc
         groups:
           - name: FV3Restart
             variables: &variables [geolon,
