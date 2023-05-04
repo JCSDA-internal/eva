@@ -1,4 +1,4 @@
-# (C) Copyright 20212-2023 NOAA/NWS/EMC
+# (C) Copyright 2022-2023 NOAA/NWS/EMC
 #
 # (C) Copyright 2022-2023 United States Government as represented by the Administrator of the
 # National Aeronautics and Space Administration. All Rights Reserved.
