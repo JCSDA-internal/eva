@@ -44,11 +44,6 @@ class MonDataSpace(EvaBase):
             coords, dims, attribs, nvars, vars, channo, scanpo = self.get_ctl_dict(control_file[0])
             ndims_used = self.get_ndims_used(dims)
 
-#            scan_arr = None
-#            if scanpo is not None:
-#                a = np.repeat(np.array(scanpo)[:,np.newaxis],dims['ydef'],1) 
-#                scan_arr = np.repeat(a[:,:,np.newaxis],dims['zdef'],2)
-
             # Get the groups to be read
             # -------------------------
             groups = get(dataset, self.logger, 'groups')
@@ -98,9 +93,6 @@ class MonDataSpace(EvaBase):
                 # add cycle as a variable to data array
                 cyc_darr = self.var_to_np_array(dims, ndims_used, cycle_tm)
 
-                if 'Scan' in coords.values():
-                    self.logger.info('BINGO')
-                
                 # create dataset from file contents
                 timestep_ds = None
 
@@ -135,7 +127,6 @@ class MonDataSpace(EvaBase):
                 # Drop regions not in user requested list
                 # ---------------------------------------
                 if drop_regions:
-                    self.logger.info('DROP regions, keeping ' + str(requested_regions))
                     ds = self.subset_coordinate(ds, 'Region', requested_regions)
 
                 # If user specifies all variables set to group list
@@ -338,8 +329,6 @@ class MonDataSpace(EvaBase):
             np.set_printoptions(threshold=sys.maxsize)
             for x in range(nvars):
 
-                self.logger.info('vars[x] = ' + str(vars[x]))
-
                 # satang variable is not used and a non-standard size
                 if vars[x] == 'satang':
                     skip = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
@@ -348,23 +337,13 @@ class MonDataSpace(EvaBase):
                                     dtype=np.dtype('>f4'))
                 else:
                     mylist = []
-                    for z in range(5):
+                    for z in range(5):	
                         arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['ydef'],
                                                                           dims['xdef'])
-                        arr = np.transpose(arr)
-                        if vars[x] == 'count':
-                            self.logger.info('count arr.shape: ' + str(arr.shape))
-                            self.logger.info('count arr: ' + str(arr))
-                           
-                        mylist.append(arr)
-                    tarr = np.dstack(mylist)
-                    if vars[x] == 'count':
-                        self.logger.info('count tarr.shape:: ' + str(tarr.shape))
+                        mylist.append(np.transpose(arr))
 
+                    tarr = np.dstack(mylist)
                 rtn_array = np.append(rtn_array, [tarr], axis=0)
-                if vars[x] == 'count':
-                    self.logger.info('rtn_array.shape : ' + str(rtn_array.shape))
-                    self.logger.info('rtn_array: ' + str(rtn_array))
 
         else:
             for x in range(nvars):
