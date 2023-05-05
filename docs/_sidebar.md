@@ -2,6 +2,7 @@
 
   - [Installing Eva](installing_eva.md)
   - [Using Eva](using_eva.md)
+  - [using Eva With DA Monitor] (using_eva_DA_monitor.md)
 
 - Eva infrastructure
 
