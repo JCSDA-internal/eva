@@ -2,6 +2,7 @@
 
   - [Installing Eva](installing_eva.md)
   - [Using Eva](using_eva.md)
+  - [Eva Yaml](eva_yaml.md)
 
 - Eva infrastructure
 
