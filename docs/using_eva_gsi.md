@@ -1,4 +1,4 @@
-# Using EVA for GSI
+# Using EVA for GSI ncdiags
 
 EVA can be used to read GSI diagnostic netCDF4 files and produce analysis plots. These capabilities extend to be used for conventional and radiance data types.
 
