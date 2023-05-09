@@ -1,6 +1,6 @@
 # Using EVA with Cubed-Sphere Restart Files
 
-EVA can be used to read cubed-sphere restart files and produce analysis plots. [EMCPy](https://github.com/NOAA-EMC/emcpy) plotting techniques now includes features that can stitch all six cubed-sphere tiles and produce a global view figure. 
+EVA can be used to read FV3 cubed-sphere restart files and produce plots. [EMCPy](https://github.com/NOAA-EMC/emcpy) plotting techniques now includes features that can stitch all six cubed-sphere tiles and produce a global view figure. 
 
 ## Steps to run and generate plots:
 
