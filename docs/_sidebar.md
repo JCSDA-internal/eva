@@ -3,6 +3,7 @@
   - [Installing Eva](installing_eva.md)
   - [Using Eva](using_eva.md)
   - [Using Eva with GSI ncdiags](using_eva_gsi.md)
+  - [Using Eva with Cubed-Sphere Restart Files](using_eva_cubedsphere.md)
 
 - Eva infrastructure
 
