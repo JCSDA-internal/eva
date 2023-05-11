@@ -2,7 +2,9 @@
 
   - [Installing Eva](installing_eva.md)
   - [Using Eva](using_eva.md)
-  - [using Eva With DA Monitor] (using_eva_DA_monitor.md)
+  - [using Eva With EMC DA Monitor] (using_eva_DA_monitor.md)
+  - [Using Eva with GSI ncdiags](using_eva_gsi.md)
+  - [Using Eva with Cubed-Sphere Restart Files](using_eva_cubedsphere.md)
 
 - Eva infrastructure
 
