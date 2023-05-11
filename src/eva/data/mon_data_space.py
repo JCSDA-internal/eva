@@ -42,35 +42,27 @@ class MonDataSpace(EvaBase):
             # --------------------------
             control_file = get(dataset, self.logger, 'control_file')
             coords, dims, attribs, nvars, vars, channo, scanpo = self.get_ctl_dict(control_file[0])
-            ndims_used = self.get_ndims_used(dims)
+            ndims_used, dims_arr = self.get_ndims_used(dims)
 
             # Get the groups to be read
             # -------------------------
             groups = get(dataset, self.logger, 'groups')
 
-            # Get requested channels, convert to list
-            # ---------------------------------------
-            channels_str_or_list = get(dataset, self.logger, 'channels')
-            drop_channels = False
-            requested_channels = []
+            # Trim coordinates 
+            #-----------------
+            coord_dict = {
+                0: ['channels', 'Channel'],
+                1: ['regions', 'Region'],
+                2: ['levels', 'Level']
+            }
+            drop_coord = [False, False, False]
+            requested_coord = [None, None, None]
 
-            if channels_str_or_list is not None:
-
-                if len(str(channels_str_or_list)) > 0:
-                    requested_channels = parse_channel_list(str(channels_str_or_list), self.logger)
-                    drop_channels = True
-
-            # Get requested regions, convert to list
-            # --------------------------------------
-            regions_str_or_list = get(dataset, self.logger, 'regions')
-            requested_regions = []
-            drop_regions = False
-
-            if regions_str_or_list is not None:
-
-                if len(str(regions_str_or_list)) > 0:
-                    requested_regions = parse_channel_list(str(regions_str_or_list), self.logger)
-                    drop_regions = True
+            for x in range(len(coord_dict)):
+                str_or_list = get(dataset, self.logger, coord_dict[x][0], abort_on_failure=False)
+                if str_or_list is not None:
+                    requested_coord[x] = parse_channel_list(str(str_or_list), self.logger)
+                    drop_coord[x] = True
 
             # Set coordinate ranges
             # ---------------------
@@ -88,16 +80,16 @@ class MonDataSpace(EvaBase):
             for filename in filenames:
 
                 # read data file
-                darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used, nvars, vars)
+                darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used, dims_arr, nvars, vars)
 
                 # add cycle as a variable to data array
-                cyc_darr = self.var_to_np_array(dims, ndims_used, cycle_tm)
+                cyc_darr = self.var_to_np_array(dims, ndims_used, dims_arr, cycle_tm)
 
                 # create dataset from file contents
                 timestep_ds = None
 
                 timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
-                                             x_range, y_range, z_range, cyc_darr)
+                                             dims_arr, x_range, y_range, z_range, cyc_darr)
 
                 if attribs['sat']:
                     timestep_ds.attrs['satellite'] = attribs['sat']
@@ -119,16 +111,12 @@ class MonDataSpace(EvaBase):
                 group_name = get(group, self.logger, 'name')
                 group_vars = get(group, self.logger, 'variables', 'all')
 
-                # Drop channels not in user requested list
-                # ----------------------------------------
-                if drop_channels:
-                    ds = self.subset_coordinate(ds, 'Channel', requested_channels)
-
-                # Drop regions not in user requested list
-                # ---------------------------------------
-                if drop_regions:
-                    ds = self.subset_coordinate(ds, 'Region', requested_regions)
-
+                # Drop coordinates not in requested list
+                # --------------------------------------
+                for x in range(len(coord_dict)):
+                    if drop_coord[x]:
+                        ds = self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x])
+      
                 # If user specifies all variables set to group list
                 # -------------------------------------------------
                 if group_vars == 'all':
@@ -221,6 +209,8 @@ class MonDataSpace(EvaBase):
                         coords['xdef'] = 'Channel'
                     elif line.find("scan") != -1:
                         coords['xdef'] = 'Scan'
+                    elif line.find("pressure") != -1:
+                        coords['xdef'] = 'Level'
 
                 if line.find('YDEF') != -1:
                     if line.find('region') != -1:
@@ -293,7 +283,7 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def read_ieee(self, file_name, coords, dims, ndims_used, nvars, vars, file_path=None):
+    def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars, file_path=None):
 
         # find cycle time in filename and create cycle_tm as datetime object
         cycle_tm = None
@@ -315,16 +305,18 @@ class MonDataSpace(EvaBase):
         f = FortranFile(filename, 'r', '>u4')
 
         if ndims_used == 1:
-            rtn_array = np.empty((0, dims['xdef']), float)
-            dimensions = [dims['xdef']]
+            rtn_array = np.empty((0, dims[dims_arr[0]]), float)
+            dimensions = [dims[dims_arr[0]]]
 
         if ndims_used == 2:
-            rtn_array = np.empty((0, dims['xdef'], dims['ydef']), float)
-            dimensions = [dims['xdef'], dims['ydef']]
+            rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]]), float)
+            dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
 
         if ndims_used == 3:
-            rtn_array = np.empty((0, dims['xdef'], dims['ydef'], dims['zdef']), float)
-            dimensions = [dims['xdef'], dims['ydef']]
+#            rtn_array = np.empty((0, dims['xdef'], dims['ydef'], dims['zdef']), float)
+            rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]], dims[dims_arr[2]]), float)
+#            dimensions = [dims['xdef'], dims['ydef']]
+            dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
 
             np.set_printoptions(threshold=sys.maxsize)
             for x in range(nvars):
@@ -348,6 +340,7 @@ class MonDataSpace(EvaBase):
         else:
             for x in range(nvars):
                 arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions)
+                self.logger.info('arr = ' + str(arr.shape)) 
                 arr = np.array(arr, dtype=np.float)
                 rtn_array = np.append(rtn_array, [arr], axis=0)
 
@@ -356,15 +349,15 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def var_to_np_array(self, dims, ndims_used, var):
+    def var_to_np_array(self, dims, ndims_used, dims_arr, var):
 
         # build numpy array with requested dimensions
         d = {
-            1: np.reshape([[var] * dims['xdef']], (dims['xdef'])),
-            2: np.reshape([[var] * dims['xdef']] * dims['ydef'],
-                          (dims['xdef'], dims['ydef'])),
-            3: np.reshape([[var] * dims['xdef'] * dims['ydef'] * dims['zdef']],
-                          (dims['xdef'], dims['ydef'], dims['zdef']))
+            1: np.reshape([[var] * dims[dims_arr[0]]], (dims[dims_arr[0]])),
+            2: np.reshape([[var] * dims[dims_arr[0]]] * dims[dims_arr[1]],
+                          (dims[dims_arr[0]], dims[dims_arr[1]])),
+            3: np.reshape([[var] * dims[dims_arr[0]] * dims[dims_arr[1]] * dims[dims_arr[2]]],
+                          (dims[dims_arr[0]], dims[dims_arr[1]], dims[dims_arr[2]]))
         }
 
         try:
@@ -400,19 +393,26 @@ class MonDataSpace(EvaBase):
     # ----------------------------------------------------------------------------------------------
 
     def get_ndims_used(self, dims):
+        # Some ieee files (ozn) can be 1 or 2 dimensions depending on the
+        # number of levels used.  Levels is the xdef, Regions is the ydef.
+        # All Ozn files use ydef, but many have xdef = 1.  The dims_arr[] 
+        # will return the name(s) of the dimensions actually used.
 
         # Ignore dims with values of 0 or 1
         ndims = len(dims)
+        dims_arr = []
         for x in range(ndims):
             if list(dims.values())[x] <= 1:
                 ndims -= 1
-
-        return ndims
+            else:
+                dims_arr.append(list(dims)[x])
+         
+        return ndims, dims_arr
 
     # ----------------------------------------------------------------------------------------------
 
     def load_dset(self, vars, nvars, coords, darr, dims, ndims_used,
-                  x_range, y_range, z_range, cyc_darr):
+                  dims_arr, x_range, y_range, z_range, cyc_darr):
 
         # create dataset from file components
         rtn_ds = None
@@ -420,16 +420,16 @@ class MonDataSpace(EvaBase):
         for x in range(0, nvars):
             if ndims_used == 1:
                 d = {
-                    vars[x]: {"dims": (coords['xdef']), "data": darr[x, :, :]}
+                    vars[x]: {"dims": (coords[dims_arr[0]]), "data": darr[x, :]}
                 }
             if ndims_used == 2:
                 d = {
-                    vars[x]: {"dims": (coords['xdef'], coords['ydef']),
+                    vars[x]: {"dims": (coords[dims_arr[0]], coords[dims_arr[1]]),
                               "data": darr[x, :, :]}
                 }
             if ndims_used == 3:
                 d = {
-                    vars[x]: {"dims": (coords['xdef'], coords['ydef'], coords['zdef']),
+                    vars[x]: {"dims": (coords[dims_arr[0]], coords[dims_arr[1]], coords[dims_arr[2]]),
                               "data": darr[x, :, :]}
                 }
 
@@ -441,26 +441,26 @@ class MonDataSpace(EvaBase):
         if ndims_used == 1:
             new_cyc = Dataset(
                 {
-                    'cycle': ((coords['xdef']), cyc_darr),
+                    'cycle': ((coords[dims_arr[0]]), cyc_darr),
                 },
-                coords={coords['xdef']: np.arange(1, dims['xdef']+1)},
+                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1)},
             )
         if ndims_used == 2:
             new_cyc = Dataset(
                 {
-                    'cycle': ((coords['xdef'], coords['ydef']), cyc_darr),
+                    'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]]), cyc_darr),
                 },
-                coords={coords['xdef']: np.arange(1, dims['xdef']+1),
-                        coords['ydef']: np.arange(1, dims['ydef']+1)},
+                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
+                        coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1)},
             )
         if ndims_used == 3:
             new_cyc = Dataset(
                 {
-                    'cycle': ((coords['xdef'], coords['ydef'], coords['zdef']), cyc_darr),
+                    'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]], coords[dims_arr[2]]), cyc_darr),
                 },
-                coords={coords['xdef']: np.arange(1, dims['xdef']+1),
-                        coords['ydef']: np.arange(1, dims['ydef']+1),
-                        coords['zdef']: np.arange(1, dims['zdef']+1)},
+                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
+                        coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1),
+                        coords[dims_arr[2]]: np.arange(1, dims[dims_arr[2]]+1)},
             )
         rtn_ds = rtn_ds.merge(new_cyc)
 
