@@ -5,6 +5,7 @@
   - [using Eva With EMC DA Monitor] (using_eva_DA_monitor.md)
   - [Using Eva with GSI ncdiags](using_eva_gsi.md)
   - [Using Eva with Cubed-Sphere Restart Files](using_eva_cubedsphere.md)
+  - [Eva Yaml](eva_yaml.md)
 
 - Eva infrastructure
 
