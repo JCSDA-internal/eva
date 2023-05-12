@@ -45,6 +45,10 @@ def application_tests(logger):
     # Loop over tests, populate YAML and run test
     for test in tests:
 
+        # check if test is a YAML file or something else
+        if not os.path.splitext(test)[-1] == '.yaml':
+            continue
+
         # Write some information
         logger.info(f'{textcolors.green}Running Eva application test with {test}{textcolors.end}')
 

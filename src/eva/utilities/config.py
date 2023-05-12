@@ -69,7 +69,6 @@ def get(dict, logger, key, default=None, abort_on_failure=True):
             logger.abort(f'Configuration does not have the key {key}')
 
     else:
-        logger.info(f'Warning:  key {key} not found, returning default {default}')
         return dict.get(key, default)
 
 
