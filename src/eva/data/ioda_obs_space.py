@@ -22,13 +22,13 @@ import netCDF4 as nc
 
 def subset_channels(ds, channels, add_channels_variable=False):
 
-    if 'channel' in list(ds.dims):
+    if 'Channel' in list(ds.dims):
 
         # Number of user requested channels
         channel_use = len(channels)
 
         # Number of channels in the file
-        channel_in_file = ds.channel.size
+        channel_in_file = ds.Channel.size
 
         # If user provided no channels then use all channels
         if channel_use == 0:
@@ -91,13 +91,17 @@ class IodaObsSpace(EvaBase):
                 ds_header = ds_header.assign_coords({"Location": locations_this_file})
                 total_loc = total_loc + ds_header['Location'].size
 
+                if 'Cluster' in ds_header.keys():
+                    clusters_this_file = range(0,ds_header['Cluster'].size)
+                    ds_header = ds_header.assign_coords({"Cluster": clusters_this_file})
+
                 # Read header part of the file to get coordinates
                 ds_groups = Dataset()
 
                 # Save sensor_channels for later
                 channel_present = False
-                if 'channel' in ds_header.keys():
-                    sensor_channels = ds_header['channel']
+                if 'Channel' in ds_header.keys():
+                    sensor_channels = ds_header['Channel']
                     channel_present = True
 
                 # Merge in the header and close
@@ -157,8 +161,8 @@ class IodaObsSpace(EvaBase):
                     ds = ds.rename(rename_dict)
 
                     # Reset channel numbers from header
-                    if channel_present:
-                        ds['channel'] = sensor_channels
+                    if channel_present and group_name == 'MetaData':
+                        ds[group_name + '::' + 'Channel_Number'] = sensor_channels
 
                     # Set channels
                     ds = subset_channels(ds, channels)
@@ -183,3 +187,4 @@ class IodaObsSpace(EvaBase):
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
+
