@@ -283,7 +283,7 @@ class MonDataSpace(EvaBase):
         cycstrs = file_name.split('.')
 
         for cycstr in cycstrs:
-            if cycstr.isnumeric():
+            if ((cycstr.isnumeric()) and (len(cycstr) == 10)):
                 cycle_tm = datetime(int(cycstr[0:4]), int(cycstr[4:6]),
                                     int(cycstr[6:8]), int(cycstr[8:]))
 
