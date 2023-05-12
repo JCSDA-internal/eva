@@ -92,7 +92,7 @@ class IodaObsSpace(EvaBase):
                 total_loc = total_loc + ds_header['Location'].size
 
                 if 'Cluster' in ds_header.keys():
-                    clusters_this_file = range(0,ds_header['Cluster'].size)
+                    clusters_this_file = range(0, ds_header['Cluster'].size)
                     ds_header = ds_header.assign_coords({"Cluster": clusters_this_file})
 
                 # Read header part of the file to get coordinates
@@ -162,7 +162,7 @@ class IodaObsSpace(EvaBase):
 
                     # Reset channel numbers from header
                     if channel_present and group_name == 'MetaData':
-                        ds[group_name + '::' + 'Channel_Number'] = sensor_channels
+                        ds[group_name + '::' + 'channelNumber'] = sensor_channels
 
                     # Set channels
                     ds = subset_channels(ds, channels)
@@ -187,4 +187,3 @@ class IodaObsSpace(EvaBase):
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
-
