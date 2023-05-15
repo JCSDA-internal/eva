@@ -90,4 +90,5 @@ def select_time(config, data_collections):
                                                             cgv_new[2], select_time)
 
     data_collections.display_collections()
+
 # --------------------------------------------------------------------------------------------------

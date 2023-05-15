@@ -1,6 +1,6 @@
 # Test Monitor Summary plot performs the following:
 #   1.  Load binary monitor data for 5 cycles
-#   2.  Select obs counts from last 4 cycles 
+#   2.  Select obs counts from last 4 cycles
 #   3.  Select total bias correction for 1 cycle and average of last 4
 #   4.  Plot obs counts for the 4 cycles (panel 1).
 #   5.  Plot bias correction for 1 cycle and average of 4 (panel 2).
@@ -34,28 +34,28 @@ diagnostics:
     - transform: select time
       new name: experiment::GsiIeee::count1
       starting field: experiment::GsiIeee::count
-      cycles: 2015051418
+      cycle: 2015051418
       for:
         variable: [none]
 
     - transform: select time
       new name: experiment::GsiIeee::count2
       starting field: experiment::GsiIeee::count
-      cycles: 2015051500
+      cycle: 2015051500
       for:
         variable: [none]
 
     - transform: select time
       new name: experiment::GsiIeee::count3
       starting field: experiment::GsiIeee::count
-      cycles: 2015051506
+      cycle: 2015051506
       for:
         variable: [none]
 
     - transform: select time
       new name: experiment::GsiIeee::count4
       starting field: experiment::GsiIeee::count
-      cycles: 2015051512
+      cycle: 2015051512
       for:
         variable: [none]
 
@@ -67,19 +67,20 @@ diagnostics:
       for:
         variable: [none]
 
-    # Single cycle total bias correction 
+    # Single cycle total bias correction
     - transform: select time
       new name: experiment::GsiIeee::total_1cyc
       starting field: experiment::GsiIeee::total_avg
-      cycles: 2015051512
+      cycle: 2015051512
       for:
         variable: [none]
 
-     # 4 cycle total bias correction using time slice    
+     # 4 cycle total bias correction using time slice
     - transform: select time
       new name: experiment::GsiIeee::total_4cyc
       starting field: experiment::GsiIeee::total_avg
-      cycles: [2015051418, 2015051512]
+      start cycle: 2015051418
+      end cycle: 2015051512
       for:
         variable: [none]
 

@@ -9,6 +9,7 @@
 
 # --------------------------------------------------------------------------------------------------
 
+
 import os
 import numpy as np
 
@@ -222,9 +223,9 @@ class MonDataSpace(EvaBase):
                 # In most cases xdef, ydef, and zdef specify the size of
                 # the coresponding coordinate.
                 #
-                # Scan is different. If xdef coresponds to Scan then it specifies
-                # the number of scan steps, starting position, and step size.
-                # Add these to scan_info for later use.
+                # Scan is different. If xdef coresponds to Scan then the xdef line
+                # specifies the number of scan steps, starting position, and step size.
+                # The last 2 are floats.  Add all to scan_info for later use.
                 if line.find('xdef') != -1:
                     strs = line.split()
                     for st in strs:
@@ -282,6 +283,7 @@ class MonDataSpace(EvaBase):
                     used += 1
 
             # If Scan is in the coords calculate the scan positions.
+            # scan_info[0] = num steps, [1] = start position, [2] = step size
             if 'Scan' in coords.values():
                 scanpo = [(float(scan_info[1]))]
                 for x in range(1, int(scan_info[0])):
