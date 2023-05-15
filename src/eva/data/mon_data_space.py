@@ -42,14 +42,17 @@ class MonDataSpace(EvaBase):
             # --------------------------
             control_file = get(dataset, self.logger, 'control_file')
             coords, dims, attribs, nvars, vars, channo, scanpo = self.get_ctl_dict(control_file[0])
+            self.logger.info('scanpo = ' + str(scanpo))
+
             ndims_used, dims_arr = self.get_ndims_used(dims)
+            self.logger.info('ndims_used, dims_arr: ' + str(ndims_used) + ' ' + str(dims_arr))
 
             # Get the groups to be read
             # -------------------------
             groups = get(dataset, self.logger, 'groups')
 
-            # Trim coordinates 
-            #-----------------
+            # Trim coordinates
+            # ----------------
             coord_dict = {
                 0: ['channels', 'Channel'],
                 1: ['regions', 'Region'],
@@ -59,10 +62,15 @@ class MonDataSpace(EvaBase):
             requested_coord = [None, None, None]
 
             for x in range(len(coord_dict)):
+                self.logger.info('coord_dict[x][0] = ' + str(coord_dict[x][0]))
                 str_or_list = get(dataset, self.logger, coord_dict[x][0], abort_on_failure=False)
+                self.logger.info('str_or_list = ' + str(str_or_list))
                 if str_or_list is not None:
                     requested_coord[x] = parse_channel_list(str(str_or_list), self.logger)
                     drop_coord[x] = True
+
+            self.logger.info('requested_coord = ' + str(requested_coord))
+            self.logger.info('drop_coord = ' + str(drop_coord))
 
             # Set coordinate ranges
             # ---------------------
@@ -80,7 +88,8 @@ class MonDataSpace(EvaBase):
             for filename in filenames:
 
                 # read data file
-                darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used, dims_arr, nvars, vars)
+                darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used,
+                                                dims_arr, nvars, vars)
 
                 # add cycle as a variable to data array
                 cyc_darr = self.var_to_np_array(dims, ndims_used, dims_arr, cycle_tm)
@@ -116,7 +125,7 @@ class MonDataSpace(EvaBase):
                 for x in range(len(coord_dict)):
                     if drop_coord[x]:
                         ds = self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x])
-      
+
                 # If user specifies all variables set to group list
                 # -------------------------------------------------
                 if group_vars == 'all':
@@ -181,8 +190,8 @@ class MonDataSpace(EvaBase):
                                   "Valid values for " + str(coordinate) + " are: \n" +
                                   f"{', '.join(str(i) for i in ds[coordinate].data)}")
         else:
-            self.logger.abort('requested coordinate, ' + str(coordinate) + ' is not in ' +
-                              ' dataset dimensions valid dimensions include ' + str(ds.dims))
+            self.logger.info('Warning:  requested coordinate, ' + str(coordinate) + ' is not in ' +
+                             ' dataset dimensions valid dimensions include ' + str(ds.dims))
 
         return ds
 
@@ -192,44 +201,45 @@ class MonDataSpace(EvaBase):
     def get_ctl_dict(self, control_file):
 
         coords = {'xdef': None, 'ydef': None, 'zdef': None}
+        coord_list = []
         dims = {'xdef': 0, 'ydef': 0, 'zdef': 0}
+        dim_list = []
         attribs = {'sensor': None, 'sat': None}
         vars = []
         nvars = 0
         channo = []
-        scanpo = None 
+        scanpo = None
         scan_info = []
+
+        coord_dict = {
+                     'channel': 'Channel',
+                     'scan': 'Scan',
+                     'pressure': 'Level',
+                     'region': 'Region'
+        }
 
         with open(control_file, 'r') as fp:
             lines = fp.readlines()
-
             for line in lines:
-                if line.find('XDEF') != -1:
-                    if line.find('channel') != -1:
-                        coords['xdef'] = 'Channel'
-                    elif line.find("scan") != -1:
-                        coords['xdef'] = 'Scan'
-                    elif line.find("pressure") != -1:
-                        coords['xdef'] = 'Level'
 
-                if line.find('YDEF') != -1:
-                    if line.find('region') != -1:
-                        coords['ydef'] = 'Region'
-                    elif line.find('channel') != -1:
-                        coords['ydef'] = 'Channel'
+                # Locate the coordinates using coord_dict.  There will be 1-3
+                # coordinates specified as XDEF, YDEF, and ZDEF.
+                for item in list(coord_dict.keys()):
+                    if 'DEF' in line and item in line:
+                        self.logger.info('need to add ' + str(coord_dict[item]))
+                        coord_list.append(coord_dict[item])
 
-                if line.find('ZDEF') != -1:
-                    if line.find('region') != -1:
-                        coords['zdef'] = 'Region'
-
-                # Calculate the scan position values if Scan is in the
-                # coord list.  The xdef line gives us the
-                # number of steps, starting position and step size.
+                # In most cases xdef, ydef, and zdef specify the size of
+                # the coresponding coordinate.
+                #
+                # Scan is different. If xdef coresponds to Scan then it specifies
+                # the number of scan steps, starting position, and step size.
+                # Add these to scan_info for later use.
                 if line.find('xdef') != -1:
                     strs = line.split()
                     for st in strs:
                         if st.isdigit():
-                            dims['xdef'] = int(st)
+                            dim_list.append(int(st))
                         if is_number(st):
                             scan_info.append(st)
 
@@ -237,13 +247,13 @@ class MonDataSpace(EvaBase):
                     strs = line.split()
                     for st in strs:
                         if st.isdigit():
-                            dims['ydef'] = int(st)
+                            dim_list.append(int(st))
 
                 if line.find('zdef') != -1:
                     strs = line.split()
                     for st in strs:
                         if st.isdigit():
-                            dims['zdef'] = int(st)
+                            dim_list.append(int(st))
 
                 if line.find('vars') != -1:
                     strs = line.split()
@@ -265,13 +275,21 @@ class MonDataSpace(EvaBase):
                     if strs[4].isdigit():
                         channo.append(int(strs[4]))
 
-
             # The list of variables is at the end of the file between the lines
             # "vars" and "end vars".
             start = len(lines) - (nvars + 1)
             for x in range(start, start + nvars):
                 strs = lines[x].split()
                 vars.append(strs[-1])
+
+            # Ignore any coordinates in the control file that have a value of 1.
+            used = 0
+            mydef = ["xdef", "ydef", "zdef"]
+            for x in range(3):
+                if dim_list[x] > 2:
+                    coords[mydef[used]] = coord_list[x]
+                    dims[mydef[used]] = dim_list[x]
+                    used += 1
 
             # If Scan is in the coords calculate the scan positions.
             if 'Scan' in coords.values():
@@ -313,9 +331,8 @@ class MonDataSpace(EvaBase):
             dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
 
         if ndims_used == 3:
-#            rtn_array = np.empty((0, dims['xdef'], dims['ydef'], dims['zdef']), float)
-            rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]], dims[dims_arr[2]]), float)
-#            dimensions = [dims['xdef'], dims['ydef']]
+            rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]],
+                                  dims[dims_arr[2]]), float)
             dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
 
             np.set_printoptions(threshold=sys.maxsize)
@@ -329,7 +346,7 @@ class MonDataSpace(EvaBase):
                                     dtype=np.dtype('>f4'))
                 else:
                     mylist = []
-                    for z in range(5):	
+                    for z in range(5):
                         arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['ydef'],
                                                                           dims['xdef'])
                         mylist.append(np.transpose(arr))
@@ -340,7 +357,6 @@ class MonDataSpace(EvaBase):
         else:
             for x in range(nvars):
                 arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions)
-                self.logger.info('arr = ' + str(arr.shape)) 
                 arr = np.array(arr, dtype=np.float)
                 rtn_array = np.append(rtn_array, [arr], axis=0)
 
@@ -395,7 +411,7 @@ class MonDataSpace(EvaBase):
     def get_ndims_used(self, dims):
         # Some ieee files (ozn) can be 1 or 2 dimensions depending on the
         # number of levels used.  Levels is the xdef, Regions is the ydef.
-        # All Ozn files use ydef, but many have xdef = 1.  The dims_arr[] 
+        # All Ozn files use ydef, but many have xdef = 1.  The dims_arr[]
         # will return the name(s) of the dimensions actually used.
 
         # Ignore dims with values of 0 or 1
@@ -406,7 +422,11 @@ class MonDataSpace(EvaBase):
                 ndims -= 1
             else:
                 dims_arr.append(list(dims)[x])
-         
+
+        for x in range(ndims, 3):
+            dims_arr.append(list(dims)[2])
+        self.logger.info('dims_arr = ' + str(dims_arr))
+
         return ndims, dims_arr
 
     # ----------------------------------------------------------------------------------------------
@@ -429,7 +449,8 @@ class MonDataSpace(EvaBase):
                 }
             if ndims_used == 3:
                 d = {
-                    vars[x]: {"dims": (coords[dims_arr[0]], coords[dims_arr[1]], coords[dims_arr[2]]),
+                    vars[x]: {"dims": (coords[dims_arr[0]], coords[dims_arr[1]],
+                                       coords[dims_arr[2]]),
                               "data": darr[x, :, :]}
                 }
 
@@ -456,7 +477,8 @@ class MonDataSpace(EvaBase):
         if ndims_used == 3:
             new_cyc = Dataset(
                 {
-                    'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]], coords[dims_arr[2]]), cyc_darr),
+                    'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]],
+                               coords[dims_arr[2]]), cyc_darr),
                 },
                 coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
                         coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1),

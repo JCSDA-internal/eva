@@ -49,7 +49,7 @@ class Config(dict):
                 self.logger.abort("Configuration does not have the key")
 
         else:
-            logger.infop(f'Warning: key {key} not found, returning default {default}') 
+            logger.info(f'Warning: key {key} not found, returning default {default}')
             return super().get(key, default)
 
 
