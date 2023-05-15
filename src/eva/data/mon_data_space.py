@@ -9,7 +9,6 @@
 
 # --------------------------------------------------------------------------------------------------
 
-import sys
 import os
 import numpy as np
 
@@ -42,10 +41,7 @@ class MonDataSpace(EvaBase):
             # --------------------------
             control_file = get(dataset, self.logger, 'control_file')
             coords, dims, attribs, nvars, vars, channo, scanpo = self.get_ctl_dict(control_file[0])
-            self.logger.info('scanpo = ' + str(scanpo))
-
             ndims_used, dims_arr = self.get_ndims_used(dims)
-            self.logger.info('ndims_used, dims_arr: ' + str(ndims_used) + ' ' + str(dims_arr))
 
             # Get the groups to be read
             # -------------------------
@@ -62,15 +58,10 @@ class MonDataSpace(EvaBase):
             requested_coord = [None, None, None]
 
             for x in range(len(coord_dict)):
-                self.logger.info('coord_dict[x][0] = ' + str(coord_dict[x][0]))
                 str_or_list = get(dataset, self.logger, coord_dict[x][0], abort_on_failure=False)
-                self.logger.info('str_or_list = ' + str(str_or_list))
                 if str_or_list is not None:
                     requested_coord[x] = parse_channel_list(str(str_or_list), self.logger)
                     drop_coord[x] = True
-
-            self.logger.info('requested_coord = ' + str(requested_coord))
-            self.logger.info('drop_coord = ' + str(drop_coord))
 
             # Set coordinate ranges
             # ---------------------
@@ -226,7 +217,6 @@ class MonDataSpace(EvaBase):
                 # coordinates specified as XDEF, YDEF, and ZDEF.
                 for item in list(coord_dict.keys()):
                     if 'DEF' in line and item in line:
-                        self.logger.info('need to add ' + str(coord_dict[item]))
                         coord_list.append(coord_dict[item])
 
                 # In most cases xdef, ydef, and zdef specify the size of
@@ -299,8 +289,6 @@ class MonDataSpace(EvaBase):
 
         return coords, dims, attribs, nvars, vars, channo, scanpo
 
-    # ----------------------------------------------------------------------------------------------
-
     def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars, file_path=None):
 
         # find cycle time in filename and create cycle_tm as datetime object
@@ -308,7 +296,7 @@ class MonDataSpace(EvaBase):
         cycstrs = file_name.split('.')
 
         for cycstr in cycstrs:
-            if cycstr.isnumeric():
+            if ((cycstr.isnumeric()) and (len(cycstr) == 10)):
                 cycle_tm = datetime(int(cycstr[0:4]), int(cycstr[4:6]),
                                     int(cycstr[6:8]), int(cycstr[8:]))
 
@@ -335,7 +323,6 @@ class MonDataSpace(EvaBase):
                                   dims[dims_arr[2]]), float)
             dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
 
-            np.set_printoptions(threshold=sys.maxsize)
             for x in range(nvars):
 
                 # satang variable is not used and a non-standard size
@@ -425,7 +412,6 @@ class MonDataSpace(EvaBase):
 
         for x in range(ndims, 3):
             dims_arr.append(list(dims)[2])
-        self.logger.info('dims_arr = ' + str(dims_arr))
 
         return ndims, dims_arr
 
@@ -485,5 +471,4 @@ class MonDataSpace(EvaBase):
                         coords[dims_arr[2]]: np.arange(1, dims[dims_arr[2]]+1)},
             )
         rtn_ds = rtn_ds.merge(new_cyc)
-
         return rtn_ds

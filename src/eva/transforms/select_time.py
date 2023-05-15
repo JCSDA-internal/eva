@@ -86,7 +86,6 @@ def select_time(config, data_collections):
                 else:
                     select_time = select_time.sel(Time=str(cycles[0]))
 
-                logger.info('select_time.shape: ' + str(select_time.shape))
                 data_collections.add_variable_to_collection(cgv_new[0], cgv_new[1],
                                                             cgv_new[2], select_time)
 
