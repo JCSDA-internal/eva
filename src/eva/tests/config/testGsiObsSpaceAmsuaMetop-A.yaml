@@ -13,11 +13,20 @@ diagnostics:
         channels: &channels 3,8
         groups:
           - name: GsiNcDiag
+            # Note: channelNumber is automatically added to the output and should not
+            # be listed as a variable
             variables: &variables [Obs_Minus_Forecast_adjusted,
                                    Observation,
                                    Latitude,
                                    Longitude]
 
+  transforms:
+    # Stats for hofxPassedGSIQc
+    - transform: channel_stats
+      variable_name: experiment::GsiNcDiag::${variable}
+      for:
+        variable: *variables  
+  
   graphics:
     # Histogram plots
     # ---------------
@@ -60,3 +69,28 @@ diagnostics:
             label: 'GSI omb (all obs)'
             bins: 100
             alpha: 0.5
+
+    # ---------- Statistical Plot ----------
+    # JEDI h(x) vs GSI h(x)
+    # -------------------------
+    - figure:
+        layout: [1,1]
+        title: 'Mean HofX vs Channel'
+        output name: hofx_vs_channel/amsua_n19/brightness_temperature/meanhofx_vs_channel.png
+      plots:
+        - add_xlabel: 'Channel'
+          add_ylabel: 'GSI HofX'
+          add_grid:
+          add_legend:
+            loc: 'upper left'
+          layers:
+          - type: Scatter
+            x:
+              variable: experiment::GsiNcDiag::channelNumber
+            y:
+              variable: experiment::GsiNcDiagMean::Obs_Minus_Forecast_adjusted
+            markersize: 5
+            color: 'red'
+            label: 'GSI h(x) versus channels (all obs)'
+            do_linear_regression: False
+

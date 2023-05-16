@@ -36,7 +36,7 @@ def subset_channels(ds, channels, add_channels_variable=False):
 
         # Keep needed channels and reset dimension in Dataset
         if channel_use < channel_in_file:
-            ds = ds.sel(channel=channels)
+            ds = ds.sel(Channel=channels)
 
     return ds
 
@@ -99,10 +99,10 @@ class IodaObsSpace(EvaBase):
                 ds_groups = Dataset()
 
                 # Save sensor_channels for later
-                channel_present = False
+                add_channels = False
                 if 'Channel' in ds_header.keys():
                     sensor_channels = ds_header['Channel']
-                    channel_present = True
+                    add_channels = True
 
                 # Merge in the header and close
                 ds_groups = ds_groups.merge(ds_header)
@@ -160,9 +160,14 @@ class IodaObsSpace(EvaBase):
                         rename_dict[group_var] = group_name + '::' + group_var
                     ds = ds.rename(rename_dict)
 
-                    # Reset channel numbers from header
-                    if channel_present and group_name == 'MetaData':
-                        ds[group_name + '::' + 'channelNumber'] = sensor_channels
+                    # Reset channel numbers from header and copy channel numbers
+                    # into MetaData for easier use
+                    if add_channels:
+                        ds['Channel'] = sensor_channels
+                        # Explicitly add the channels to the collection (we do not want to
+                        # include this in the 'variables' list in the YAML to avoid transforms
+                        # being applied to them)
+                        ds['MetaData::channelNumber'] = sensor_channels
 
                     # Set channels
                     ds = subset_channels(ds, channels)

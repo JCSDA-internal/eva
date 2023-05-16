@@ -17,14 +17,13 @@ diagnostics:
                    416, 418, 423, 426, 428, 432, 433, 434, 439, 442, 445, 450, 457, 459, 472, 477, 483,
                    509, 515, 546, 552, 559, 566, 571, 573, 578, 584, 594, 625, 646, 662, 668, 705, 739,
                    756, 797, 867, 906, 921, 1027, 1046, 1090, 1098, 1121, 1133, 1173]
+        # Note: channelNumber is automatically added to the output and should not be listed below         
         groups:
           - name: ObsValue
             variables: &variables ['brightnessTemperature']
           - name: GsiHofXBc
           - name: hofx
           - name: EffectiveQC
-          - name: MetaData
-            variables: ['sensorChannelNumber']
           - name: GsiEffectiveQC
           - name: GsiFinalObsError
           - name: EffectiveError
@@ -71,7 +70,7 @@ diagnostics:
           layers:
           - type: Scatter
             x:
-              variable: experiment::MetaData::sensorChannelNumber
+              variable: experiment::MetaData::channelNumber
             y:
               variable: experiment::hofxMean::brightnessTemperature
             markersize: 5
@@ -80,7 +79,7 @@ diagnostics:
             do_linear_regression: False
           - type: Scatter
             x:
-              variable: experiment::MetaData::sensorChannelNumber
+              variable: experiment::MetaData::channelNumber
             y:
               variable: experiment::hofxPassedGSIQcMean::brightnessTemperature
             markersize: 5

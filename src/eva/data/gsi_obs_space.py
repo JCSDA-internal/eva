@@ -16,7 +16,6 @@ from eva.eva_base import EvaBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list
 
-
 # --------------------------------------------------------------------------------------------------
 
 
@@ -104,6 +103,11 @@ def satellite_dataset(ds):
     data_vars = {}
     # Loop through each variable
     for var in ds.variables:
+
+        # Ignore geovals data
+        if var in ['air_temperature', 'air_pressure', 'air_pressure_levels',
+                   'atmosphere_absorber_01', 'atmosphere_absorber_02', 'atmosphere_absorber_03']:
+            continue
 
         # If variable has len of nchans, pass along data
         if len(ds[var]) == nchans:
@@ -201,7 +205,6 @@ class GsiObsSpace(EvaBase):
                         group_vars = list(ds.data_vars)
 
                     # Reshape variables if satellite diag
-                    nchans_present = False
                     if 'nchans' in ds.dims:
                         ds = satellite_dataset(ds)
                         ds = subset_channels(ds, channels, self.logger)
@@ -222,6 +225,12 @@ class GsiObsSpace(EvaBase):
                     vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
                     ds = ds.drop_vars(vars_to_remove)
 
+                    # Explicitly add the channels to the collection (we do not want to include this
+                    # in the 'variables' list in the YAML to avoid transforms being applied to them)
+                    if 'nchans' in ds.dims:
+                        channels_used = ds['nchans']
+                        ds[group_name + '::channelNumber'] = channels_used
+
                     # Rename variables with group
                     rename_dict = {}
                     for group_var in group_vars:
@@ -239,6 +248,9 @@ class GsiObsSpace(EvaBase):
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
+
+        # Change the location dimension name
+        data_collections.adjust_location_dimension_name('nobs')
 
         # Change the channel dimension name
         data_collections.adjust_channel_dimension_name('nchans')
