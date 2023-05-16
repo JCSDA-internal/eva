@@ -10,7 +10,7 @@ diagnostics:
           - ${data_input_path}/ioda_obs_space.amsua_n19.hofx.2020-12-14T210000Z.nc4
         channels: &channels 3,8
         # Note: channelNumber is automatically added to the output and should not
-        # be listed below 
+        # be listed below
         groups:
           - name: ObsValue
             variables: &variables [brightnessTemperature]

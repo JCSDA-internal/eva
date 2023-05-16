@@ -25,8 +25,8 @@ diagnostics:
     - transform: channel_stats
       variable_name: experiment::GsiNcDiag::${variable}
       for:
-        variable: *variables  
-  
+        variable: *variables
+
   graphics:
     # Histogram plots
     # ---------------
