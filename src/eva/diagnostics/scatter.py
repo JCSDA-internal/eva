@@ -31,6 +31,7 @@ class Scatter():
             channel = config.get('channel')
 
         xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel)
+        xdata1 = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2])
         ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel)
 
         # see if we need to slice data

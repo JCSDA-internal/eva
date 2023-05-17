@@ -92,6 +92,15 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
+    def adjust_location_dimension_name(self, location_dimension_name):
+
+        for collection in self._collections.keys():
+            if location_dimension_name in list(self._collections[collection].dims):
+                self._collections[collection] = \
+                    self._collections[collection].rename_dims({location_dimension_name: 'Location'})
+
+    # ----------------------------------------------------------------------------------------------
+
     def add_variable_to_collection(self, collection_name, group_name, variable_name, variable):
 
         # Assert that new variable is an xarray Dataarray
