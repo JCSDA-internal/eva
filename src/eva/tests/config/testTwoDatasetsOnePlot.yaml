@@ -49,7 +49,7 @@ diagnostics:
       figure:
         figure size: [20,10]
         layout: [1,1]
-        title: 'Aircraft TObservations | FV3 2m Temperature'
+        title: 'Aircraft T Observations | FV3 2m Temperature'
         output name: map_plots/multi/fv3_t2m_aircraft_t.png
       plots:
         - mapping:
