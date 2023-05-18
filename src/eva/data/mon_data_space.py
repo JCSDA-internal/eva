@@ -30,134 +30,130 @@ class MonDataSpace(EvaBase):
 
     def execute(self, data_collections, timing):
 
-        # Loop over the datasets
-        # ----------------------
-        for dataset in self.config.get('datasets'):
+        # Set the collection name
+        # -----------------------
+        collection_name = get(dataset, self.logger, 'name')
 
-            # Set the collection name
-            # -----------------------
-            collection_name = get(dataset, self.logger, 'name')
+        # Get control file and parse
+        # --------------------------
+        control_file = get(dataset, self.logger, 'control_file')
+        coords, dims, attribs, nvars, vars, channo = self.get_ctl_dict(control_file[0])
+        ndims_used = self.get_ndims_used(dims)
 
-            # Get control file and parse
-            # --------------------------
-            control_file = get(dataset, self.logger, 'control_file')
-            coords, dims, attribs, nvars, vars, channo = self.get_ctl_dict(control_file[0])
-            ndims_used = self.get_ndims_used(dims)
+        # Get the groups to be read
+        # -------------------------
+        groups = get(dataset, self.logger, 'groups')
 
-            # Get the groups to be read
-            # -------------------------
-            groups = get(dataset, self.logger, 'groups')
+        # Get requested channels, convert to list
+        # ---------------------------------------
+        channels_str_or_list = get(dataset, self.logger, 'channels')
+        drop_channels = False
+        requested_channels = []
 
-            # Get requested channels, convert to list
+        if channels_str_or_list is not None:
+
+            if len(str(channels_str_or_list)) > 0:
+                requested_channels = parse_channel_list(str(channels_str_or_list), self.logger)
+                drop_channels = True
+
+        # Get requested regions, convert to list
+        # --------------------------------------
+        regions_str_or_list = get(dataset, self.logger, 'regions')
+        requested_regions = []
+        drop_regions = False
+
+        if regions_str_or_list is not None:
+
+            if len(str(regions_str_or_list)) > 0:
+                requested_regions = parse_channel_list(str(regions_str_or_list), self.logger)
+                drop_regions = True
+
+        # Set coordinate ranges
+        # ---------------------
+        x_range, y_range, z_range = self.get_dim_ranges(coords, dims, channo)
+
+        # Filenames to be read into this collection
+        # -----------------------------------------
+        filenames = get(dataset, self.logger, 'filenames')
+        ds_list = []
+
+        # Get missing value threshold
+        # ---------------------------
+        threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
+
+        for filename in filenames:
+
+            # read data file
+            darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used, nvars, vars)
+
+            # add cycle as a variable to data array
+            cyc_darr = self.cycle_to_np_array(dims, ndims_used, cycle_tm)
+
+            # create dataset from file contents
+            timestep_ds = None
+
+            timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
+                                            x_range, y_range, z_range, cyc_darr)
+
+            if attribs['sat']:
+                timestep_ds.attrs['satellite'] = attribs['sat']
+            if attribs['sensor']:
+                timestep_ds.attrs['sensor'] = attribs['sensor']
+
+            # add cycle_tm dim for concat
+            timestep_ds['Time'] = cycle_tm.strftime("%Y%m%d%H")
+
+            # Add this dataset to the list of ds_list
+            ds_list.append(timestep_ds)
+
+        # Concatenate datasets from ds_list into a single dataset
+        ds = concat(ds_list, dim='Time')
+
+        # Group name and variables
+        # ------------------------
+        for group in groups:
+            group_name = get(group, self.logger, 'name')
+            group_vars = get(group, self.logger, 'variables', 'all')
+
+            # Drop channels not in user requested list
+            # ----------------------------------------
+            if drop_channels:
+                ds = self.subset_coordinate(ds, 'Channel', requested_channels)
+
+            # Drop regions not in user requested list
             # ---------------------------------------
-            channels_str_or_list = get(dataset, self.logger, 'channels')
-            drop_channels = False
-            requested_channels = []
+            if drop_regions:
+                ds = self.subset_coordinate(ds, 'Region', requested_regions)
 
-            if channels_str_or_list is not None:
+            # If user specifies all variables set to group list
+            # -------------------------------------------------
+            if group_vars == 'all':
+                group_vars = list(ds.data_vars)
 
-                if len(str(channels_str_or_list)) > 0:
-                    requested_channels = parse_channel_list(str(channels_str_or_list), self.logger)
-                    drop_channels = True
+            # Drop data variables not in user requested variables
+            # ---------------------------------------------------
+            vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
+            ds = ds.drop_vars(vars_to_remove)
 
-            # Get requested regions, convert to list
-            # --------------------------------------
-            regions_str_or_list = get(dataset, self.logger, 'regions')
-            requested_regions = []
-            drop_regions = False
+            # Conditionally add channel as a variable using single dimension
+            if 'channel' in group_vars:
+                ds['channel'] = (['Channel'], channo)
 
-            if regions_str_or_list is not None:
+            # Rename variables with group
+            rename_dict = {}
+            for group_var in group_vars:
+                rename_dict[group_var] = group_name + '::' + group_var
 
-                if len(str(regions_str_or_list)) > 0:
-                    requested_regions = parse_channel_list(str(regions_str_or_list), self.logger)
-                    drop_regions = True
+            ds = ds.rename(rename_dict)
 
-            # Set coordinate ranges
-            # ---------------------
-            x_range, y_range, z_range = self.get_dim_ranges(coords, dims, channo)
+            # Assert that the collection contains at least one variable
+            if not ds.keys():
+                self.logger.abort('Collection \'' + dataset['name'] + '\', group \'' +
+                                    group_name + '\' in file ' + filename +
+                                    ' does not have any variables.')
 
-            # Filenames to be read into this collection
-            # -----------------------------------------
-            filenames = get(dataset, self.logger, 'filenames')
-            ds_list = []
-
-            # Get missing value threshold
-            # ---------------------------
-            threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
-
-            for filename in filenames:
-
-                # read data file
-                darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used, nvars, vars)
-
-                # add cycle as a variable to data array
-                cyc_darr = self.cycle_to_np_array(dims, ndims_used, cycle_tm)
-
-                # create dataset from file contents
-                timestep_ds = None
-
-                timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
-                                             x_range, y_range, z_range, cyc_darr)
-
-                if attribs['sat']:
-                    timestep_ds.attrs['satellite'] = attribs['sat']
-                if attribs['sensor']:
-                    timestep_ds.attrs['sensor'] = attribs['sensor']
-
-                # add cycle_tm dim for concat
-                timestep_ds['Time'] = cycle_tm.strftime("%Y%m%d%H")
-
-                # Add this dataset to the list of ds_list
-                ds_list.append(timestep_ds)
-
-            # Concatenate datasets from ds_list into a single dataset
-            ds = concat(ds_list, dim='Time')
-
-            # Group name and variables
-            # ------------------------
-            for group in groups:
-                group_name = get(group, self.logger, 'name')
-                group_vars = get(group, self.logger, 'variables', 'all')
-
-                # Drop channels not in user requested list
-                # ----------------------------------------
-                if drop_channels:
-                    ds = self.subset_coordinate(ds, 'Channel', requested_channels)
-
-                # Drop regions not in user requested list
-                # ---------------------------------------
-                if drop_regions:
-                    ds = self.subset_coordinate(ds, 'Region', requested_regions)
-
-                # If user specifies all variables set to group list
-                # -------------------------------------------------
-                if group_vars == 'all':
-                    group_vars = list(ds.data_vars)
-
-                # Drop data variables not in user requested variables
-                # ---------------------------------------------------
-                vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
-                ds = ds.drop_vars(vars_to_remove)
-
-                # Conditionally add channel as a variable using single dimension
-                if 'channel' in group_vars:
-                    ds['channel'] = (['Channel'], channo)
-
-                # Rename variables with group
-                rename_dict = {}
-                for group_var in group_vars:
-                    rename_dict[group_var] = group_name + '::' + group_var
-
-                ds = ds.rename(rename_dict)
-
-                # Assert that the collection contains at least one variable
-                if not ds.keys():
-                    self.logger.abort('Collection \'' + dataset['name'] + '\', group \'' +
-                                      group_name + '\' in file ' + filename +
-                                      ' does not have any variables.')
-
-            # Add the dataset to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds, 'cycle')
+        # Add the dataset to the collections
+        data_collections.create_or_add_to_collection(collection_name, ds, 'cycle')
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)

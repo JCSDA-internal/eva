@@ -3,9 +3,9 @@ diagnostics:
   # Data read
   # ---------
 - data:
-    type: MonDataSpace
     datasets:
       - name: experiment
+        type: MonDataSpace
         satellite: metop-a
         sensor: hirs4
         control_file:

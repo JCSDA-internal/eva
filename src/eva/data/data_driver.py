@@ -31,8 +31,13 @@ class DataDriver(EvaBase):
         # Loop over datasets
         for dataset in datasets:
 
-            # Get the dataset type
-            dataset_type = get(dataset, self.logger, 'dataset')
+            # Extract name for this diagnostic data type
+            try:
+                eva_data_class_name = dataset['type']
+            except Exception as e:
+                msg = '\'type\' key not found. \'diagnostic_data_config\': ' \
+                    f'{diagnostic_data_config}, error: {e}'
+                raise KeyError(msg)
 
             # Replace spaces with underscore
             dataset_type = dataset_type.replace(' ', '_')

@@ -3,9 +3,9 @@ diagnostics:
   # Data read
   # ---------
 - data:
-    type: CubedSphereRestart
     datasets:
       - name: experiment
+        type: CubedSphereRestart
         variable: T
         resolution: C48
         fv3_filenames:
