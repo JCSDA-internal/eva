@@ -213,7 +213,7 @@ class GsiObsSpace(EvaBase):
                 # Check that all user variables are in the dataset_config
                 if not all(v in list(ds.data_vars) for v in group_vars):
                     self.logger.abort('For collection \'' + dataset_config['name']
-                                      + '\', group \'' + group_name + '\' in file '+ filename +
+                                      + '\', group \'' + group_name + '\' in file ' + filename +
                                       f' . Variables {group_vars} not all present in ' +
                                       f'the data set variables: {list(ds.keys())}')
 
