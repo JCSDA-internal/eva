@@ -12,7 +12,7 @@
 
 
 from eva.utilities.config import get
-from eva.eva_base import EvaBase
+from eva.eva_base import EvaBase, EvaFactory
 
 import importlib
 import os
@@ -26,7 +26,7 @@ class DataDriver(EvaBase):
     def execute(self, data_collections, timing):
 
         # Get list of dataset dictionaries
-        datasets = get(self.config, self.logger, 'datasets')
+        datasets = get(self.config['data'], self.logger, 'datasets')
 
         # Loop over datasets
         for dataset in datasets:
@@ -39,16 +39,20 @@ class DataDriver(EvaBase):
                     f'{diagnostic_data_config}, error: {e}'
                 raise KeyError(msg)
 
-            # Replace spaces with underscore
-            dataset_type = dataset_type.replace(' ', '_')
+            # Create the data object
+            creator = EvaFactory()
+            timing.start('DataObjectConstructor')
+            eva_data_object = creator.create_eva_object(eva_data_class_name,
+                                                        'data',
+                                                        dataset,
+                                                        self.logger,
+                                                        timing)
+            timing.stop('DataObjectConstructor')
 
-            # Instantiate the tranform object
-            dataset_method = getattr(importlib.import_module('eva.data.'+dataset_type),
-                                       dataset_type)
-
-            # Call the dataset
-            timing.start(f'dataset: {dataset_type}')
-            dataset_method(dataset, data_collections)
-            timing.stop(f'dataset: {dataset_type}')
+            # Prepare diagnostic data
+            logger.info(f'Running execute for {eva_data_object.name}')
+            timing.start('DataObjectExecute')
+            eva_data_object.execute(data_collections, timing)
+            timing.stop('DataObjectExecute')
 
 # --------------------------------------------------------------------------------------------------

@@ -151,19 +151,19 @@ def eva(eva_config, eva_logger=None):
 
         # Create the data object
         creator = EvaFactory()
-        timing.start('DataObjectConstructor')
+        timing.start('DataConstructor')
         eva_data_object = creator.create_eva_object('DataDriver',
                                                     'data',
                                                     diagnostic_config,
                                                     eva_logger,
                                                     timing)
-        timing.stop('DataObjectConstructor')
+        timing.stop('DataConstructor')
 
         # Prepare diagnostic data
         logger.info(f'Running execute for {eva_data_object.name}')
-        timing.start('DataObjectExecute')
+        timing.start('DataExecute')
         eva_data_object.execute(data_collections, timing)
-        timing.stop('DataObjectExecute')
+        timing.stop('DataExecute')
 
         # Create the transforms
         if 'transforms' in diagnostic_config:
