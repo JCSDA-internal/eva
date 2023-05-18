@@ -10,19 +10,19 @@ class LatLon(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def execute(self, data_collections):
+    def execute(self, dataset_config, data_collections):
 
         # Filename to be read into this collection
-        filename = get(dataset, self.logger, 'filename')
+        filename = get(dataset_config, self.logger, 'filename')
         # get list of variables
-        variables = get(dataset, self.logger, 'variables')
+        variables = get(dataset_config, self.logger, 'variables')
         # Set the collection name
-        collection_name = dataset['name']
+        collection_name = dataset_config['name']
         # get 'group' name
-        group = get(dataset, self.logger, 'group')
+        group = get(dataset_config, self.logger, 'group')
 
         if group not in valid_groups:
-            self.logger.abort('For collection \'' + dataset['name'] + '\'' +
+            self.logger.abort('For collection \'' + dataset_config['name'] + '\'' +
                                 f' group \'{group}\' is not a valid group type for LatLon.' +
                                 f' The valid types are {valid_groups}')
 
@@ -35,7 +35,7 @@ class LatLon(EvaBase):
 
         # for lat and lon, need to do a meshgrid so that each point has a lat and a lon
 
-        # rename variables in dataset
+        # rename variables in dataset_config
         rename_dict = {}
         for v in variables:
             rename_dict[v] = f'{group}::{v}'
@@ -43,11 +43,11 @@ class LatLon(EvaBase):
 
         # Assert that the collection contains at least one variable
         if not ds.keys():
-            self.logger.abort('Collection \'' + dataset['name'] + '\', group \'' +
+            self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
                                 group + '\' in file ' + filename +
                                 ' does not have any variables.')
 
-        # add the dataset to the collections
+        # add the dataset_config to the collections
         data_collections.create_or_add_to_collection(collection_name, ds)
 
         ds.close()

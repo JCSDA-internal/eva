@@ -50,9 +50,9 @@ class DataDriver(EvaBase):
             timing.stop('DataObjectConstructor')
 
             # Prepare diagnostic data
-            logger.info(f'Running execute for {eva_data_object.name}')
+            self.logger.info(f'Running execute for {eva_data_object.name}')
             timing.start('DataObjectExecute')
-            eva_data_object.execute(data_collections, timing)
+            eva_data_object.execute(dataset, data_collections, timing)
             timing.stop('DataObjectExecute')
 
 # --------------------------------------------------------------------------------------------------

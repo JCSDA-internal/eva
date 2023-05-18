@@ -88,7 +88,7 @@ def subset_channels(ds, channels, logger, add_channels_variable=False):
 
 def satellite_dataset(ds):
     """
-    Builds a new dataset to reshape satellite
+    Builds a new dataset_config to reshape satellite
     data.
     """
     nchans = ds.dims['nchans']
@@ -134,7 +134,7 @@ def satellite_dataset(ds):
                 data = np.reshape(ds[var].data, (iters, nchans))
                 data_vars[var] = (('nobs', 'nchans'), data)
 
-    # create dataset
+    # create dataset_config
     new_ds = Dataset(data_vars=data_vars,
                      coords=coords,
                      attrs=ds.attrs)
@@ -149,11 +149,11 @@ class GsiObsSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def execute(self, data_collections, timeing):
+    def execute(self, dataset_config, data_collections, timeing):
 
         # Get channels for radiances
         # --------------------------
-        channels_str_or_list = get(dataset, self.logger, 'channels', [])
+        channels_str_or_list = get(dataset_config, self.logger, 'channels', [])
 
         # Convert channels to list
         channels = []
@@ -162,22 +162,22 @@ class GsiObsSpace(EvaBase):
 
         # Filenames to be read into this collection
         # -----------------------------------------
-        filenames = get(dataset, self.logger, 'filenames')
+        filenames = get(dataset_config, self.logger, 'filenames')
 
         # File variable type
-        if 'satellite' in dataset:
-            satellite = get(dataset, self.logger, 'satellite')
-            sensor = get(dataset, self.logger, 'sensor')
+        if 'satellite' in dataset_config:
+            satellite = get(dataset_config, self.logger, 'satellite')
+            sensor = get(dataset_config, self.logger, 'sensor')
         else:
-            variable = get(dataset, self.logger, 'variable')
+            variable = get(dataset_config, self.logger, 'variable')
 
         # Get missing value threshold
         # ---------------------------
-        threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
+        threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
         # Get the groups to be read
         # -------------------------
-        groups = get(dataset, self.logger, 'groups')
+        groups = get(dataset_config, self.logger, 'groups')
 
         # Loop over filenames
         # -------------------
@@ -191,7 +191,7 @@ class GsiObsSpace(EvaBase):
                 group_vars = get(group, self.logger, 'variables', 'all')
 
                 # Set the collection name
-                collection_name = dataset['name']
+                collection_name = dataset_config['name']
 
                 ds = open_dataset(filename, mask_and_scale=False,
                                     decode_times=False)
@@ -210,9 +210,9 @@ class GsiObsSpace(EvaBase):
                     if variable == 'uv':
                         group_vars = uv(group_vars)
 
-                # Check that all user variables are in the dataset
+                # Check that all user variables are in the dataset_config
                 if not all(v in list(ds.data_vars) for v in group_vars):
-                    self.logger.abort('For collection \'' + dataset['name'] + '\', group \'' +
+                    self.logger.abort('For collection \'' + dataset_config['name'] + '\', group \'' +
                                         group_name + '\' in file ' + filename +
                                         f' . Variables {group_vars} not all present in ' +
                                         f'the data set variables: {list(ds.keys())}')
@@ -235,11 +235,11 @@ class GsiObsSpace(EvaBase):
 
                 # Assert that the collection contains at least one variable
                 if not ds.keys():
-                    self.logger.abort('Collection \'' + dataset['name'] + '\', group \'' +
+                    self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
                                         group_name + '\' in file ' + filename +
                                         ' does not have any variables.')
 
-            # Add the dataset to the collections
+            # Add the dataset_config to the collections
             data_collections.create_or_add_to_collection(collection_name, ds, 'nobs')
 
         # Nan out unphysical values

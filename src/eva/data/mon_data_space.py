@@ -28,25 +28,25 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def execute(self, data_collections, timing):
+    def execute(self, dataset_config, data_collections, timing):
 
         # Set the collection name
         # -----------------------
-        collection_name = get(dataset, self.logger, 'name')
+        collection_name = get(dataset_config, self.logger, 'name')
 
         # Get control file and parse
         # --------------------------
-        control_file = get(dataset, self.logger, 'control_file')
+        control_file = get(dataset_config, self.logger, 'control_file')
         coords, dims, attribs, nvars, vars, channo = self.get_ctl_dict(control_file[0])
         ndims_used = self.get_ndims_used(dims)
 
         # Get the groups to be read
         # -------------------------
-        groups = get(dataset, self.logger, 'groups')
+        groups = get(dataset_config, self.logger, 'groups')
 
         # Get requested channels, convert to list
         # ---------------------------------------
-        channels_str_or_list = get(dataset, self.logger, 'channels')
+        channels_str_or_list = get(dataset_config, self.logger, 'channels')
         drop_channels = False
         requested_channels = []
 
@@ -58,7 +58,7 @@ class MonDataSpace(EvaBase):
 
         # Get requested regions, convert to list
         # --------------------------------------
-        regions_str_or_list = get(dataset, self.logger, 'regions')
+        regions_str_or_list = get(dataset_config, self.logger, 'regions')
         requested_regions = []
         drop_regions = False
 
@@ -74,12 +74,12 @@ class MonDataSpace(EvaBase):
 
         # Filenames to be read into this collection
         # -----------------------------------------
-        filenames = get(dataset, self.logger, 'filenames')
+        filenames = get(dataset_config, self.logger, 'filenames')
         ds_list = []
 
         # Get missing value threshold
         # ---------------------------
-        threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
+        threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
         for filename in filenames:
 
@@ -148,7 +148,7 @@ class MonDataSpace(EvaBase):
 
             # Assert that the collection contains at least one variable
             if not ds.keys():
-                self.logger.abort('Collection \'' + dataset['name'] + '\', group \'' +
+                self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
                                     group_name + '\' in file ' + filename +
                                     ' does not have any variables.')
 

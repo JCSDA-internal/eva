@@ -48,11 +48,11 @@ class IodaObsSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def execute(self, data_collections, timing):
+    def execute(self, dataset_config, data_collections, timing):
 
         # Get channels for radiances
         # --------------------------
-        channels_str_or_list = get(dataset, self.logger, 'channels', [])
+        channels_str_or_list = get(dataset_config, self.logger, 'channels', [])
 
         # Convert channels to list
         channels = []
@@ -61,15 +61,15 @@ class IodaObsSpace(EvaBase):
 
         # Filenames to be read into this collection
         # -----------------------------------------
-        filenames = get(dataset, self.logger, 'filenames')
+        filenames = get(dataset_config, self.logger, 'filenames')
 
         # Get missing value threshold
         # ---------------------------
-        threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
+        threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
         # Get the groups to be read
         # -------------------------
-        groups = get(dataset, self.logger, 'groups')
+        groups = get(dataset_config, self.logger, 'groups')
 
         # Loop over filenames
         # -------------------
@@ -127,7 +127,7 @@ class IodaObsSpace(EvaBase):
                     group_vars = 'all'
 
                 # Set the collection name
-                collection_name = dataset['name']
+                collection_name = dataset_config['name']
 
                 # Read the group
                 timing.start(f'IodaObsSpace: open_dataset {os.path.basename(filename)}')
@@ -139,9 +139,9 @@ class IodaObsSpace(EvaBase):
                 if group_vars == 'all':
                     group_vars = list(ds.data_vars)
 
-                # Check that all user variables are in the dataset
+                # Check that all user variables are in the dataset_config
                 if not all(v in list(ds.data_vars) for v in group_vars):
-                    self.logger.abort('For collection \'' + dataset['name'] + '\', group \'' +
+                    self.logger.abort('For collection \'' + dataset_config['name'] + '\', group \'' +
                                         group_name + '\' in file ' + filename +
                                         f' . Variables {group_vars} not all present in ' +
                                         f'the data set variables: {list(ds.keys())}')
@@ -170,17 +170,17 @@ class IodaObsSpace(EvaBase):
 
                 # Assert that the collection contains at least one variable
                 if not ds.keys():
-                    self.logger.abort('Collection \'' + dataset['name'] + '\', group \'' +
+                    self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
                                         group_name + '\' in file ' + filename +
                                         ' does not have any variables.')
 
                 # Merge with other groups
                 ds_groups = ds_groups.merge(ds)
 
-                # Close dataset
+                # Close dataset_config
                 ds.close()
 
-            # Add the dataset to the collections
+            # Add the dataset_config to the collections
             data_collections.create_or_add_to_collection(collection_name, ds_groups, 'Location')
 
         # Nan out unphysical values

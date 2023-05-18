@@ -40,13 +40,13 @@ class JediLog(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def execute(self, data_collections, timing):
+    def execute(self, dataset_config, data_collections, timing):
 
         # Get name of the log file to parse
-        jedi_log_to_parse = self.config.get('jedi_log_to_parse')
+        jedi_log_to_parse = self.dataset_config.get('jedi_log_to_parse')
 
         # Collection name to use
-        collection_name = self.config.get('collection_name')
+        collection_name = self.dataset_config.get('collection_name')
 
         # Read log file into a string
         with open(jedi_log_to_parse) as jedi_log_to_parse_open:
@@ -86,7 +86,7 @@ class JediLog(EvaBase):
             self.log_chunks.append('\n'.join(chunk))
 
         # Get list of things to parse from the dictionary
-        data_to_parse = self.config.get('data_to_parse')
+        data_to_parse = self.dataset_config.get('data_to_parse')
 
         # Loop and add to dataset
         for metric in data_to_parse:

@@ -33,17 +33,17 @@ class EvaInteractive():
 
     def load_ioda(self, filename):
         self.filename = filename
-        eva_dict = {'datasets': [{'filenames': [filename],
-                                  'groups': [],
-                                  'missing_value_threshold': 1.0e06,
-                                  'name': self.collection}]}
+        eva_dict = {'filenames': [filename],
+                    'groups': [],
+                    'missing_value_threshold': 1.0e06,
+                    'name': self.collection}
         creator = EvaFactory()
         eva_data_object = creator.create_eva_object('IodaObsSpace',
                                                     'data',
                                                     eva_dict,
                                                     self.logger,
                                                     self.timer)
-        eva_data_object.execute(self.data_collection, self.timer)
+        eva_data_object.execute(eva_dict, self.data_collection, self.timer)
 
     def scatter(self, x, y):
         x_group, x_var = x.split('::')
