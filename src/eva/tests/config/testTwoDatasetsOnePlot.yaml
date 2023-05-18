@@ -11,7 +11,7 @@ diagnostics:
         groups:
           - name: ObsValue
             variables: [airTemperature]
-          - name: MetaData    
+          - name: MetaData
       - name: forecast
         type: CubedSphereRestart
         variable: T
