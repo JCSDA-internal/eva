@@ -1,0 +1,87 @@
+diagnostics:
+
+  # Data read
+  # ---------
+- data:
+    datasets:
+      - name: observations
+        type: IodaObsSpace
+        filenames:
+          - ${data_input_path}/ioda_obs_space.aircraft.hofx.2020-12-14T210000Z.nc4
+        groups:
+          - name: ObsValue
+            variables: [airTemperature]
+          - name: MetaData    
+      - name: forecast
+        type: CubedSphereRestart
+        variable: T
+        resolution: C48
+        fv3_filenames:
+          - ${data_input_path}/20210323.150000.sfc_data.tile1.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile2.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile3.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile4.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile5.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile6.nc
+        orog_filenames:
+          - ${data_input_path}/C48_oro_data.tile1.nc
+          - ${data_input_path}/C48_oro_data.tile2.nc
+          - ${data_input_path}/C48_oro_data.tile3.nc
+          - ${data_input_path}/C48_oro_data.tile4.nc
+          - ${data_input_path}/C48_oro_data.tile5.nc
+          - ${data_input_path}/C48_oro_data.tile6.nc
+        groups:
+          - name: FV3Restart
+            variables: &variables [geolon,
+                                   geolat,
+                                   t2m]
+
+  graphics:
+    # Map plots
+    # ---------
+
+    # Observations
+    - batch figure:
+        variables: [t2m]
+      dynamic options:
+        - type: vminvmaxcmap
+          data variable: forecast::FV3Restart::t2m
+      figure:
+        figure size: [20,10]
+        layout: [1,1]
+        title: 'Observations | FV3 surface | 2m Temperature'
+        output name: map_plots/FV3/${variable}/fv3_surface_${variable}.png
+      plots:
+        - mapping:
+            projection: plcarr
+            domain: global
+          add_map_features: ['coastline']
+          add_colorbar:
+            label: 2m Temperature
+          add_grid:
+          layers:
+          - type: MapGridded
+            longitude:
+              variable: forecast::FV3Restart::geolon
+            latitude:
+              variable: forecast::FV3Restart::geolat
+            data:
+              variable: forecast::FV3Restart::t2m
+            label: 2m T
+            colorbar: true
+            cmap: jet
+            vmin: 250
+            vmax: 320
+          - type: MapScatter
+            longitude:
+              variable: observations::MetaData::longitude
+            latitude:
+              variable: observations::MetaData::latitude
+            data:
+              variable: observations::ObsValue::airTemperature
+            markersize: 2
+            label: Temperature
+            colorbar: true
+            cmap: jet
+            vmin: 250
+            vmax: 320
