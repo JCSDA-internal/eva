@@ -49,15 +49,15 @@ diagnostics:
       figure:
         figure size: [20,10]
         layout: [1,1]
-        title: 'Observations | FV3 surface | 2m Temperature'
-        output name: map_plots/FV3/${variable}/fv3_surface_${variable}.png
+        title: 'Aircraft TObservations | FV3 2m Temperature'
+        output name: map_plots/multi/fv3_t2m_aircraft_t.png
       plots:
         - mapping:
             projection: plcarr
             domain: global
           add_map_features: ['coastline']
           add_colorbar:
-            label: 2m Temperature
+            label: Temperature
           add_grid:
           layers:
           - type: MapGridded
