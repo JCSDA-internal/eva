@@ -91,13 +91,13 @@ class CubedSphereRestart(EvaBase):
             for var in group_vars:
                 if var in ['geolon', 'geolat']:
                     var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                            read_nc(orog_filenames, var,
-                                                                    resolution, self.logger))
+                                                         read_nc(orog_filenames, var,
+                                                                 resolution, self.logger))
 
                 else:
                     var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                            read_nc(fv3_filenames, var,
-                                                                    resolution, self.logger))
+                                                         read_nc(fv3_filenames, var,
+                                                                 resolution, self.logger))
 
             # Create dataset_config from data dictionary
             ds = xr.Dataset(var_dict)
@@ -105,8 +105,8 @@ class CubedSphereRestart(EvaBase):
             # Assert that the collection contains at least one variable
             if not ds.keys():
                 self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
-                                    group_name + '\' in file ' + filename +
-                                    ' does not have any variables.')
+                                  group_name + '\' in file ' + filename +
+                                  ' does not have any variables.')
 
         # Add the dataset_config to the collections
         data_collections.create_or_add_to_collection(collection_name, ds)

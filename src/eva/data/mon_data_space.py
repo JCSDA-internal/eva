@@ -93,7 +93,7 @@ class MonDataSpace(EvaBase):
             timestep_ds = None
 
             timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
-                                            x_range, y_range, z_range, cyc_darr)
+                                         x_range, y_range, z_range, cyc_darr)
 
             if attribs['sat']:
                 timestep_ds.attrs['satellite'] = attribs['sat']
@@ -149,8 +149,8 @@ class MonDataSpace(EvaBase):
             # Assert that the collection contains at least one variable
             if not ds.keys():
                 self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
-                                    group_name + '\' in file ' + filename +
-                                    ' does not have any variables.')
+                                  group_name + '\' in file ' + filename +
+                                  ' does not have any variables.')
 
         # Add the dataset to the collections
         data_collections.create_or_add_to_collection(collection_name, ds, 'cycle')

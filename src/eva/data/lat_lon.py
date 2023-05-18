@@ -23,8 +23,8 @@ class LatLon(EvaBase):
 
         if group not in valid_groups:
             self.logger.abort('For collection \'' + dataset_config['name'] + '\'' +
-                                f' group \'{group}\' is not a valid group type for LatLon.' +
-                                f' The valid types are {valid_groups}')
+                              f' group \'{group}\' is not a valid group type for LatLon.' +
+                              f' The valid types are {valid_groups}')
 
         # open the input netCDF file
         ds = xr.open_dataset(filename)
@@ -44,8 +44,8 @@ class LatLon(EvaBase):
         # Assert that the collection contains at least one variable
         if not ds.keys():
             self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
-                                group + '\' in file ' + filename +
-                                ' does not have any variables.')
+                              group + '\' in file ' + filename +
+                              ' does not have any variables.')
 
         # add the dataset_config to the collections
         data_collections.create_or_add_to_collection(collection_name, ds)

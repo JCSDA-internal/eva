@@ -132,7 +132,7 @@ class IodaObsSpace(EvaBase):
                 # Read the group
                 timing.start(f'IodaObsSpace: open_dataset {os.path.basename(filename)}')
                 ds = open_dataset(filename, group=group_name, mask_and_scale=False,
-                                    decode_times=False)
+                                  decode_times=False)
                 timing.stop(f'IodaObsSpace: open_dataset {os.path.basename(filename)}')
 
                 # If user specifies all variables set to group list
@@ -141,10 +141,11 @@ class IodaObsSpace(EvaBase):
 
                 # Check that all user variables are in the dataset_config
                 if not all(v in list(ds.data_vars) for v in group_vars):
-                    self.logger.abort('For collection \'' + dataset_config['name'] + '\', group \'' +
-                                        group_name + '\' in file ' + filename +
-                                        f' . Variables {group_vars} not all present in ' +
-                                        f'the data set variables: {list(ds.keys())}')
+                    self.logger.abort('For collection \'' + dataset_config['name'] +
+                                      '\', group \'' +
+                                      group_name + '\' in file ' + filename +
+                                      f' . Variables {group_vars} not all present in ' +
+                                      f'the data set variables: {list(ds.keys())}')
 
                 # Drop data variables not in user requested variables
                 vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
@@ -171,8 +172,8 @@ class IodaObsSpace(EvaBase):
                 # Assert that the collection contains at least one variable
                 if not ds.keys():
                     self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
-                                        group_name + '\' in file ' + filename +
-                                        ' does not have any variables.')
+                                      group_name + '\' in file ' + filename +
+                                      ' does not have any variables.')
 
                 # Merge with other groups
                 ds_groups = ds_groups.merge(ds)
