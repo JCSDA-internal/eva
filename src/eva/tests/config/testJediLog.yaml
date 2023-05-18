@@ -57,11 +57,12 @@ diagnostics:
               label: 'Normalized norm reduction'
 
 - data:
-    type: JediLog
-    collection_name: jedi_log_test
-    jedi_log_to_parse: ${data_input_path}/jedi_log.var_dripcg_ctest.txt
-    data_to_parse:
-      convergence: true
+    datasets:
+      - type: JediLog
+        collection_name: jedi_log_test
+        jedi_log_to_parse: ${data_input_path}/jedi_log.var_dripcg_ctest.txt
+        data_to_parse:
+          convergence: true
 
   # Make plots
   graphics:
