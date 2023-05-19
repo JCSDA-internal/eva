@@ -36,7 +36,7 @@ class Config(dict):
 
     # ----------------------------------------------------------------------------------------------
 
-    def get(self, key, default=None):
+    def get(self, key, default=None, abort_on_failure=True):
 
         if default is None:
 
@@ -44,12 +44,11 @@ class Config(dict):
 
                 return super().get(key)
 
-            else:
+            elif abort_on_failure:
 
                 self.logger.abort("Configuration does not have the key")
 
         else:
-
             return super().get(key, default)
 
 
