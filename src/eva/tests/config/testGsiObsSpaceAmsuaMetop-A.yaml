@@ -3,9 +3,9 @@ diagnostics:
   # Data read
   # ---------
 - data:
-    type: GsiObsSpace
     datasets:
       - name: experiment
+        type: GsiObsSpace
         satellite: metop-a
         sensor: amsua
         filenames:

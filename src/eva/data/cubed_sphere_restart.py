@@ -54,63 +54,62 @@ class CubedSphereRestart(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def execute(self, data_collections, timing):
+    def execute(self, dataset_config, data_collections, timing):
 
-        for dataset in self.config.get('datasets'):
-            # Filenames to be read into this collection
-            # -----------------------------------------
-            fv3_filenames = get(dataset, self.logger, 'fv3_filenames')
-            orog_filenames = get(dataset, self.logger, 'orog_filenames')
+        # Filenames to be read into this collection
+        # -----------------------------------------
+        fv3_filenames = get(dataset_config, self.logger, 'fv3_filenames')
+        orog_filenames = get(dataset_config, self.logger, 'orog_filenames')
 
-            # File variable type
-            variable = get(dataset, self.logger, 'variable')
+        # File variable type
+        variable = get(dataset_config, self.logger, 'variable')
 
-            # File resolution
-            resolution = get(dataset, self.logger, 'resolution')
-            resolution = int(resolution.replace('C', ''))
+        # File resolution
+        resolution = get(dataset_config, self.logger, 'resolution')
+        resolution = int(resolution.replace('C', ''))
 
-            # Get missing value threshold
-            # ---------------------------
-            threshold = float(get(dataset, self.logger, 'missing_value_threshold', 1.0e30))
+        # Get missing value threshold
+        # ---------------------------
+        threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
-            # Get the groups to be read
-            # -------------------------
-            groups = get(dataset, self.logger, 'groups')
+        # Get the groups to be read
+        # -------------------------
+        groups = get(dataset_config, self.logger, 'groups')
 
-            for group in groups:
+        for group in groups:
 
-                # Group name and variables
-                group_name = get(group, self.logger, 'name')
-                group_vars = get(group, self.logger, 'variables', 'all')
+            # Group name and variables
+            group_name = get(group, self.logger, 'name')
+            group_vars = get(group, self.logger, 'variables', 'all')
 
-                # Set the collection name
-                collection_name = dataset['name']
+            # Set the collection name
+            collection_name = dataset_config['name']
 
-                var_dict = {}
+            var_dict = {}
 
-                # Loop through group vars to create data dictionary
-                for var in group_vars:
-                    if var in ['geolon', 'geolat']:
-                        var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                             read_nc(orog_filenames, var,
-                                                                     resolution, self.logger))
+            # Loop through group vars to create data dictionary
+            for var in group_vars:
+                if var in ['geolon', 'geolat']:
+                    var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
+                                                         read_nc(orog_filenames, var,
+                                                                 resolution, self.logger))
 
-                    else:
-                        var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                             read_nc(fv3_filenames, var,
-                                                                     resolution, self.logger))
+                else:
+                    var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
+                                                         read_nc(fv3_filenames, var,
+                                                                 resolution, self.logger))
 
-                # Create dataset from data dictionary
-                ds = xr.Dataset(var_dict)
+            # Create dataset_config from data dictionary
+            ds = xr.Dataset(var_dict)
 
-                # Assert that the collection contains at least one variable
-                if not ds.keys():
-                    self.logger.abort('Collection \'' + dataset['name'] + '\', group \'' +
-                                      group_name + '\' in file ' + filename +
-                                      ' does not have any variables.')
+            # Assert that the collection contains at least one variable
+            if not ds.keys():
+                self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
+                                  group_name + '\' in file ' + filename +
+                                  ' does not have any variables.')
 
-            # Add the dataset to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds)
+        # Add the dataset_config to the collections
+        data_collections.create_or_add_to_collection(collection_name, ds)
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)

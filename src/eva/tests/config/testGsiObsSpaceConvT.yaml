@@ -3,9 +3,9 @@ diagnostics:
   # Data read
   # ---------
 - data:
-    type: GsiObsSpace
     datasets:
       - name: experiment
+        type: GsiObsSpace
         variable: t
         filenames:
           - ${data_input_path}/gsi_obs_space.conv_t_ges.2020092000.nc4
