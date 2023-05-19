@@ -125,7 +125,7 @@ diagnostics:
               x:
                 variable: experiment::GsiIeee::channel
               y:
-               variable: experiment::GsiIeee::count4
+                variable: experiment::GsiIeee::count4
               color: 'red'
               label: '2015051512'
 
