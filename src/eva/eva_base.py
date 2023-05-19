@@ -145,33 +145,25 @@ def eva(eva_config, eva_logger=None):
             msg = "diagnostic config must contain 'data' and 'graphics'"
             raise KeyError(msg)
 
-        # Extract name for this diagnostic data type
-        try:
-            eva_data_class_name = diagnostic_config['data']['type']
-        except Exception as e:
-            msg = '\'type\' key not found. \'diagnostic_data_config\': ' \
-                  f'{diagnostic_data_config}, error: {e}'
-            raise KeyError(msg)
-
         # Create the data collections
         # ---------------------------
         data_collections = DataCollections()
 
         # Create the data object
         creator = EvaFactory()
-        timing.start('DataObjectConstructor')
-        eva_data_object = creator.create_eva_object(eva_data_class_name,
+        timing.start('DataConstructor')
+        eva_data_object = creator.create_eva_object('DataDriver',
                                                     'data',
-                                                    diagnostic_config['data'],
+                                                    diagnostic_config,
                                                     eva_logger,
                                                     timing)
-        timing.stop('DataObjectConstructor')
+        timing.stop('DataConstructor')
 
         # Prepare diagnostic data
         logger.info(f'Running execute for {eva_data_object.name}')
-        timing.start('DataObjectExecute')
+        timing.start('DataExecute')
         eva_data_object.execute(data_collections, timing)
-        timing.stop('DataObjectExecute')
+        timing.stop('DataExecute')
 
         # Create the transforms
         if 'transforms' in diagnostic_config:

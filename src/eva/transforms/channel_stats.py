@@ -50,6 +50,8 @@ def channel_stats(config, data_collections):
         for group in groups:
             for variable in variables:
 
+                if variable == 'Latitude' or variable == 'Longitude':
+                    continue
                 # Replace collection, group, variable in template
                 [variable_name] = replace_cgv(logger, collection, group, variable,
                                               variable_name_template)
