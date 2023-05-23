@@ -58,15 +58,13 @@ class CubedSphereRestart(EvaBase):
 
         # Filenames to be read into this collection
         # -----------------------------------------
-        fv3_filenames = get(dataset_config, self.logger, 'fv3_filenames')
+        restart_files = get(dataset_config, self.logger, 'restart_filenames')
         orog_filenames = get(dataset_config, self.logger, 'orog_filenames')
 
-        # File variable type
-        variable = get(dataset_config, self.logger, 'variable')
-
         # File resolution
-        resolution = get(dataset_config, self.logger, 'resolution')
-        resolution = int(resolution.replace('C', ''))
+        npx = get(dataset_config, self.logger, 'npx')
+        npy = get(dataset_config, self.logger, 'npy')
+        npz = get(dataset_config, self.logger, 'npz')
 
         # Get missing value threshold
         # ---------------------------
