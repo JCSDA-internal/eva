@@ -58,7 +58,7 @@ class CubedSphereRestart(EvaBase):
 
         # Filenames to be read into this collection
         # -----------------------------------------
-        restart_files = get(dataset_config, self.logger, 'restart_filenames')
+        restart_sets = get(dataset_config, self.logger, 'restart_filenames')
         orog_filenames = get(dataset_config, self.logger, 'orog_filenames')
 
         # File resolution
@@ -70,11 +70,21 @@ class CubedSphereRestart(EvaBase):
         # ---------------------------
         threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
-        # Get the groups to be read
+        # Get the variables to be read
         # -------------------------
-        groups = get(dataset_config, self.logger, 'groups')
+        orog_vars = get(dataset_config, self.logger, 'orography variables')
+        vars_2d = get(dataset_config, self.logger, '2d variables')
+        vars_3d = get(dataset_config, self.logger, '3d variables')
 
-        for group in groups:
+        # Read orographic fields first
+        # -------------------------
+
+        # Loop through sets of RESTART files
+        # -------------------------
+        for restart_filelist in restart_sets:
+            print(restart_filelist)
+
+        #for group in groups:
 
             # Group name and variables
             group_name = get(group, self.logger, 'name')
@@ -106,8 +116,8 @@ class CubedSphereRestart(EvaBase):
                                   group_name + '\' in file ' + filename +
                                   ' does not have any variables.')
 
-        # Add the dataset_config to the collections
-        data_collections.create_or_add_to_collection(collection_name, ds)
+            # Add the dataset_config to the collections
+            data_collections.create_or_add_to_collection(collection_name, ds)
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
