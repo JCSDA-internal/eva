@@ -96,7 +96,7 @@ class CubedSphereRestart(EvaBase):
         group_name = 'FV3Vars2D'
         for var in vars_2d:
             var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                 read_fms_tiles(restart_filelist,
+                                                 read_fms_tiles(restart_filenames,
                                                                 var, self.logger))
 
         # 3D variables
@@ -104,7 +104,7 @@ class CubedSphereRestart(EvaBase):
         group_name = 'FV3Vars3D'
         for var in vars_3d:
             var_dict[group_name + '::' + var] = (["lev", "lon", "lat", "tile"],
-                                                 read_fms_tiles(restart_filelist,
+                                                 read_fms_tiles(restart_filenames,
                                                                 var, self.logger))
 
         # Create dataset_config from data dictionary
