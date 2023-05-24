@@ -35,7 +35,7 @@ diagnostics:
         variables: [t2m]
       dynamic options:
         - type: vminvmaxcmap
-          data variable: experiment::FV3Restart::t2m
+          data variable: experiment::FV3Vars2D::t2m
       figure:
         figure size: [20,10]
         layout: [1,1]
@@ -52,11 +52,11 @@ diagnostics:
           layers:
           - type: MapGridded
             longitude:
-              variable: experiment::FV3Restart::geolon
+              variable: experiment::FV3Orog::geolon
             latitude:
-              variable: experiment::FV3Restart::geolat
+              variable: experiment::FV3Orog::geolat
             data:
-              variable: experiment::FV3Restart::t2m
+              variable: experiment::FV3Vars2D::t2m
             label: 2m T
             colorbar: true
             cmap: ${dynamic_cmap}
