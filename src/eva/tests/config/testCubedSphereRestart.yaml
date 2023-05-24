@@ -10,12 +10,12 @@ diagnostics:
         npy: 49
         npz: 127
         restart_filenames:
-          - - ${data_input_path}/20210323.150000.sfc_data.tile1.nc
-            - ${data_input_path}/20210323.150000.sfc_data.tile2.nc
-            - ${data_input_path}/20210323.150000.sfc_data.tile3.nc
-            - ${data_input_path}/20210323.150000.sfc_data.tile4.nc
-            - ${data_input_path}/20210323.150000.sfc_data.tile5.nc
-            - ${data_input_path}/20210323.150000.sfc_data.tile6.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile1.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile2.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile3.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile4.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile5.nc
+          - ${data_input_path}/20210323.150000.sfc_data.tile6.nc
         orog_filenames:
           - ${data_input_path}/C48_oro_data.tile1.nc
           - ${data_input_path}/C48_oro_data.tile2.nc
@@ -24,7 +24,7 @@ diagnostics:
           - ${data_input_path}/C48_oro_data.tile5.nc
           - ${data_input_path}/C48_oro_data.tile6.nc
         2d variables: [t2m]
-        orographic variables: [geolon, geolat]
+        orography variables: [geolon, geolat]
 
   graphics:
     # Map plots

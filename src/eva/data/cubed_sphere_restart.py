@@ -33,7 +33,7 @@ def read_fms_tiles(files, variable, logger):
 
         with Dataset(file, mode='r') as f:
             try:
-                var = f.variables[variable][:]
+                var = np.squeeze(f.variables[variable][:])
             except KeyError:
                 logger.abort(f"{variable} is not a valid variable. \nExiting ...")
 
@@ -43,7 +43,7 @@ def read_fms_tiles(files, variable, logger):
 
             if i == 0:
                 # need to create outvar on the first file
-                outvar = np.empty(var.shape+len(files), dtype=var.dtype)
+                outvar = np.empty(var.shape+(len(files),), dtype=var.dtype)
             # add values to the correct part of the array
             outvar[..., i] = var
 
@@ -61,7 +61,7 @@ class CubedSphereRestart(EvaBase):
 
         # Filenames to be read into this collection
         # -----------------------------------------
-        restart_sets = get(dataset_config, self.logger, 'restart_filenames')
+        restart_filenames = get(dataset_config, self.logger, 'restart_filenames')
         orog_filenames = get(dataset_config, self.logger, 'orog_filenames')
 
         # File resolution
@@ -80,8 +80,8 @@ class CubedSphereRestart(EvaBase):
         # Get the variables to be read
         # -------------------------
         orog_vars = get(dataset_config, self.logger, 'orography variables')
-        vars_2d = get(dataset_config, self.logger, '2d variables')
-        vars_3d = get(dataset_config, self.logger, '3d variables')
+        vars_2d = get(dataset_config, self.logger, '2d variables', default=[])
+        vars_3d = get(dataset_config, self.logger, '3d variables', default=[])
 
         # Read orographic fields first
         # -------------------------
@@ -90,48 +90,41 @@ class CubedSphereRestart(EvaBase):
         for var in orog_vars:
             var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
                                                  read_fms_tiles(orog_filenames, var, self.logger))
+
+        # 2D variables
+        # -------------------------
+        group_name = 'FV3Vars2D'
+        for var in vars_2d:
+            var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
+                                                 read_fms_tiles(restart_filelist,
+                                                                var, self.logger))
+
+        # 3D variables
+        # -------------------------
+        group_name = 'FV3Vars3D'
+        for var in vars_3d:
+            var_dict[group_name + '::' + var] = (["lev", "lon", "lat", "tile"],
+                                                 read_fms_tiles(restart_filelist,
+                                                                var, self.logger))
+
         # Create dataset_config from data dictionary
+        # -------------------------
         ds = xr.Dataset(var_dict)
 
         # Assert that the collection contains at least one variable
+        # -------------------------
         if not ds.keys():
             self.logger.abort('Collection \'' + collection_name + '\', group \'' +
                               group_name + '\' does not have any variables.')
 
         # Add the dataset_config to the collections
+        # -------------------------
         data_collections.create_or_add_to_collection(collection_name, ds)
 
-        # Loop through sets of RESTART files
-        # -------------------------
-        for restart_filelist in restart_sets:
-            var_dict = {}
-            # 2D vars
-            group_name = 'FV3Vars2D'
-            for var in vars_2d:
-                var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                     read_fms_tiles(restart_filelist,
-                                                                    var, self.logger))
-
-            # 3D vars
-            group_name = 'FV3Vars3D'
-            for var in vars_3d:
-                var_dict[group_name + '::' + var] = (["lev", "lon", "lat", "tile"],
-                                                     read_fms_tiles(restart_filelist,
-                                                                    var, self.logger))
-
-            # Create dataset_config from data dictionary
-            ds = xr.Dataset(var_dict)
-
-            # Assert that the collection contains at least one variable
-            if not ds.keys():
-                self.logger.abort('Collection \'' + collection_name + '\', group \'' +
-                                  group_name + '\' does not have any variables.')
-
-            # Add the dataset_config to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds)
-
         # Nan out unphysical values
+        # -------------------------
         data_collections.nan_float_values_outside_threshold(threshold)
 
         # Display the contents of the collections for helping the user with making plots
+        # -------------------------
         data_collections.display_collections()
