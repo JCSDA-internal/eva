@@ -6,9 +6,7 @@ diagnostics:
     datasets:
       - name: experiment
         type: CubedSphereRestart
-        variable: T
-        resolution: C48
-        fv3_filenames:
+        restart_filenames:
           - ${data_input_path}/20210323.150000.sfc_data.tile1.nc
           - ${data_input_path}/20210323.150000.sfc_data.tile2.nc
           - ${data_input_path}/20210323.150000.sfc_data.tile3.nc
@@ -22,11 +20,8 @@ diagnostics:
           - ${data_input_path}/C48_oro_data.tile4.nc
           - ${data_input_path}/C48_oro_data.tile5.nc
           - ${data_input_path}/C48_oro_data.tile6.nc
-        groups:
-          - name: FV3Restart
-            variables: &variables [geolon,
-                                   geolat,
-                                   t2m]
+        2d variables: [t2m]
+        orography variables: [geolon, geolat]
 
   graphics:
     # Map plots
@@ -37,7 +32,7 @@ diagnostics:
         variables: [t2m]
       dynamic options:
         - type: vminvmaxcmap
-          data variable: experiment::FV3Restart::t2m
+          data variable: experiment::FV3Vars2D::t2m
       figure:
         figure size: [20,10]
         layout: [1,1]
@@ -54,11 +49,11 @@ diagnostics:
           layers:
           - type: MapGridded
             longitude:
-              variable: experiment::FV3Restart::geolon
+              variable: experiment::FV3Orog::geolon
             latitude:
-              variable: experiment::FV3Restart::geolat
+              variable: experiment::FV3Orog::geolat
             data:
-              variable: experiment::FV3Restart::t2m
+              variable: experiment::FV3Vars2D::t2m
             label: 2m T
             colorbar: true
             cmap: ${dynamic_cmap}
