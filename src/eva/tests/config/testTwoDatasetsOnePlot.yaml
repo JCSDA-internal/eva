@@ -14,9 +14,6 @@ diagnostics:
           - name: MetaData
       - name: forecast
         type: CubedSphereRestart
-        npx: 49
-        npy: 49
-        npz: 127
         restart_filenames:
           - ${data_input_path}/20210323.150000.sfc_data.tile1.nc
           - ${data_input_path}/20210323.150000.sfc_data.tile2.nc
