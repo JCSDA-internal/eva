@@ -64,11 +64,6 @@ class CubedSphereRestart(EvaBase):
         restart_filenames = get(dataset_config, self.logger, 'restart_filenames')
         orog_filenames = get(dataset_config, self.logger, 'orog_filenames')
 
-        # File resolution
-        npx = get(dataset_config, self.logger, 'npx')
-        npy = get(dataset_config, self.logger, 'npy')
-        npz = get(dataset_config, self.logger, 'npz')
-
         # Get missing value threshold
         # ---------------------------
         threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
