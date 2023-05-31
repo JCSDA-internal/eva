@@ -1,4 +1,4 @@
-<img src="https://github.com/JCSDA-internal/eva-docs/blob/gh-pages/logo/eva_logo_round.png" width="200" align=left> 
+<img src="https://github.com/JCSDA-internal/eva-docs/blob/develop/doc/_static/images/eva_logo_ball.png" width="200" align=left> 
 
 
 <div
@@ -7,10 +7,10 @@
   
 # Evaluation and Verification of the Analysis (EVA)
 
-![Application tests](https://github.com/JCSDA-internal/eva/actions/workflows/eva_tests_application.yml/badge.svg)
-![Notebook tests](https://github.com/JCSDA-internal/eva/actions/workflows/eva_tests_notebook.yml/badge.svg)
-![Python coding norms](https://github.com/JCSDA-internal/eva/actions/workflows/python_coding_norms.yml/badge.svg)
-![YAML coding norms](https://github.com/JCSDA-internal/eva/actions/workflows/yaml_coding_norms.yml/badge.svg)
+[![Eva Application Tests](https://github.com/JCSDA-internal/eva/actions/workflows/eva_tests_application.yml/badge.svg)](https://github.com/JCSDA-internal/eva/actions/workflows/eva_tests_application.yml)
+[![Eva Notebook Tests](https://github.com/JCSDA-internal/eva/actions/workflows/eva_tests_notebook.yml/badge.svg)](https://github.com/JCSDA-internal/eva/actions/workflows/eva_tests_notebook.yml)
+[![Python Coding Norms](https://github.com/JCSDA-internal/eva/actions/workflows/python_coding_norms.yml/badge.svg)](https://github.com/JCSDA-internal/eva/actions/workflows/python_coding_norms.yml)
+[![YAML Coding Norms](https://github.com/JCSDA-internal/eva/actions/workflows/yaml_coding_norms.yml/badge.svg)](https://github.com/JCSDA-internal/eva/actions/workflows/yaml_coding_norms.yml)
 
 </div>
 
