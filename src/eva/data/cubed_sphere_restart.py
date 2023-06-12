@@ -18,30 +18,33 @@ from eva.utilities.config import get
 # --------------------------------------------------------------------------------------------------
 
 
-def read_nc(files, variable, resolution, logger):
+def read_fms_tiles(files, variable, logger):
     """
-    Given list of ncfiles, variable and resolution, make a 3D variable.
+    Given list of FMS netCDF files and a variable name,
+    stitch the files together into N+1 dimension variable
     """
     # Check there are no duplicates in files
     if len(files) != len(set(files)):
         logger.abort('Duplicate files were found in input file ' +
                      f'list: {files}. \nExiting ...')
 
-    # Create empty variable to store data in
-    outvar = np.empty((resolution, resolution, len(files)))
-
     # Loop through nc files and store variable data in outvar
     for i, file in enumerate(files):
 
         with Dataset(file, mode='r') as f:
             try:
-                var = f.variables[variable][:]
+                var = np.squeeze(f.variables[variable][:])
             except KeyError:
                 logger.abort(f"{variable} is not a valid variable. \nExiting ...")
 
             if variable in ['lon', 'geolon']:
+                # transform longitudes to be -180 to 180
                 var[np.where(var > 180)] = var[np.where(var > 180)] - 360
 
+            if i == 0:
+                # need to create outvar on the first file
+                outvar = np.empty(var.shape+(len(files),), dtype=var.dtype)
+            # add values to the correct part of the array
             outvar[..., i] = var
 
     return outvar
@@ -58,61 +61,65 @@ class CubedSphereRestart(EvaBase):
 
         # Filenames to be read into this collection
         # -----------------------------------------
-        fv3_filenames = get(dataset_config, self.logger, 'fv3_filenames')
+        restart_filenames = get(dataset_config, self.logger, 'restart_filenames')
         orog_filenames = get(dataset_config, self.logger, 'orog_filenames')
-
-        # File variable type
-        variable = get(dataset_config, self.logger, 'variable')
-
-        # File resolution
-        resolution = get(dataset_config, self.logger, 'resolution')
-        resolution = int(resolution.replace('C', ''))
 
         # Get missing value threshold
         # ---------------------------
         threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
-        # Get the groups to be read
+        # Get collection name
+        # ---------------------------
+        collection_name = dataset_config['name']
+
+        # Get the variables to be read
         # -------------------------
-        groups = get(dataset_config, self.logger, 'groups')
+        orog_vars = get(dataset_config, self.logger, 'orography variables')
+        vars_2d = get(dataset_config, self.logger, '2d variables', default=[])
+        vars_3d = get(dataset_config, self.logger, '3d variables', default=[])
 
-        for group in groups:
+        # Read orographic fields first
+        # -------------------------
+        var_dict = {}
+        group_name = 'FV3Orog'
+        for var in orog_vars:
+            var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
+                                                 read_fms_tiles(orog_filenames, var, self.logger))
 
-            # Group name and variables
-            group_name = get(group, self.logger, 'name')
-            group_vars = get(group, self.logger, 'variables', 'all')
+        # 2D variables
+        # -------------------------
+        group_name = 'FV3Vars2D'
+        for var in vars_2d:
+            var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
+                                                 read_fms_tiles(restart_filenames,
+                                                                var, self.logger))
 
-            # Set the collection name
-            collection_name = dataset_config['name']
+        # 3D variables
+        # -------------------------
+        group_name = 'FV3Vars3D'
+        for var in vars_3d:
+            var_dict[group_name + '::' + var] = (["lev", "lon", "lat", "tile"],
+                                                 read_fms_tiles(restart_filenames,
+                                                                var, self.logger))
 
-            var_dict = {}
+        # Create dataset_config from data dictionary
+        # -------------------------
+        ds = xr.Dataset(var_dict)
 
-            # Loop through group vars to create data dictionary
-            for var in group_vars:
-                if var in ['geolon', 'geolat']:
-                    var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                         read_nc(orog_filenames, var,
-                                                                 resolution, self.logger))
-
-                else:
-                    var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                         read_nc(fv3_filenames, var,
-                                                                 resolution, self.logger))
-
-            # Create dataset_config from data dictionary
-            ds = xr.Dataset(var_dict)
-
-            # Assert that the collection contains at least one variable
-            if not ds.keys():
-                self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
-                                  group_name + '\' in file ' + filename +
-                                  ' does not have any variables.')
+        # Assert that the collection contains at least one variable
+        # -------------------------
+        if not ds.keys():
+            self.logger.abort('Collection \'' + collection_name + '\', group \'' +
+                              group_name + '\' does not have any variables.')
 
         # Add the dataset_config to the collections
+        # -------------------------
         data_collections.create_or_add_to_collection(collection_name, ds)
 
         # Nan out unphysical values
+        # -------------------------
         data_collections.nan_float_values_outside_threshold(threshold)
 
         # Display the contents of the collections for helping the user with making plots
+        # -------------------------
         data_collections.display_collections()
