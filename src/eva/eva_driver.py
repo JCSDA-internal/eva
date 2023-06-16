@@ -1,9 +1,9 @@
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
-from eva.data import data_driver
-from eva.transforms import transform_driver
-from eva.plot_tools import figure_driver
-
+from eva.data.data_driver import data_driver
+from eva.transforms.transform_driver import transform_driver
+from eva.plot_tools.figure_driver import figure_driver
+from eva.data.data_collections import DataCollections
 
 def eva(eva_config, eva_logger=None):
 
@@ -57,7 +57,7 @@ def eva(eva_config, eva_logger=None):
             logger.info(f'Running transform driver')
             timing.start('TransformDriverExecute')
             transform_driver(diagnostic_config, data_collections, timing, logger)
-            timing.stop('TransformsDriverExecute')
+            timing.stop('TransformDriverExecute')
 
         # Generate figure(s)
         logger.info(f'Running figure driver')

@@ -43,7 +43,7 @@ def transform_driver(config, data_collections, timing, logger):
 
     # Display the contents of the collections after updating with transforms
     if transforms:
-        self.logger.info('Tranforms complete. Collections after transforms:')
+        logger.info('Tranforms complete. Collections after transforms:')
         data_collections.display_collections()
 
 
