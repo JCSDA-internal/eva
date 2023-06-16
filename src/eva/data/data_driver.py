@@ -12,7 +12,7 @@
 
 
 from eva.utilities.config import get
-from eva.eva_base import EvaBase, EvaFactory
+from eva.eva_base import EvaFactory
 
 import importlib
 import os
@@ -20,39 +20,36 @@ import os
 
 # --------------------------------------------------------------------------------------------------
 
+def data_driver(config, data_collections, timing, logger):
 
-class DataDriver(EvaBase):
+    # Get list of dataset dictionaries
+    datasets = get(config['data'], logger, 'datasets')
 
-    def execute(self, data_collections, timing):
+    # Loop over datasets
+    for dataset in datasets:
 
-        # Get list of dataset dictionaries
-        datasets = get(self.config['data'], self.logger, 'datasets')
+        # Extract name for this diagnostic data type
+        try:
+            eva_data_class_name = dataset['type']
+        except Exception as e:
+            msg = '\'type\' key not found. \'diagnostic_data_config\': ' \
+                f'{diagnostic_data_config}, error: {e}'
+            raise KeyError(msg)
 
-        # Loop over datasets
-        for dataset in datasets:
+        # Create the data object
+        creator = EvaFactory()
+        timing.start('DataObjectConstructor')
+        eva_data_object = creator.create_eva_object(eva_data_class_name,
+                                                    'data',
+                                                    dataset,
+                                                    logger,
+                                                    timing)
+        timing.stop('DataObjectConstructor')
 
-            # Extract name for this diagnostic data type
-            try:
-                eva_data_class_name = dataset['type']
-            except Exception as e:
-                msg = '\'type\' key not found. \'diagnostic_data_config\': ' \
-                    f'{diagnostic_data_config}, error: {e}'
-                raise KeyError(msg)
-
-            # Create the data object
-            creator = EvaFactory()
-            timing.start('DataObjectConstructor')
-            eva_data_object = creator.create_eva_object(eva_data_class_name,
-                                                        'data',
-                                                        dataset,
-                                                        self.logger,
-                                                        timing)
-            timing.stop('DataObjectConstructor')
-
-            # Prepare diagnostic data
-            self.logger.info(f'Running execute for {eva_data_object.name}')
-            timing.start('DataObjectExecute')
-            eva_data_object.execute(dataset, data_collections, timing)
-            timing.stop('DataObjectExecute')
+        # Prepare diagnostic data
+        logger.info(f'Running execute for {eva_data_object.name}')
+        timing.start('DataObjectExecute')
+        eva_data_object.execute(dataset, data_collections, timing)
+        timing.stop('DataObjectExecute')
 
 # --------------------------------------------------------------------------------------------------
