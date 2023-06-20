@@ -21,7 +21,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import Config
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
-from eva.utilities.utils import camelcase_to_underscore, load_yaml_file
+from eva.utilities.utils import camelcase_to_underscore
 from eva.data.data_collections import DataCollections
 
 

@@ -23,7 +23,7 @@ import os
 def data_driver(config, data_collections, timing, logger):
 
     # Get list of dataset dictionaries
-    datasets = get(config['data'], logger, 'datasets')
+    datasets = get(config, logger, 'datasets')
 
     # Loop over datasets
     for dataset in datasets:
