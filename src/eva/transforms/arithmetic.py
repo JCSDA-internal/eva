@@ -11,6 +11,7 @@
 
 
 from math import sqrt
+from numpy import log
 import re
 from statistics import mean
 
@@ -61,7 +62,7 @@ def arithmetic(config, data_collections):
                 expression = ''.join(expression.split())
 
                 # Split math equation
-                expression_elements = re.split(r'\(|\)|-|\*|\+|\/', expression)
+                expression_elements = re.split(r'\(|\)|-|\*|\+|\/|log', expression)
 
                 # Remove empty elements and duplicates from expression elements
                 expression_elements = remove_empty_from_list_of_strings(expression_elements)
