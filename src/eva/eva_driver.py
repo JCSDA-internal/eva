@@ -6,6 +6,7 @@ from eva.plot_tools.figure_driver import figure_driver
 from eva.data.data_collections import DataCollections
 from eva.utilities.utils import load_yaml_file
 
+
 def eva(eva_config, eva_logger=None):
 
     # Create timing object
@@ -23,6 +24,7 @@ def eva(eva_config, eva_logger=None):
     else:
         # Create dictionary from the input file
         eva_dict = load_yaml_file(eva_config, logger)
+    timing.stop('Generate Dictionary')
 
     # Each diagnostic should have two dictionaries: data and graphics
     if not all(sub_config in eva_dict for sub_config in ['datasets', 'graphics']):
