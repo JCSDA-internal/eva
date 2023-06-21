@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-# (C) Copyright 2021-2022 NOAA/NWS/EMC
+# (C) Copyright 2021-2023 NOAA/NWS/EMC
 #
-# (C) Copyright 2021-2022 United States Government as represented by the Administrator of the
+# (C) Copyright 2021-2023 United States Government as represented by the Administrator of the
 # National Aeronautics and Space Administration. All Rights Reserved.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
@@ -19,15 +19,13 @@ import os
 from eva.eva_path import return_eva_path
 from eva.utilities.logger import Logger, textcolors
 from eva.utilities.utils import load_yaml_file, replace_vars_dict, replace_vars_notebook
-from eva.plot_tools import figure_driver
-from eva.plot_tools.figure_driver import FigureDriver
 
 # --------------------------------------------------------------------------------------------------
 
 
 def application_tests(logger):
 
-    from eva.eva_base import eva
+    from eva.eva_driver import eva
 
     # Write some messaging
     logger.info(f'Running Eva application tests ...')
@@ -64,7 +62,7 @@ def application_tests(logger):
 
 def notebook_tests(logger):
 
-    from eva.eva_base import eva
+    from eva.eva_driver import eva
     import nbformat
     from nbconvert.preprocessors import ExecutePreprocessor
 

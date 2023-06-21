@@ -10,46 +10,41 @@
 
 # --------------------------------------------------------------------------------------------------
 
-
 from eva.utilities.config import get
-from eva.eva_base import EvaBase
 
 import importlib
 import os
 
-
 # --------------------------------------------------------------------------------------------------
 
 
-class TransformDriver(EvaBase):
+def transform_driver(config, data_collections, timing, logger):
 
-    def execute(self, data_collections, timing):
+    # Get list of transform dictionaries
+    transforms = get(config, logger, 'transforms')
 
-        # Get list of transform dictionaries
-        transforms = get(self.config, self.logger, 'transforms')
+    # Loop over transforms
+    for transform in transforms:
 
-        # Loop over transforms
-        for transform in transforms:
+        # Get the transform type
+        transform_type = get(transform, logger, 'transform')
 
-            # Get the transform type
-            transform_type = get(transform, self.logger, 'transform')
+        # Replace spaces with underscore
+        transform_type = transform_type.replace(' ', '_')
 
-            # Replace spaces with underscore
-            transform_type = transform_type.replace(' ', '_')
+        # Instantiate the tranform object
+        transform_method = getattr(importlib.import_module('eva.transforms.'+transform_type),
+                                   transform_type)
 
-            # Instantiate the tranform object
-            transform_method = getattr(importlib.import_module('eva.transforms.'+transform_type),
-                                       transform_type)
+        # Call the transform
+        timing.start(f'Transform: {transform_type}')
+        transform_method(transform, data_collections)
+        timing.stop(f'Transform: {transform_type}')
 
-            # Call the transform
-            timing.start(f'Transform: {transform_type}')
-            transform_method(transform, data_collections)
-            timing.stop(f'Transform: {transform_type}')
-
-        # Display the contents of the collections after updating with transforms
-        if transforms:
-            self.logger.info('Tranforms complete. Collections after transforms:')
-            data_collections.display_collections()
+    # Display the contents of the collections after updating with transforms
+    if transforms:
+        logger.info('Tranforms complete. Collections after transforms:')
+        data_collections.display_collections()
 
 
 # --------------------------------------------------------------------------------------------------
