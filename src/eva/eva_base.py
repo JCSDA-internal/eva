@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # (C) Copyright 2021-2022 NOAA/NWS/EMC
 #
 # (C) Copyright 2021-2022 United States Government as represented by the Administrator of the
