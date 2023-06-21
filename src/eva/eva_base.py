@@ -31,7 +31,7 @@ from eva.data.data_collections import DataCollections
 class EvaBase(ABC):
 
     # Base class constructor
-    def __init__(self, eva_class_name, config, eva_logger, timing):
+    def __init__(self, eva_class_name, eva_logger, timing):
 
         # Replace logger
         # --------------
@@ -48,24 +48,26 @@ class EvaBase(ABC):
         # -----------------------------------
         self.logger.info(f"  Initializing eva {self.name} object")
 
-        # Create a configuration object
-        # -----------------------------
-        self.config = Config(config, self.logger)
-
     @abstractmethod
-    def execute(self, data_collections, timing):
+    def execute(self, config, data_collections, timing):
         '''
         Each class must implement this method and it is where it will do all of its work.
         '''
         pass
 
+    @abstractmethod
+    def generate_default_config(self, filenames, collection_name):
+        '''
+        Each class must implement this method and it is where it will do all of its work.
+        '''
+        pass
 
 # --------------------------------------------------------------------------------------------------
 
 
 class EvaFactory():
 
-    def create_eva_object(self, eva_class_name, eva_group_name, config, eva_logger, timing):
+    def create_eva_object(self, eva_class_name, eva_group_name, eva_logger, timing):
 
         # Create temporary logger
         logger = Logger('EvaFactory')
@@ -102,4 +104,4 @@ class EvaFactory():
 
         # Return implementation of the class (calls base class constructor that is above)
         # -------------------------------------------------------------------------------
-        return eva_class(eva_class_name, config, eva_logger, timing)
+        return eva_class(eva_class_name, eva_logger, timing)

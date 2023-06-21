@@ -283,3 +283,10 @@ class JediLog(EvaBase):
         return convergence_ds
 
     # ----------------------------------------------------------------------------------------------
+
+    def generate_default_config(self, filenames, collection_name):
+        # Create default config
+        eva_dict = {'datasets': [{'jedi_log_to_parse': filenames[0],
+                                  'collection_name': collection_name,
+                                  'data_to_parse': {'convergence':'true'}}
+        return eva_dict

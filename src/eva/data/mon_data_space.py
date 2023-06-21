@@ -156,6 +156,11 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
+    def generate_default_config(self, filenames, collection_name):
+        pass
+
+    # ----------------------------------------------------------------------------------------------
+
     def subset_coordinate(self, ds, coordinate, requested_subset):
 
         if coordinate in list(ds.dims):

@@ -41,7 +41,6 @@ def data_driver(config, data_collections, timing, logger):
         timing.start('DataObjectConstructor')
         eva_data_object = creator.create_eva_object(eva_data_class_name,
                                                     'data',
-                                                    dataset,
                                                     logger,
                                                     timing)
         timing.stop('DataObjectConstructor')
