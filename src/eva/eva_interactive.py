@@ -57,6 +57,7 @@ class EvaInteractive():
         data_collection = DataCollections()
         eva_object = creator.create_eva_object(eva_class_name, 'data', self.logger, self.timer)
         config = eva_object.generate_default_config(filenames, collection_name)
+        print(config)
         eva_object.execute(config, data_collection, self.timer)
 
         self.dc_dict[collection_name] = data_collection

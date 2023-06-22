@@ -192,8 +192,13 @@ class IodaObsSpace(EvaBase):
 
 
     def generate_default_config(self, filenames, collection_name):
-        eva_dict = {'datasets': [{'filenames': filenames,
-                                  'groups': [],
-                                  'missing_value_threshold': 1.0e06,
-                                  'name': collection_name}]}
+        #eva_dict = {'datasets': [{'filenames': filenames,
+        #                          'groups': [],
+        #                          'missing_value_threshold': 1.0e06,
+        #                          'name': collection_name}]}
+
+        eva_dict = {'filenames': filenames,
+                    'groups': [],
+                    'missing_value_threshold': 1.0e06,
+                    'name': collection_name}
         return eva_dict
