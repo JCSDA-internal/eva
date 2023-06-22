@@ -208,7 +208,8 @@ class MonDataSpace(EvaBase):
                      'channel': 'Channel',
                      'scan': 'Scan',
                      'pressure': 'Level',
-                     'region': 'Region'
+                     'region': 'Region',
+                     'iter': 'Iteration'
         }
 
         with open(control_file, 'r') as fp:
@@ -296,7 +297,7 @@ class MonDataSpace(EvaBase):
 
         # find cycle time in filename and create cycle_tm as datetime object
         cycle_tm = None
-        cycstrs = file_name.split('.')
+        cycstrs = file_name.replace('/', '.').split('.')
 
         for cycstr in cycstrs:
             if ((cycstr.isnumeric()) and (len(cycstr) == 10)):
@@ -305,52 +306,66 @@ class MonDataSpace(EvaBase):
 
         filename = os.path.join(file_path, file_name) if file_path else file_name
 
-        if not os.path.isfile(filename):
+        load_data = True
+        if os.path.isfile(filename):
+            f = FortranFile(filename, 'r', '>u4')
+        else:
             self.logger.info(f"WARNING:  file {filename} is missing")
-            rtn_array = None
-            return rtn_array
+            load_data = False
 
-        # read binary Fortran file
-        f = FortranFile(filename, 'r', '>u4')
-
-        if ndims_used == 1:
-            rtn_array = np.empty((0, dims[dims_arr[0]]), float)
+        if ndims_used == 1:		# MinMon
+            rtn_array = np.empty((0, dims[dims_arr[0]]), dtype=float)
+            if not load_data:
+                zarray = np.zeros((dims[dims_arr[0]]), float)
             dimensions = [dims[dims_arr[0]]]
 
-        if ndims_used == 2:
+        if ndims_used == 2:		# RadMon time, bcoef, bcor, OznMon time
             rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]]), float)
+            if not load_data:
+                zarray = np.zeros((dims[dims_arr[0]], dims[dims_arr[1]]), float)
             dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
 
-        if ndims_used == 3:
+        if ndims_used == 3:		# RadMon angle
             rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]],
                                   dims[dims_arr[2]]), float)
+            zarray = np.zeros((dims[dims_arr[0]], dims[dims_arr[1]],
+                               dims[dims_arr[2]]), float)
+
             dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
 
             for x in range(nvars):
 
-                # satang variable is not used and a non-standard size
-                if vars[x] == 'satang':
-                    skip = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
-                                                                       dims['ydef'])
-                    tarr = np.zeros((dims['xdef'], dims['ydef'], dims['zdef']),
-                                    dtype=np.dtype('>f4'))
-                else:
-                    mylist = []
-                    for z in range(5):
-                        arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['ydef'],
-                                                                          dims['xdef'])
-                        mylist.append(np.transpose(arr))
+                if load_data:
+                    # satang variable is not used and a non-standard size
+                    if vars[x] == 'satang':
+                        skip = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['xdef'],
+                                                                           dims['ydef'])
+                        tarr = zarray
+                    else:
+                        mylist = []
+                        for z in range(5):
+                            arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['ydef'],
+                                                                              dims['xdef'])
+                            mylist.append(np.transpose(arr))
+                        tarr = np.dstack(mylist)
 
-                    tarr = np.dstack(mylist)
+                else:
+                    tarr = zarray
                 rtn_array = np.append(rtn_array, [tarr], axis=0)
 
-        else:
+        else:		# ndims_used == 1|2
             for x in range(nvars):
-                arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions)
-                arr = np.array(arr, dtype=np.float)
+                if load_data:
+                    if ndims_used == 1:
+                        arr = np.fromfile(file_name, dtype='f4').reshape(dimensions)
+                    else:
+                        arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions)
+                else:
+                    arr = zarray
                 rtn_array = np.append(rtn_array, [arr], axis=0)
 
-        f.close()
+        if load_data:
+            f.close()
         return rtn_array, cycle_tm
 
     # ----------------------------------------------------------------------------------------------

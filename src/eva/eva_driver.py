@@ -1,3 +1,11 @@
+# (C) Copyright 2021-2023 NOAA/NWS/EMC
+#
+# (C) Copyright 2021-2023 United States Government as represented by the Administrator of the
+# National Aeronautics and Space Administration. All Rights Reserved.
+#
+# This software is licensed under the terms of the Apache Licence Version 2.0
+# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
 from eva.data.data_driver import data_driver
@@ -5,6 +13,8 @@ from eva.transforms.transform_driver import transform_driver
 from eva.plot_tools.figure_driver import figure_driver
 from eva.data.data_collections import DataCollections
 from eva.utilities.utils import load_yaml_file
+import argparse
+import os
 
 
 def eva(eva_config, eva_logger=None):
@@ -76,13 +86,6 @@ def main():
 
     # Run the diagnostic(s)
     eva(config_file)
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-if __name__ == "__main__":
-    main()
 
 
 # --------------------------------------------------------------------------------------------------
