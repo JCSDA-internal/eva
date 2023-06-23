@@ -120,23 +120,26 @@ class MonDataSpace(EvaBase):
             if group_vars == 'all':
                 group_vars = list(ds.data_vars)
 
-            # Drop data variables not in user requested variables
-            # ---------------------------------------------------
-            vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
-            ds = ds.drop_vars(vars_to_remove)
-
             # Conditionally add channel as a variable using single dimension
             # If channel is used then add chan_assim, chan_nassim, and
             # chan_yaxis to allow plotting of channel markers.
+            # --------------------------------------------------------------
             if 'channel' in group_vars:
                 ds['channel'] = (['Channel'], channo)
                 ds['chan_assim'] = (['Channel'], chan_assim)
                 ds['chan_nassim'] = (['Channel'], chan_nassim)
-                ds['chan_yaxis'] = (['Channel'], [-100]*len(channo))
+                ds['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
+                ds['chan_yaxis_3'] = (['Channel'], [-3]*len(channo))
 
             # Conditionally add scan position as a variable using single dimension
+            # --------------------------------------------------------------------
             if 'scan' in group_vars:
                 ds['scan'] = (['scan'], scanpo)
+
+            # Drop data variables not in user requested variables
+            # ---------------------------------------------------
+            vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
+            ds = ds.drop_vars(vars_to_remove)
 
             # Rename variables with group
             rename_dict = {}
