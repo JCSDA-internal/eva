@@ -1,61 +1,56 @@
-diagnostics:
+datasets:
+  - name: experiment
+    type: CubedSphereRestart
+    restart_filenames:
+      - ${data_input_path}/20210323.150000.sfc_data.tile1.nc
+      - ${data_input_path}/20210323.150000.sfc_data.tile2.nc
+      - ${data_input_path}/20210323.150000.sfc_data.tile3.nc
+      - ${data_input_path}/20210323.150000.sfc_data.tile4.nc
+      - ${data_input_path}/20210323.150000.sfc_data.tile5.nc
+      - ${data_input_path}/20210323.150000.sfc_data.tile6.nc
+    orog_filenames:
+      - ${data_input_path}/C48_oro_data.tile1.nc
+      - ${data_input_path}/C48_oro_data.tile2.nc
+      - ${data_input_path}/C48_oro_data.tile3.nc
+      - ${data_input_path}/C48_oro_data.tile4.nc
+      - ${data_input_path}/C48_oro_data.tile5.nc
+      - ${data_input_path}/C48_oro_data.tile6.nc
+    2d variables: [t2m]
+    orography variables: [geolon, geolat]
 
-  # Data read
+graphics:
+  # Map plots
   # ---------
-- data:
-    datasets:
-      - name: experiment
-        type: CubedSphereRestart
-        restart_filenames:
-          - ${data_input_path}/20210323.150000.sfc_data.tile1.nc
-          - ${data_input_path}/20210323.150000.sfc_data.tile2.nc
-          - ${data_input_path}/20210323.150000.sfc_data.tile3.nc
-          - ${data_input_path}/20210323.150000.sfc_data.tile4.nc
-          - ${data_input_path}/20210323.150000.sfc_data.tile5.nc
-          - ${data_input_path}/20210323.150000.sfc_data.tile6.nc
-        orog_filenames:
-          - ${data_input_path}/C48_oro_data.tile1.nc
-          - ${data_input_path}/C48_oro_data.tile2.nc
-          - ${data_input_path}/C48_oro_data.tile3.nc
-          - ${data_input_path}/C48_oro_data.tile4.nc
-          - ${data_input_path}/C48_oro_data.tile5.nc
-          - ${data_input_path}/C48_oro_data.tile6.nc
-        2d variables: [t2m]
-        orography variables: [geolon, geolat]
 
-  graphics:
-    # Map plots
-    # ---------
-
-    # Observations
-    - batch figure:
-        variables: [t2m]
-      dynamic options:
-        - type: vminvmaxcmap
-          data variable: experiment::FV3Vars2D::t2m
-      figure:
-        figure size: [20,10]
-        layout: [1,1]
-        title: 'Observations | FV3 surface | 2m Temperature'
-        output name: map_plots/FV3/${variable}/fv3_surface_${variable}.png
-      plots:
-        - mapping:
-            projection: plcarr
-            domain: global
-          add_map_features: ['coastline']
-          add_colorbar:
-            label: 2m Temperature
-          add_grid:
-          layers:
-          - type: MapGridded
-            longitude:
-              variable: experiment::FV3Orog::geolon
-            latitude:
-              variable: experiment::FV3Orog::geolat
-            data:
-              variable: experiment::FV3Vars2D::t2m
-            label: 2m T
-            colorbar: true
-            cmap: ${dynamic_cmap}
-            vmin: ${dynamic_vmin}
-            vmax: ${dynamic_vmax}
+  # Observations
+  - batch figure:
+      variables: [t2m]
+    dynamic options:
+      - type: vminvmaxcmap
+        data variable: experiment::FV3Vars2D::t2m
+    figure:
+      figure size: [20,10]
+      layout: [1,1]
+      title: 'Observations | FV3 surface | 2m Temperature'
+      output name: map_plots/FV3/${variable}/fv3_surface_${variable}.png
+    plots:
+      - mapping:
+          projection: plcarr
+          domain: global
+        add_map_features: ['coastline']
+        add_colorbar:
+          label: 2m Temperature
+        add_grid:
+        layers:
+        - type: MapGridded
+          longitude:
+            variable: experiment::FV3Orog::geolon
+          latitude:
+            variable: experiment::FV3Orog::geolat
+          data:
+            variable: experiment::FV3Vars2D::t2m
+          label: 2m T
+          colorbar: true
+          cmap: ${dynamic_cmap}
+          vmin: ${dynamic_vmin}
+          vmax: ${dynamic_vmax}

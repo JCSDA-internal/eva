@@ -212,7 +212,7 @@ class MonDataSpace(EvaBase):
                      'scan': 'Scan',
                      'pressure': 'Level',
                      'region': 'Region',
-                     'iter': 'Iteration',
+                     'iter': 'Iteration'
         }
 
         with open(control_file, 'r') as fp:
