@@ -11,7 +11,7 @@
 import numpy as np
 import xarray as xr
 from netCDF4 import Dataset
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 
 
@@ -53,7 +53,7 @@ def read_fms_tiles(files, variable, logger):
 # --------------------------------------------------------------------------------------------------
 
 
-class CubedSphereRestart(EvaBase):
+class CubedSphereRestart(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 

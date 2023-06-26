@@ -14,7 +14,7 @@ import os
 import numpy as np
 import xarray as xr
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 
 
 # --------------------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ def get_data_from_line(jedi_log_line, search_term, separator, position):
 # --------------------------------------------------------------------------------------------------
 
 
-class JediLog(EvaBase):
+class JediLog(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 

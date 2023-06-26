@@ -18,7 +18,7 @@ import numpy as np
 from eva.data.data_collections import DataCollections
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
-from eva.eva_base import EvaFactory
+from eva.data.eva_dataset_base import EvaDatasetFactory
 from eva.transforms.arithmetic import arithmetic
 from eva.transforms.accept_where import accept_where
 # --------------------------------------------------------------------------------------------------
@@ -36,24 +36,13 @@ class EvaInteractive():
         self.var_cache = []
 
 
-    def load_collection(self, collection_name, filenames , load_type, control_file = None):
+    def load_collection(self, collection_name, filenames , eva_class_name, control_file = None):
 
         #Handle filenames input
         if isinstance(filenames, str):
             filenames = [filenames]
 
-        if load_type == 'ioda':
-            eva_class_name = 'IodaObsSpace'
-        elif load_type == 'gsi':
-            eva_class_name = 'GsiObsSpace'
-        elif load_type == 'jedilog':
-            eva_class_name = 'JediLog'
-        #elif load_type == 'mon':
-        else:
-            self.logger.abort(f'Load type \'{load_type}\' not available. ' +
-                               'Available load types: ioda, gsi, jedilog')
-
-        creator = EvaFactory()
+        creator = EvaDatasetFactory()
         data_collection = DataCollections()
         eva_object = creator.create_eva_object(eva_class_name, 'data', self.logger, self.timer)
         config = eva_object.generate_default_config(filenames, collection_name)
@@ -64,7 +53,7 @@ class EvaInteractive():
         self.fn_dict[collection_name] = filenames[0]
 
         #open up file to find channel requirements
-        if load_type != 'jedilog':
+        if eva_class_name != 'JediLog':
             ds = nc.Dataset(filenames[0])
             if 'Channel' in ds.dimensions.keys():
                 self.ch_required_dict[collection_name] = True

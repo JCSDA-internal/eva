@@ -1,4 +1,4 @@
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 import xarray as xr
 
@@ -6,7 +6,7 @@ import xarray as xr
 valid_groups = ['state', 'increment']
 
 
-class LatLon(EvaBase):
+class LatLon(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 

@@ -12,7 +12,7 @@ import numpy as np
 from itertools import groupby
 from xarray import Dataset, open_dataset
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list
 
@@ -145,7 +145,7 @@ def satellite_dataset(ds):
 # --------------------------------------------------------------------------------------------------
 
 
-class GsiObsSpace(EvaBase):
+class GsiObsSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 

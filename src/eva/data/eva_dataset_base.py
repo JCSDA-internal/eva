@@ -8,7 +8,6 @@
 
 # imports
 from abc import ABC, abstractmethod
-import argparse
 import importlib
 import os
 import sys
@@ -26,7 +25,7 @@ from eva.data.data_collections import DataCollections
 # --------------------------------------------------------------------------------------------------
 
 
-class EvaBase(ABC):
+class EvaDatasetBase(ABC):
 
     # Base class constructor
     def __init__(self, eva_class_name, eva_logger, timing):
@@ -63,12 +62,12 @@ class EvaBase(ABC):
 # --------------------------------------------------------------------------------------------------
 
 
-class EvaFactory():
+class EvaDatasetFactory():
 
     def create_eva_object(self, eva_class_name, eva_group_name, eva_logger, timing):
 
         # Create temporary logger
-        logger = Logger('EvaFactory')
+        logger = Logger('EvaDatasetFactory')
 
         # Convert capitilized string to one with underscores
         # --------------------------------------------------
@@ -91,14 +90,14 @@ class EvaFactory():
         # Import class based on user selected task
         # ----------------------------------------
         module_to_import = "eva."+eva_group_name+"."+eva_module_name
-        timing.start(f'EvaFactory import: {eva_class_name} from {module_to_import}')
+        timing.start(f'EvaDatasetFactory import: {eva_class_name} from {module_to_import}')
         try:
             eva_class = getattr(importlib.import_module(module_to_import), eva_class_name)
         except Exception as e:
             logger.abort(f'Expecting to find a class called \'{eva_class_name}\' in a file ' +
                          f'called \'{expected_file}.py\' but no such file was found or an error ' +
                          f'occurred during import. \n Reported error: {e}.')
-        timing.stop(f'EvaFactory import: {eva_class_name} from {module_to_import}')
+        timing.stop(f'EvaDatasetFactory import: {eva_class_name} from {module_to_import}')
 
         # Return implementation of the class (calls base class constructor that is above)
         # -------------------------------------------------------------------------------

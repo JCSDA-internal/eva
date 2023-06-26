@@ -17,14 +17,14 @@ from xarray import Dataset, concat
 from scipy.io import FortranFile
 from datetime import datetime
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list, is_number
 
 # --------------------------------------------------------------------------------------------------
 
 
-class MonDataSpace(EvaBase):
+class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 

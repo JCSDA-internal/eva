@@ -11,7 +11,7 @@
 import os
 from xarray import Dataset, open_dataset
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list
 
@@ -44,7 +44,7 @@ def subset_channels(ds, channels, add_channels_variable=False):
 # --------------------------------------------------------------------------------------------------
 
 
-class IodaObsSpace(EvaBase):
+class IodaObsSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
