@@ -2,7 +2,7 @@
 # ---------
 datasets:
   - name: experiment
-    type: SocaField
+    type: SocaRestart
     soca_filenames: ${data_input_path}/ocn.3dvar_soca.an.2018-04-15T00:00:00Z.nc
     geometry_file: ${data_input_path}/soca_gridspec.72x35x25.nc
 
