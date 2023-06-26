@@ -16,6 +16,7 @@ from eva.utilities.utils import load_yaml_file
 import argparse
 import os
 
+
 def eva(eva_config, eva_logger=None):
 
     # Create timing object
