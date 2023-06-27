@@ -142,14 +142,47 @@ class EvaInteractive():
 
   # --------------------------------------------------------------------------------------------------
 
-    def map_gridded():
+    def map_gridded(self):
         print('map gridded')
 
-    def line_plot():
+  # --------------------------------------------------------------------------------------------------
+
+    def line_plot(self):
         print('line plot')
 
-    def histogram():
-        print('histogram')
+  # --------------------------------------------------------------------------------------------------
+
+    def histogram(self, plot_list):
+        #Make empty dataframe
+        df = pd.DataFrame()
+        for item in plot_list:
+            item_list = item.split('::')
+            if len(item_list) == 3:
+                collection = item_list[0]
+                group = item_list[1]
+                variable = item_list[2]
+
+                if self.ch_required_dict[collection] == True:
+                    self.logger.abort(f'Please include channel number for \'{item}\'.')
+
+                arr = self.dc_dict[collection].get_variable_data(collection,
+                                                                 group,
+                                                                 variable)
+            elif len(item_list) == 4:
+                collection = item_list[0]
+                group = item_list[1]
+                variable = item_list[2]
+                channel = int(item_list[3])
+                arr = self.dc_dict[collection].get_variable_data(collection,
+                                                                 group,
+                                                                 variable,
+                                                                 channel)
+            else:
+                self.logger.abort(f'Insufficient info in \'{item}\'.')
+            df[item] = arr
+
+        df = df.dropna()
+        return df.hvplot.hist(bins=100)
 
   # --------------------------------------------------------------------------------------------------
 
