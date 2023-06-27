@@ -19,8 +19,8 @@ from eva.data.data_collections import DataCollections
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
 from eva.data.eva_dataset_base import EvaDatasetFactory
-from eva.transforms.arithmetic import arithmetic
-from eva.transforms.accept_where import accept_where
+from eva.transforms.arithmetic import arithmetic, generate_arithmetic_config
+from eva.transforms.accept_where import accept_where, generate_accept_where_config
 # --------------------------------------------------------------------------------------------------
 
 
@@ -35,6 +35,7 @@ class EvaInteractive():
         self.ch_required_dict = {}
         self.var_cache = []
 
+    # --------------------------------------------------------------------------------------------------
 
     def load_collection(self, collection_name, filenames , eva_class_name, control_file = None):
 
@@ -63,19 +64,23 @@ class EvaInteractive():
             self.ch_required_dict[collection_name] = False
         self.ch_required_dict[collection_name] = False
 
+  # --------------------------------------------------------------------------------------------------
+
     def get_data_collection(self, collection_name):
         if collection_name in self.dc_dict.keys():
             return self.dc_dict[collection_name]
         else:
             self.logger.abort(f'Collection name \'{collection_name}\' does not exist. ')
 
-        
+  # --------------------------------------------------------------------------------------------------
+
     def print_data_collection(self, collection_name):
         if collection_name in self.dc_dict.keys():
             self.dc_dict[collection_name].display_collections()
         else:
             self.logger.abort(f'Collection name \'{collection_name}\' does not exist. ')
 
+  # --------------------------------------------------------------------------------------------------
 
     def retrieve_var_list(self, collection, group):
         ds = nc.Dataset(self.fn_dict[collection])
@@ -84,66 +89,45 @@ class EvaInteractive():
             self.var_cache = var_list
         return self.var_cache
 
+  # --------------------------------------------------------------------------------------------------
 
     def arithmetic(self, new_name, expression, collection, var_list=[]):
-
-        # Update new_name
-        updated_name = collection + '::' + new_name + '::${variable}'
-
-        # Fix expression
-        groups = re.split(r'\(|\)|-|\*|\+|\/', expression)
-        for group in groups:
-            expression = expression.replace(group, collection +
-                                            '::' + group + '::${variable}')
+        # Ensure var_list is not empty
         if not var_list:
-            var_list = self.retrieve_var_list(collection, group)
-            #self.logger.abort(f'Please provide var list ')
+           group = re.split(r'\(|\)|-|\*|\+|\/', expression)[0]
+           var_list = self.retrieve_var_list(collection, group)
 
-        # Build dictionary
-        arithmetic_config = {
-                             'new name': updated_name,
-                             'transform': "arithmetic",
-                             'for': {
-                               'variable': var_list
-                              },
-                             'equals': expression
-                             }
+        # Generate default config for transform
+        arithmetic_config = generate_arithmetic_config(new_name, expression, collection, var_list)
 
+        # Execute transform
         arithmetic(arithmetic_config, self.dc_dict[collection])
         self.logger.info(f'Added \'{new_name}\' to data collection \'{collection}\'.')
 
+  # --------------------------------------------------------------------------------------------------
 
     def accept_where(self, new_name, starting_field, where, collection, var_list=[]):
-        # Update new_name
-        updated_name = collection + '::' + new_name + '::${variable}'
-        starting_field = collection + '::' + starting_field + '::${variable}'
-
-        for index, expression in enumerate(where):
-            # Get group
+        # Make sure all expressions are in correct format
+        for expression in where:
             try:
                 group, _, _ = expression.split(' ')
-                if not var_list:
-                    var_list = self.retrieve_var_list(collection, group)
-                    #self.logger.abort(f'Please provide var list ')
             except Exception:
                 self.logger.abort(f'Failed to split \'{expression}\'. Check that ' +
-                                  'it has the correct format')
-            where[index] = expression.replace(group, collection +
-                                              '::' + group + '::${variable}')
-        # Build dict
-        accept_where_config = {
-                                  'new name': updated_name,
-                                  'where': where,
-                                  'transform': 'accept where',
-                                  'starting field': starting_field,
-                                  'for': {
-                                     "variable": var_list
-                                  }
-                              }
+                                    'it has the correct format')
+        
+        # Set var_list if empty
+        if not var_list:
+            var_list = self.retrieve_var_list(collection, group)
+            
+        # Generate default config for transform
+        accept_where_config = generate_accept_where_config(new_name, starting_field, 
+                                                           where, collection, var_list)
 
+        # Execute transform
         accept_where(accept_where_config, self.dc_dict[collection])
         self.logger.info(f'Added \'{new_name}\' to data collection \'{collection}\'.')
 
+  # --------------------------------------------------------------------------------------------------
 
     def print_statistics(self, df):
         # for each column, print statistics
@@ -156,6 +140,7 @@ class EvaInteractive():
                   "\n\t std:  " + str(col.std()))
                   #"\n\t number: " + nobs)
 
+  # --------------------------------------------------------------------------------------------------
 
     def map_gridded():
         print('map gridded')
@@ -165,6 +150,8 @@ class EvaInteractive():
 
     def histogram():
         print('histogram')
+
+  # --------------------------------------------------------------------------------------------------
 
     def map_scatter(self, plot_entry):
         #retrieve latitude, longitude, and variable
@@ -187,6 +174,7 @@ class EvaInteractive():
                           geo=True, tiles='OSM', 
                           hover_cols=variable, frame_width=700)
 
+  # --------------------------------------------------------------------------------------------------
 
     def density_plot(self, plot_list, print_stats=True):
 
@@ -226,6 +214,7 @@ class EvaInteractive():
         
         return df.hvplot.kde(filled=True, legend='top_left', alpha=0.5, bandwidth=0.1, height=400)               
  
+   # --------------------------------------------------------------------------------------------------
 
     def scatter(self, x, y, print_stats=True):
         df = pd.DataFrame()
@@ -266,3 +255,4 @@ class EvaInteractive():
 
         return df.hvplot.scatter(x, y, s=20, c='b', height=400, width=400)
 
+  # --------------------------------------------------------------------------------------------------
