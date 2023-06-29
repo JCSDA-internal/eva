@@ -21,7 +21,6 @@ class HorizontalLine():
         layer_schema = config.get('schema', os.path.join(return_eva_path(), 'defaults',
                                   'horizontal_line.yaml'))
         config = get_schema(layer_schema, config, logger)
-#        delvars = ['y', 'type', 'schema']
         delvars = ['type', 'schema']
         for d in delvars:
             config.pop(d, None)
