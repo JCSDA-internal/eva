@@ -1,4 +1,4 @@
-# Scatter class default schema
+# MapScatter class default schema
 markersize: 5
 marker: 'o'
 vmin:

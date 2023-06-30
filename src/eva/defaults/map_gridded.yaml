@@ -1,4 +1,4 @@
-# Scatter class default schema
+# MapGridded class default schema
 cmap: 'viridis'
 vmin:
 vmax:

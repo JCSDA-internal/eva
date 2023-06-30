@@ -1,4 +1,4 @@
-# Scatter class default schema
+# LinePlot class default schema
 markersize: 5
 color: 'darkgray'
 marker: 'o'
