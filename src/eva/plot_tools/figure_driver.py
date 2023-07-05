@@ -151,8 +151,6 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
     fig.create_figure()
     if 'title' in figure_conf:
         fig.add_suptitle(figure_conf['title'])
-    if 'tight_layout' in figure_conf:
-        fig.tight_layout(figure_conf['tight_layout'])
     saveargs = get_saveargs(figure_conf)
     fig.save_figure(output_file, **saveargs)
 
