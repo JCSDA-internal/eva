@@ -149,10 +149,15 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
                        figsize=tuple(figure_conf['figure size']))
     fig.plot_list = plot_list
     fig.create_figure()
+
     if 'title' in figure_conf:
         fig.add_suptitle(figure_conf['title'])
-    if 'tight_layout' in figure_conf:
-        fig.tight_layout(figure_conf['tight_layout'])
+    if 'tight layout' in figure_conf:
+        if isinstance(figure_conf['tight layout'], dict):
+            fig.tight_layout(**figure_conf['tight layout'])
+        else:
+            fig.tight_layout()
+
     saveargs = get_saveargs(figure_conf)
     fig.save_figure(output_file, **saveargs)
 

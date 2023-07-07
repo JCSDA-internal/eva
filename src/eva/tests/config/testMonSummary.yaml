@@ -11,13 +11,13 @@ datasets:
     satellite: metop-a
     sensor: hirs4
     control_file:
-      - ${data_input_path}/time.hirs4_metop-a.ctl
+      - ../data/time.hirs4_metop-a.ctl
     filenames:
-      - ${data_input_path}/time.hirs4_metop-a.2015051418.ieee_d
-      - ${data_input_path}/time.hirs4_metop-a.2015051500.ieee_d
-      - ${data_input_path}/time.hirs4_metop-a.2015051506.ieee_d
-      - ${data_input_path}/time.hirs4_metop-a.2015051512.ieee_d
-      - ${data_input_path}/time.hirs4_metop-a.2015051518.ieee_d
+      - ../data/time.hirs4_metop-a.2015051418.ieee_d
+      - ../data/time.hirs4_metop-a.2015051500.ieee_d
+      - ../data/time.hirs4_metop-a.2015051506.ieee_d
+      - ../data/time.hirs4_metop-a.2015051512.ieee_d
+      - ../data/time.hirs4_metop-a.2015051518.ieee_d
 
     channels: &channels 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
     regions: &regions 1
@@ -86,6 +86,8 @@ graphics:
     - figure:
         layout: [2,1]
         figure size: [12,10]
+        tight layout:
+          pad: 5
         title: 'hirs4_metop-a | Number of Obs Count'
         output name: lineplots/hirs4_metop-a/summary.hirs4_metop-a.png
 
