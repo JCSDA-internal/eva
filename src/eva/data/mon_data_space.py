@@ -129,7 +129,8 @@ class MonDataSpace(EvaBase):
                 ds['chan_assim'] = (['Channel'], chan_assim)
                 ds['chan_nassim'] = (['Channel'], chan_nassim)
                 ds['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
-                ds['chan_yaxis_3'] = (['Channel'], [-3]*len(channo))
+                ds['chan_yaxis_1p5'] = (['Channel'], [-1.5]*len(channo))
+                ds['chan_yaxis_p05'] = (['Channel'], [-0.05]*len(channo))
 
             # Conditionally add scan position as a variable using single dimension
             # --------------------------------------------------------------------
@@ -347,7 +348,7 @@ class MonDataSpace(EvaBase):
             rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]]), float)
             if not load_data:
                 zarray = np.zeros((dims[dims_arr[0]], dims[dims_arr[1]]), float)
-            dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
+            dimensions = [dims[dims_arr[1]], dims[dims_arr[0]]]
 
         if ndims_used == 3:		# RadMon angle
             rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]],
@@ -383,7 +384,7 @@ class MonDataSpace(EvaBase):
                     if ndims_used == 1:
                         arr = np.fromfile(file_name, dtype='f4').reshape(dimensions)
                     else:
-                        arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions)
+                        arr = np.transpose(f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions))
                 else:
                     arr = zarray
                 rtn_array = np.append(rtn_array, [arr], axis=0)
