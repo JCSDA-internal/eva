@@ -97,7 +97,7 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
     # Adjust the plots configs if there are dynamic options
     # -----------------------------------------------------
     for dynamic_option in dynamic_options:
-        dynamic_option_module = importlib.import_module("eva.plot_tools.dynamic_config")
+        dynamic_option_module = importlib.import_module("eva.plotting.emcpy.plot_tools.dynamic_config")
         dynamic_option_method = getattr(dynamic_option_module, dynamic_option['type'])
         plots = dynamic_option_method(logger, dynamic_option, plots, data_collections)
 
@@ -114,7 +114,7 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
         for layer in plot.get("layers"):
             eva_class_name = layer.get("type")
             eva_module_name = camelcase_to_underscore(eva_class_name)
-            full_module = "eva.diagnostics."+eva_module_name
+            full_module = "eva.plotting.emcpy.diagnostics."+eva_module_name
             layer_class = getattr(importlib.import_module(full_module), eva_class_name)
             # use the translator class to go from eva to declarative plotting
             layer_list.append(layer_class(layer, logger, data_collections).plotobj)

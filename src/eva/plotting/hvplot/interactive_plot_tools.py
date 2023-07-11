@@ -69,7 +69,7 @@ def hvplot_histogram(dc_dict, plot_list, ch_required_dict, logger):
 
 # --------------------------------------------------------------------------------------------------
 
-def hvplot_map_scatter(dc_dict, plot_entry):
+def hvplot_map_scatter(dc_dict, plot_entry, logger):
     #retrieve latitude, longitude, and variable
     df = pd.DataFrame()
     collection, group, variable = plot_entry.split('::')
@@ -92,8 +92,7 @@ def hvplot_map_scatter(dc_dict, plot_entry):
 
 # --------------------------------------------------------------------------------------------------
 
-def hvplot_density_plot(plot_list, ch_required_dict, logger):
-
+def hvplot_density_plot(dc_dict, plot_list, ch_required_dict, logger):
     #Make empty dataframe
     df = pd.DataFrame()
     for item in plot_list:

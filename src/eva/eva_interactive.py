@@ -12,15 +12,14 @@ import xarray as xr
 import re
 import numpy as np
 
-from eva.plotting.hvplot.interactive_plot_tools import hvplot_line_plot, hvplot_histogram,
-                                                       hvplot_map_scatter, hvplot_density_plot,
-                                                       hvplot_scatter
 from eva.data.data_collections import DataCollections
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
 from eva.data.eva_dataset_base import EvaDatasetFactory
 from eva.transforms.arithmetic import arithmetic, generate_arithmetic_config
 from eva.transforms.accept_where import accept_where, generate_accept_where_config
+
+import eva.plotting.hvplot.interactive_plot_tools as plot_tools
 # --------------------------------------------------------------------------------------------------
 
 
@@ -148,26 +147,26 @@ class EvaInteractive():
   # --------------------------------------------------------------------------------------------------
 
     def line_plot(self, plot_list):
-        hvplot_line_plot(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
+        return plot_tools.hvplot_line_plot(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
 
   # --------------------------------------------------------------------------------------------------
 
     def histogram(self, plot_list):
-        hvplot_histogram(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
+        return plot_tools.hvplot_histogram(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
 
   # --------------------------------------------------------------------------------------------------
 
     def map_scatter(self, plot_entry):
-        hvplot_map_scatter(self.dc_dict, plot_entry)
+        return plot_tools.hvplot_map_scatter(self.dc_dict, plot_entry, self.logger)
 
   # --------------------------------------------------------------------------------------------------
 
-    def density_plot(self, plot_list, print_stats=True):
-        hvplot_density_plot(plot_list, print_stats=True, ch_required_dict, logger)
+    def density_plot(self, plot_list):
+        return plot_tools.hvplot_density_plot(self.dc_dict, plot_list,  self.ch_required_dict, self.logger)
 
    # --------------------------------------------------------------------------------------------------
 
-    def scatter(self, x, y, print_stats=True):
-        hvplot_scatter(dc_dict, x, y, print_stats, ch_required_dict, logger)
+    def scatter(self, x, y):
+        return plot_tools.hvplot_scatter(self.dc_dict, x, y, self.ch_required_dict, self.logger)
 
   # --------------------------------------------------------------------------------------------------
