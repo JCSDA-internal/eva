@@ -1,0 +1,7 @@
+# HorizontalLine class default schema
+color: 'black'
+label: None
+linestyle: '-'
+linewidth: 1.5
+marker: ''
+

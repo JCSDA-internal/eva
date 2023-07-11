@@ -37,7 +37,8 @@ class MonDataSpace(EvaDatasetBase):
         # Get control file and parse
         # --------------------------
         control_file = get(dataset_config, self.logger, 'control_file')
-        coords, dims, attribs, nvars, vars, channo, scanpo = self.get_ctl_dict(control_file[0])
+        coords, dims, attribs, nvars, vars, channo, scanpo, chan_assim, chan_nassim = (
+                                                      self.get_ctl_dict(control_file[0]))
         ndims_used, dims_arr = self.get_ndims_used(dims)
 
         # Get the groups to be read
@@ -119,18 +120,26 @@ class MonDataSpace(EvaDatasetBase):
             if group_vars == 'all':
                 group_vars = list(ds.data_vars)
 
+            # Conditionally add channel as a variable using single dimension
+            # If channel is used then add chan_assim, chan_nassim, and
+            # chan_yaxis to allow plotting of channel markers.
+            # --------------------------------------------------------------
+            if 'channel' in group_vars:
+                ds['channel'] = (['Channel'], channo)
+                ds['chan_assim'] = (['Channel'], chan_assim)
+                ds['chan_nassim'] = (['Channel'], chan_nassim)
+                ds['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
+                ds['chan_yaxis_3'] = (['Channel'], [-3]*len(channo))
+
+            # Conditionally add scan position as a variable using single dimension
+            # --------------------------------------------------------------------
+            if 'scan' in group_vars:
+                ds['scan'] = (['scan'], scanpo)
+
             # Drop data variables not in user requested variables
             # ---------------------------------------------------
             vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
             ds = ds.drop_vars(vars_to_remove)
-
-            # Conditionally add channel as a variable using single dimension
-            if 'channel' in group_vars:
-                ds['channel'] = (['Channel'], channo)
-
-            # Conditionally add scan position as a variable using single dimension
-            if 'scan' in group_vars:
-                ds['scan'] = (['scan'], scanpo)
 
             # Rename variables with group
             rename_dict = {}
@@ -201,6 +210,8 @@ class MonDataSpace(EvaDatasetBase):
         vars = []
         nvars = 0
         channo = []
+        chan_assim = []
+        chan_nassim = []
         scanpo = None
         scan_info = []
 
@@ -263,10 +274,18 @@ class MonDataSpace(EvaDatasetBase):
                 # Note we need to extract the actual channel numbers.  We have the
                 # number of channels via the xdef line, but they are not necessarily
                 # ordered consecutively.
+                #
+                # If channel is used then assign channel numbers to the chan_assim and
+                # chan_nassim arrays based on the channel's iuse setting in the control
+                # file.  In the file 1 = assimilated, -1 = not assimilated.
                 if line.find('channel=') != -1:
                     strs = line.split()
                     if strs[4].isdigit():
                         channo.append(int(strs[4]))
+                    if strs[7] == '1':
+                        chan_assim.append(int(strs[4]))
+                    if strs[7] == '-1':
+                        chan_nassim.append(int(strs[4]))
 
             # The list of variables is at the end of the file between the lines
             # "vars" and "end vars".
@@ -291,7 +310,17 @@ class MonDataSpace(EvaDatasetBase):
                 for x in range(1, int(scan_info[0])):
                     scanpo.append(float(scan_info[1])+(float(scan_info[2])*x))
 
-        return coords, dims, attribs, nvars, vars, channo, scanpo
+            # If Channel is in the coords then pad out the chan_assim adn chan_nassim
+            # arrays with zeros.  They need to be the correct length to use 'Channel' as
+            # the dimension.  Also the yaml file can use the 'select where' transform
+            # to drop all values < 1 and plot only the assim/nassim channel markers.
+            if 'Channel' in coords.values():
+                for x in range(len(chan_assim), len(channo)):
+                    chan_assim.append(0)
+                for x in range(len(chan_nassim), len(channo)):
+                    chan_nassim.append(0)
+
+        return coords, dims, attribs, nvars, vars, channo, scanpo, chan_assim, chan_nassim
 
     def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars, file_path=None):
 

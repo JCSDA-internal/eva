@@ -86,6 +86,8 @@ graphics:
     - figure:
         layout: [2,1]
         figure size: [12,10]
+        tight layout:
+          pad: 5
         title: 'hirs4_metop-a | Number of Obs Count'
         output name: lineplots/hirs4_metop-a/summary.hirs4_metop-a.png
 
