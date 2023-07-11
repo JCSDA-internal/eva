@@ -8,13 +8,13 @@
 
 import os
 import netCDF4 as nc
-import hvplot.pandas
 import xarray as xr
 import re
-import pandas as pd
-import geopandas as gpd
 import numpy as np
 
+from eva.plotting.hvplot.interactive_plot_tools import hvplot_line_plot, hvplot_histogram,
+                                                       hvplot_map_scatter, hvplot_density_plot,
+                                                       hvplot_scatter
 from eva.data.data_collections import DataCollections
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
@@ -60,7 +60,7 @@ class EvaInteractive():
                 self.ch_required_dict[collection_name] = True
             else:
                 self.ch_required_dict[collection_name] = False
-        else: 
+        else:
             self.ch_required_dict[collection_name] = False
         self.ch_required_dict[collection_name] = False
 
@@ -114,13 +114,13 @@ class EvaInteractive():
             except Exception:
                 self.logger.abort(f'Failed to split \'{expression}\'. Check that ' +
                                     'it has the correct format')
-        
+
         # Set var_list if empty
         if not var_list:
             var_list = self.retrieve_var_list(collection, group)
-            
+
         # Generate default config for transform
-        accept_where_config = generate_accept_where_config(new_name, starting_field, 
+        accept_where_config = generate_accept_where_config(new_name, starting_field,
                                                            where, collection, var_list)
 
         # Execute transform
@@ -134,9 +134,9 @@ class EvaInteractive():
         nobs = str(len(df))
         for column in df:
             col = df[column]
-            print("name: " + column + 
+            print("name: " + column +
                   "\n\t minimum: " + str(col.min()) +
-                  "\n\t maximum:  " + str(col.max()) + 
+                  "\n\t maximum:  " + str(col.max()) +
                   "\n\t std:  " + str(col.std()))
                   #"\n\t number: " + nobs)
 
@@ -148,172 +148,26 @@ class EvaInteractive():
   # --------------------------------------------------------------------------------------------------
 
     def line_plot(self, plot_list):
-        df = pd.DataFrame()
-        for item in plot_list:
-            item_list = item.split('::')
-            if len(item_list) == 3:
-                collection = item_list[0]
-                group = item_list[1]
-                variable = item_list[2]
-
-                if self.ch_required_dict[collection] == True:
-                    self.logger.abort(f'Please include channel number for \'{item}\'.')
-
-                arr = self.dc_dict[collection].get_variable_data(collection,
-                                                                 group,
-                                                                 variable)
-            elif len(item_list) == 4:
-                collection = item_list[0]
-                group = item_list[1]
-                variable = item_list[2]
-                channel = int(item_list[3])
-                arr = self.dc_dict[collection].get_variable_data(collection,
-                                                                 group,
-                                                                 variable,
-                                                                 channel)
-            else:
-                self.logger.abort(f'Insufficient info in \'{item}\'.')
-            df[item] = arr
-
-        df = df.dropna()
-        return df.hvplot.line()
+        hvplot_line_plot(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
 
   # --------------------------------------------------------------------------------------------------
 
     def histogram(self, plot_list):
-        #Make empty dataframe
-        df = pd.DataFrame()
-        for item in plot_list:
-            item_list = item.split('::')
-            if len(item_list) == 3:
-                collection = item_list[0]
-                group = item_list[1]
-                variable = item_list[2]
-
-                if self.ch_required_dict[collection] == True:
-                    self.logger.abort(f'Please include channel number for \'{item}\'.')
-
-                arr = self.dc_dict[collection].get_variable_data(collection,
-                                                                 group,
-                                                                 variable)
-            elif len(item_list) == 4:
-                collection = item_list[0]
-                group = item_list[1]
-                variable = item_list[2]
-                channel = int(item_list[3])
-                arr = self.dc_dict[collection].get_variable_data(collection,
-                                                                 group,
-                                                                 variable,
-                                                                 channel)
-            else:
-                self.logger.abort(f'Insufficient info in \'{item}\'.')
-            df[item] = arr
-
-        df = df.dropna()
-        return df.hvplot.hist(bins=100)
+        hvplot_histogram(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
 
   # --------------------------------------------------------------------------------------------------
 
     def map_scatter(self, plot_entry):
-        #retrieve latitude, longitude, and variable
-        df = pd.DataFrame()
-        collection, group, variable = plot_entry.split('::')
-        df['Latitude'] = self.dc_dict[collection].get_variable_data(collection,
-                                                                    'MetaData',
-                                                                    'latitude')        
-        df['Longitude'] = self.dc_dict[collection].get_variable_data(collection,
-                                                                     'MetaData',
-                                                                     'longitude')
-        df[variable] = self.dc_dict[collection].get_variable_data(collection,
-                                                                  group,
-                                                                  variable)
-        df = df.dropna() 
-        gdf = gpd.GeoDataFrame(
-            df[variable], geometry=gpd.points_from_xy(x=df.Longitude, y=df.Latitude)
-        )
-        return gdf.hvplot(global_extent=True, 
-                          geo=True, tiles='OSM', 
-                          hover_cols=variable, frame_width=700)
+        hvplot_map_scatter(self.dc_dict, plot_entry)
 
   # --------------------------------------------------------------------------------------------------
 
     def density_plot(self, plot_list, print_stats=True):
+        hvplot_density_plot(plot_list, print_stats=True, ch_required_dict, logger)
 
-        #Make empty dataframe
-        df = pd.DataFrame()
-        for item in plot_list:
-            item_list = item.split('::')
-            if len(item_list) == 3:
-                collection = item_list[0]
-                group = item_list[1]
-                variable = item_list[2]
-
-                if self.ch_required_dict[collection] == True:
-                    self.logger.abort(f'Please include channel number for \'{item}\'.')
-
-                arr = self.dc_dict[collection].get_variable_data(collection,
-                                                                 group,
-                                                                 variable)
-            elif len(item_list) == 4:
-                collection = item_list[0]
-                group = item_list[1]
-                variable = item_list[2]
-                channel = int(item_list[3])
-                arr = self.dc_dict[collection].get_variable_data(collection,
-                                                                 group,  
-                                                                 variable,
-                                                                 channel)   
-            else:
-                self.logger.abort(f'Insufficient info in \'{item}\'.')
-
-            df[item] = arr
-            print(np.count_nonzero(~np.isnan(arr)))
-             
-        if print_stats:
-            self.print_statistics(df)
-        df = df.dropna() 
-        
-        return df.hvplot.kde(filled=True, legend='top_left', alpha=0.5, bandwidth=0.1, height=400)               
- 
    # --------------------------------------------------------------------------------------------------
 
     def scatter(self, x, y, print_stats=True):
-        df = pd.DataFrame()
-        plot_list = [x, y]
-        for item in plot_list:
-            #split would break here if no channel and channel required, use try/except
-            #block and no need to check for channel required
-            item_list = item.split('::')
-            print(item_list)
-            print(len(item_list))
-            if len(item_list) == 3:
-                collection = item_list[0]
-                group = item_list[1]
-                variable = item_list[2]
-
-                if self.ch_required_dict[collection] == True:
-                    self.logger.abort(f'Please include channel number for \'{item}\'.')
-
-                arr = self.dc_dict[collection].get_variable_data(collection,
-                                                                 group,
-                                                                 variable)
-            elif len(item_list) == 4:
-                collection = item_list[0]
-                group = item_list[1]
-                variable = item_list[2]
-                channel = int(item_list[3])
-                arr = self.dc_dict[collection].get_variable_data(collection,
-                                                                 group,
-                                                                 variable,
-                                                                 channel)
-            else:
-                self.logger.abort(f'Insufficient info in \'{item}\'.')
-            df[item] = arr
-
-        df = df.dropna()
-        if print_stats:
-            self.print_statistics(df)
-
-        return df.hvplot.scatter(x, y, s=20, c='b', height=400, width=400)
+        hvplot_scatter(dc_dict, x, y, print_stats, ch_required_dict, logger)
 
   # --------------------------------------------------------------------------------------------------
