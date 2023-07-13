@@ -53,7 +53,7 @@ class EvaInteractive():
         self.fn_dict[collection_name] = filenames[0]
 
         # Open up file to find channel requirements
-        if eva_class_name != 'JediLog':
+        if eva_class_name is not 'JediLog':
             ds = nc.Dataset(filenames[0])
             if 'Channel' in ds.dimensions.keys():
                 self.ch_required_dict[collection_name] = True
@@ -61,7 +61,6 @@ class EvaInteractive():
                 self.ch_required_dict[collection_name] = False
         else:
             self.ch_required_dict[collection_name] = False
-        self.ch_required_dict[collection_name] = False
 
     # --------------------------------------------------------------------------------------------------
 

@@ -1,17 +1,18 @@
 import pandas as pd
 import hvplot.pandas
 import geopandas as gpd
+from eva.utilities.logger import Logger
 
 
 def make_dataframe(dc_dict, plot_list, ch_required_dict, logger):
     df = pd.DataFrame()
+
     for item in plot_list:
         item_list = item.split('::')
         if len(item_list) == 3:
             collection = item_list[0]
             group = item_list[1]
             variable = item_list[2]
-
             if ch_required_dict[collection] is True:
                 logger.abort(f'Please include channel number for \'{item}\'.')
 
@@ -33,6 +34,7 @@ def make_dataframe(dc_dict, plot_list, ch_required_dict, logger):
 
     df = df.dropna()
     return df
+
 
 def hvplot_line_plot(dc_dict, plot_list, ch_required_dict, logger):
     df = make_dataframe(dc_dict, plot_list, ch_required_dict, logger)

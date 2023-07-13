@@ -1,0 +1,41 @@
+datasets:
+  - group: increment
+    type: LatLon
+    filename: ${data_input_path}/gdas.t00z.atminc.nc
+    name: experiment
+    variables: [T_inc, lat, lon]
+
+graphics:
+  # Map plots
+  # ---------
+
+  # Observations
+  - batch figure:
+      variables: [T_inc]
+    figure:
+      figure size: [20,10]
+      layout: [1,1]
+      title: 'Increment from GSI'
+      output name: map_plots/increments/${variable}/nearsfc_inc_${variable}.png
+    plots:
+      - mapping:
+          projection: plcarr
+          domain: global
+        add_map_features: ['coastline']
+        add_colorbar:
+          label: Temperature Increment
+        add_grid:
+        layers:
+        - type: MapGridded
+          longitude:
+            variable: experiment::increment::lon
+          latitude:
+            variable: experiment::increment::lat
+          data:
+            variable: experiment::increment::T_inc
+            slices: '[-1,...]'
+          label: T increment
+          colorbar: true
+          cmap: 'bwr'
+          vmin: -1
+          vmax: 1
