@@ -10,7 +10,7 @@ class LatLon(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def execute(self, dataset_config, data_collections):
+    def execute(self, dataset_config, data_collections, timing):
 
         # Filename to be read into this collection
         filename = get(dataset_config, self.logger, 'filename')
@@ -32,8 +32,6 @@ class LatLon(EvaDatasetBase):
         # Drop data variables not in user requested variables
         vars_to_remove = list(set(list(ds.keys())) - set(variables))
         ds = ds.drop_vars(vars_to_remove)
-
-        # for lat and lon, need to do a meshgrid so that each point has a lat and a lon
 
         # rename variables in dataset_config
         rename_dict = {}
