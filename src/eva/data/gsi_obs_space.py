@@ -257,7 +257,7 @@ class GsiObsSpace(EvaDatasetBase):
     def generate_default_config(self, filenames, collection_name):
         # Create config template
         eva_dict = {'datasets': [{'filenames': filenames,
-                                  'groups': [{'name':'eva_interactive'}],
+                                  'groups': [{'name': 'eva_interactive'}],
                                   'missing_value_threshold': 1.0e06,
                                   'name': collection_name}]}
 
@@ -269,7 +269,7 @@ class GsiObsSpace(EvaDatasetBase):
             variable = name_parts[1]
             eva_dict['datasets'][0]['variable'] = variable
         else:
-            satellite = name_parts[1] 
+            satellite = name_parts[1]
             sensor = name_parts[0]
             eva_dict['datasets'][0]['satellite'] = satellite
             eva_dict['datasets'][0]['sensor'] = sensor

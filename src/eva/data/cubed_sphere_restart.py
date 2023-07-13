@@ -128,4 +128,3 @@ class CubedSphereRestart(EvaDatasetBase):
 
     def generate_default_config(self, filenames, collection_name):
         pass
-

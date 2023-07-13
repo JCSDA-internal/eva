@@ -288,5 +288,5 @@ class JediLog(EvaDatasetBase):
         # Create default config
         eva_dict = {'datasets': [{'jedi_log_to_parse': filenames[0],
                                   'collection_name': collection_name,
-                                  'data_to_parse': {'convergence':'true'}}
+                                  'data_to_parse': {'convergence': 'true'}}]}
         return eva_dict

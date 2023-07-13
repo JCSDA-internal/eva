@@ -58,8 +58,8 @@ class Scatter():
 
         # Get defaults from schema
         # ------------------------
-        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'defaults',
-                                  'scatter.yaml'))
+        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
+                                                         'emcpy', 'defaults', 'scatter.yaml'))
         config = get_schema(layer_schema, config, logger)
         delvars = ['x', 'y', 'type', 'schema']
         for d in delvars:

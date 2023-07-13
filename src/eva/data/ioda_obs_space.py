@@ -190,13 +190,7 @@ class IodaObsSpace(EvaDatasetBase):
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
 
-
     def generate_default_config(self, filenames, collection_name):
-        #eva_dict = {'datasets': [{'filenames': filenames,
-        #                          'groups': [],
-        #                          'missing_value_threshold': 1.0e06,
-        #                          'name': collection_name}]}
-
         eva_dict = {'filenames': filenames,
                     'groups': [],
                     'missing_value_threshold': 1.0e06,

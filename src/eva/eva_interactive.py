@@ -19,7 +19,7 @@ from eva.data.eva_dataset_base import EvaDatasetFactory
 from eva.transforms.arithmetic import arithmetic, generate_arithmetic_config
 from eva.transforms.accept_where import accept_where, generate_accept_where_config
 
-import eva.plotting.hvplot.interactive_plot_tools as plot_tools
+import eva.plotting.hvplot.interactive_plot_tools as plot
 # --------------------------------------------------------------------------------------------------
 
 
@@ -36,9 +36,9 @@ class EvaInteractive():
 
     # --------------------------------------------------------------------------------------------------
 
-    def load_collection(self, collection_name, filenames , eva_class_name, control_file = None):
+    def load_collection(self, collection_name, filenames, eva_class_name, control_file=None):
 
-        #Handle filenames input
+        # Handle filenames input
         if isinstance(filenames, str):
             filenames = [filenames]
 
@@ -52,7 +52,7 @@ class EvaInteractive():
         self.dc_dict[collection_name] = data_collection
         self.fn_dict[collection_name] = filenames[0]
 
-        #open up file to find channel requirements
+        # Open up file to find channel requirements
         if eva_class_name != 'JediLog':
             ds = nc.Dataset(filenames[0])
             if 'Channel' in ds.dimensions.keys():
@@ -63,7 +63,7 @@ class EvaInteractive():
             self.ch_required_dict[collection_name] = False
         self.ch_required_dict[collection_name] = False
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def get_data_collection(self, collection_name):
         if collection_name in self.dc_dict.keys():
@@ -71,7 +71,7 @@ class EvaInteractive():
         else:
             self.logger.abort(f'Collection name \'{collection_name}\' does not exist. ')
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def print_data_collection(self, collection_name):
         if collection_name in self.dc_dict.keys():
@@ -79,7 +79,7 @@ class EvaInteractive():
         else:
             self.logger.abort(f'Collection name \'{collection_name}\' does not exist. ')
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def retrieve_var_list(self, collection, group):
         ds = nc.Dataset(self.fn_dict[collection])
@@ -88,13 +88,13 @@ class EvaInteractive():
             self.var_cache = var_list
         return self.var_cache
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def arithmetic(self, new_name, expression, collection, var_list=[]):
         # Ensure var_list is not empty
         if not var_list:
-           group = re.split(r'\(|\)|-|\*|\+|\/', expression)[0]
-           var_list = self.retrieve_var_list(collection, group)
+            group = re.split(r'\(|\)|-|\*|\+|\/', expression)[0]
+            var_list = self.retrieve_var_list(collection, group)
 
         # Generate default config for transform
         arithmetic_config = generate_arithmetic_config(new_name, expression, collection, var_list)
@@ -103,7 +103,7 @@ class EvaInteractive():
         arithmetic(arithmetic_config, self.dc_dict[collection])
         self.logger.info(f'Added \'{new_name}\' to data collection \'{collection}\'.')
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def accept_where(self, new_name, starting_field, where, collection, var_list=[]):
         # Make sure all expressions are in correct format
@@ -112,7 +112,7 @@ class EvaInteractive():
                 group, _, _ = expression.split(' ')
             except Exception:
                 self.logger.abort(f'Failed to split \'{expression}\'. Check that ' +
-                                    'it has the correct format')
+                                  'it has the correct format')
 
         # Set var_list if empty
         if not var_list:
@@ -126,7 +126,7 @@ class EvaInteractive():
         accept_where(accept_where_config, self.dc_dict[collection])
         self.logger.info(f'Added \'{new_name}\' to data collection \'{collection}\'.')
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def print_statistics(self, df):
         # for each column, print statistics
@@ -137,36 +137,35 @@ class EvaInteractive():
                   "\n\t minimum: " + str(col.min()) +
                   "\n\t maximum:  " + str(col.max()) +
                   "\n\t std:  " + str(col.std()))
-                  #"\n\t number: " + nobs)
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def map_gridded(self):
         print('map gridded')
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def line_plot(self, plot_list):
-        return plot_tools.hvplot_line_plot(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
+        return plot.hvplot_line_plot(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def histogram(self, plot_list):
-        return plot_tools.hvplot_histogram(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
+        return plot.hvplot_histogram(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def map_scatter(self, plot_entry):
-        return plot_tools.hvplot_map_scatter(self.dc_dict, plot_entry, self.logger)
+        return plot.hvplot_map_scatter(self.dc_dict, plot_entry, self.logger)
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def density_plot(self, plot_list):
-        return plot_tools.hvplot_density_plot(self.dc_dict, plot_list,  self.ch_required_dict, self.logger)
+        return plot.hvplot_density_plot(self.dc_dict, plot_list, self.ch_required_dict, self.logger)
 
-   # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
     def scatter(self, x, y):
-        return plot_tools.hvplot_scatter(self.dc_dict, x, y, self.ch_required_dict, self.logger)
+        return plot.hvplot_scatter(self.dc_dict, x, y, self.ch_required_dict, self.logger)
 
-  # --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------

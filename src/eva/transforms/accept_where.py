@@ -86,7 +86,7 @@ def generate_accept_where_config(new_name, starting_field, where, collection, va
         group, _, _ = expression.split(' ')
         # Fix group name in expression
         where[index] = expression.replace(group, collection +
-                                              '::' + group + '::${variable}')
+                                          '::' + group + '::${variable}')
     # Build config
     accept_where_config = {
                             'new name': updated_name,

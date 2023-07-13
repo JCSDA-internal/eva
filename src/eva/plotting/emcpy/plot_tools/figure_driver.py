@@ -16,7 +16,7 @@ from eva.utilities.utils import get_schema, camelcase_to_underscore, parse_chann
 from eva.utilities.utils import replace_vars_dict
 from emcpy.plots.create_plots import CreatePlot, CreateFigure
 import copy
-import importlib
+import importlib as im
 import os
 
 # --------------------------------------------------------------------------------------------------
@@ -42,8 +42,8 @@ def figure_driver(config, data_collections, timing, logger):
 
         # update figure conf based on schema
         # ----------------------------------
-        fig_schema = figure_conf.get('schema', os.path.join(return_eva_path(), 'defaults',
-                                     'figure.yaml'))
+        fig_schema = figure_conf.get('schema', os.path.join(return_eva_path(), 'plotting',
+                                                            'emcpy', 'defaults', 'figure.yaml'))
         figure_conf = get_schema(fig_schema, figure_conf, logger)
 
         # pass configurations and make graphic(s)
@@ -97,7 +97,7 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
     # Adjust the plots configs if there are dynamic options
     # -----------------------------------------------------
     for dynamic_option in dynamic_options:
-        dynamic_option_module = importlib.import_module("eva.plotting.emcpy.plot_tools.dynamic_config")
+        dynamic_option_module = im.import_module("eva.plotting.emcpy.plot_tools.dynamic_config")
         dynamic_option_method = getattr(dynamic_option_module, dynamic_option['type'])
         plots = dynamic_option_method(logger, dynamic_option, plots, data_collections)
 
@@ -115,7 +115,7 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
             eva_class_name = layer.get("type")
             eva_module_name = camelcase_to_underscore(eva_class_name)
             full_module = "eva.plotting.emcpy.diagnostics."+eva_module_name
-            layer_class = getattr(importlib.import_module(full_module), eva_class_name)
+            layer_class = getattr(im.import_module(full_module), eva_class_name)
             # use the translator class to go from eva to declarative plotting
             layer_list.append(layer_class(layer, logger, data_collections).plotobj)
         # get mapping dictionary
