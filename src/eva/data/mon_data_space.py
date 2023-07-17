@@ -87,7 +87,7 @@ class MonDataSpace(EvaDatasetBase):
             timestep_ds = None
 
             timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
-                                         dims_arr, x_range, y_range, z_range, cyc_darr)
+                                         dims_arr, x_range, y_range, z_range, cyc_darr, channo)
 
             if attribs['sat']:
                 timestep_ds.attrs['satellite'] = attribs['sat']
@@ -466,7 +466,7 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def load_dset(self, vars, nvars, coords, darr, dims, ndims_used,
-                  dims_arr, x_range, y_range, z_range, cyc_darr):
+                  dims_arr, x_range, y_range, z_range, cyc_darr, channo):
 
         # create dataset from file components
         rtn_ds = None
@@ -487,6 +487,9 @@ class MonDataSpace(EvaDatasetBase):
                                        coords[dims_arr[2]]),
                               "data": darr[x, :, :]}
                 }
+
+            if 'Channel' in coords.values():
+                d.update({"Channel": {"dims": ("Channel"), "data": channo}})
 
             new_ds = Dataset.from_dict(d)
             rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
