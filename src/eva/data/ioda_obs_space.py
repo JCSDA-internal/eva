@@ -11,7 +11,7 @@
 import os
 from xarray import Dataset, open_dataset
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list
 
@@ -44,7 +44,7 @@ def subset_channels(ds, channels, add_channels_variable=False):
 # --------------------------------------------------------------------------------------------------
 
 
-class IodaObsSpace(EvaBase):
+class IodaObsSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
@@ -189,3 +189,10 @@ class IodaObsSpace(EvaBase):
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
+
+    def generate_default_config(self, filenames, collection_name):
+        eva_dict = {'filenames': filenames,
+                    'groups': [],
+                    'missing_value_threshold': 1.0e06,
+                    'name': collection_name}
+        return eva_dict

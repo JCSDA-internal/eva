@@ -14,7 +14,7 @@ import os
 import numpy as np
 import xarray as xr
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 
 
 # --------------------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ def get_data_from_line(jedi_log_line, search_term, separator, position):
 # --------------------------------------------------------------------------------------------------
 
 
-class JediLog(EvaBase):
+class JediLog(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
@@ -283,3 +283,10 @@ class JediLog(EvaBase):
         return convergence_ds
 
     # ----------------------------------------------------------------------------------------------
+
+    def generate_default_config(self, filenames, collection_name):
+        # Create default config
+        eva_dict = {'datasets': [{'jedi_log_to_parse': filenames[0],
+                                  'collection_name': collection_name,
+                                  'data_to_parse': {'convergence': 'true'}}]}
+        return eva_dict
