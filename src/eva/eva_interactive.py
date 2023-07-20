@@ -45,15 +45,20 @@ class EvaInteractive():
         creator = EvaDatasetFactory()
         data_collection = DataCollections()
         eva_object = creator.create_eva_object(eva_class_name, 'data', self.logger, self.timer)
-        config = eva_object.generate_default_config(filenames, collection_name)
-        print(config)
+
+        if control_file:
+            config = eva_object.generate_default_config(filenames, collection_name, control_file)
+        else:
+            config = eva_object.generate_default_config(filenames, collection_name)
+
         eva_object.execute(config, data_collection, self.timer)
 
         self.dc_dict[collection_name] = data_collection
         self.fn_dict[collection_name] = filenames[0]
 
+        no_ch_dataspaces = ['JediLog', 'MonDataSpace']
         # Open up file to find channel requirements
-        if eva_class_name is not 'JediLog':
+        if eva_class_name not in no_ch_dataspaces:
             ds = nc.Dataset(filenames[0])
             if 'Channel' in ds.dimensions.keys():
                 self.ch_required_dict[collection_name] = True

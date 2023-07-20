@@ -53,7 +53,7 @@ class EvaDatasetBase(ABC):
         pass
 
     @abstractmethod
-    def generate_default_config(self, filenames, collection_name):
+    def generate_default_config(self, filenames, collection_name, control_file=None):
         '''
         Each class must implement this method and it is where it will do all of its work.
         '''
