@@ -37,7 +37,7 @@ setuptools.setup(
         'netCDF4>=1.5.3',
         'matplotlib>=3.5.2',
         'cartopy>=0.18.0',
-        'scikit-learn>=1.0.2',
+        'scikit-learn>=1.3.0',
         'xarray>=0.11.3',
         'emcpy @ git+https://github.com/NOAA-EMC/' +
         'emcpy@fb7828841611aafa47a8a154776b780f7f944ae6#egg=emcpy',
