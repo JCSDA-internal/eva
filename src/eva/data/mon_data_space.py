@@ -167,15 +167,16 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def generate_default_config(self, filenames, collection_name, control_file):
-        'satellite': None,
-        'sensor': None,
-        'control_file': control_file,
-        'filenames': filenames,
-        'channels': [],
-        'regions': [],
-        'levels': [],
-        'groups': [],
-        'name': collection_name
+        eva_dict = {'satellite': None,
+                    'sensor': None,
+                    'control_file': control_file,
+                    'filenames': filenames,
+                    'channels': [],
+                    'regions': [],
+                    'levels': [],
+                    'groups': [],
+                    'name': collection_name}
+        return eva_dict
 
     # ----------------------------------------------------------------------------------------------
 
