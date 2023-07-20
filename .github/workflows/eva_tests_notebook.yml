@@ -45,7 +45,7 @@ jobs:
     #- name: Upgrade pip
     #  run: $CONDA/bin/pip3 install --upgrade pip
     - name: Install eva and dependencies
-      run: $CONDA/bin/pip3 install --use-deprecated=legacy-resolver -r requirements-github.txt --user .
+      run: $CONDA/bin/pip3 install -U --use-deprecated=legacy-resolver -r requirements-github.txt --user .
     - name: Put eva in the path
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
