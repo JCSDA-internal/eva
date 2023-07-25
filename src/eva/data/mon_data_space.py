@@ -17,14 +17,14 @@ from xarray import Dataset, concat
 from scipy.io import FortranFile
 from datetime import datetime
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list, is_number
 
 # --------------------------------------------------------------------------------------------------
 
 
-class MonDataSpace(EvaBase):
+class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
@@ -163,6 +163,20 @@ class MonDataSpace(EvaBase):
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
+
+    # ----------------------------------------------------------------------------------------------
+
+    def generate_default_config(self, filenames, collection_name, control_file):
+        eva_dict = {'satellite': None,
+                    'sensor': None,
+                    'control_file': control_file,
+                    'filenames': filenames,
+                    'channels': [],
+                    'regions': [],
+                    'levels': [],
+                    'groups': [],
+                    'name': collection_name}
+        return eva_dict
 
     # ----------------------------------------------------------------------------------------------
 
