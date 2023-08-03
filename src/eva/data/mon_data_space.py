@@ -113,7 +113,9 @@ class MonDataSpace(EvaDatasetBase):
             # --------------------------------------
             for x in range(len(coord_dict)):
                 if drop_coord[x]:
-                    ds = self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x])
+                    ds, channo, chan_assim, chan_nassim = \
+                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], channo,
+                                              chan_assim, chan_nassim)
 
             # If user specifies all variables set to group list
             # -------------------------------------------------
@@ -124,29 +126,25 @@ class MonDataSpace(EvaDatasetBase):
             # If channel is used then add chan_assim, chan_nassim, and
             # chan_yaxis to allow plotting of channel markers.
             # --------------------------------------------------------------
-            if 'channel' in group_vars:
+            if 'Channel' in coords.values():
                 ds['channel'] = (['Channel'], channo)
-                ds['chan_assim'] = (['Channel'], chan_assim)
-                ds['chan_nassim'] = (['Channel'], chan_nassim)
+                if len(chan_assim) > 0:
+                    ds['chan_assim'] = (['Channel'], chan_assim)
+                if len(chan_nassim) > 0:
+                    ds['chan_nassim'] = (['Channel'], chan_nassim)
                 ds['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
                 ds['chan_yaxis_1p5'] = (['Channel'], [-1.5]*len(channo))
                 ds['chan_yaxis_p05'] = (['Channel'], [-0.05]*len(channo))
 
             # Conditionally add scan position as a variable using single dimension
             # --------------------------------------------------------------------
-            if 'scan' in group_vars:
-                ds['scan'] = (['scan'], scanpo)
-
-            # Drop data variables not in user requested variables
-            # ---------------------------------------------------
-            vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
-            ds = ds.drop_vars(vars_to_remove)
+            if 'Scan' in coords.values():
+                ds['scan'] = (['Scan'], scanpo)
 
             # Rename variables with group
             rename_dict = {}
-            for group_var in group_vars:
-                rename_dict[group_var] = group_name + '::' + group_var
-
+            for var in list(ds.data_vars):
+                rename_dict[var] = group_name + '::' + var
             ds = ds.rename(rename_dict)
 
             # Assert that the collection contains at least one variable
@@ -180,7 +178,7 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def subset_coordinate(self, ds, coordinate, requested_subset):
+    def subset_coordinate(self, ds, coordinate, requested_subset, channo, chan_assim, chan_nassim):
 
         if coordinate in list(ds.dims):
 
@@ -201,11 +199,33 @@ class MonDataSpace(EvaDatasetBase):
                                   ", but that is not a valid value. \n" +
                                   "Valid values for " + str(coordinate) + " are: \n" +
                                   f"{', '.join(str(i) for i in ds[coordinate].data)}")
+
+            # If Channel coordinate has been reduced from "all" (by yaml
+            # file) then reset chan_assim/nassim and channo accordingly
+            if coordinate == 'Channel':
+                channo = requested_subset
+                new_chan_assim = []
+                new_chan_nassim = []
+
+                for x in channo:
+                    if x in chan_assim:
+                        new_chan_assim.append(x)
+                    elif x in chan_nassim:
+                        new_chan_nassim.append(x)
+
+                chan_assim = new_chan_assim
+                chan_nassim = new_chan_nassim
+
+                for x in range(len(chan_assim), len(channo)):
+                    chan_assim.append(0)
+                for x in range(len(chan_nassim), len(channo)):
+                    chan_nassim.append(0)
+
         else:
             self.logger.info('Warning:  requested coordinate, ' + str(coordinate) + ' is not in ' +
                              ' dataset dimensions valid dimensions include ' + str(ds.dims))
 
-        return ds
+        return ds, channo, chan_assim, chan_nassim
 
     # ----------------------------------------------------------------------------------------------
 
@@ -510,15 +530,15 @@ class MonDataSpace(EvaDatasetBase):
                 {
                     'cycle': ((coords[dims_arr[0]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1)},
+                coords={coords[dims_arr[0]]: x_range},
             )
         if ndims_used == 2:
             new_cyc = Dataset(
                 {
                     'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
-                        coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1)},
+                coords={coords[dims_arr[0]]: x_range,
+                        coords[dims_arr[1]]: y_range},
             )
         if ndims_used == 3:
             new_cyc = Dataset(
@@ -526,9 +546,10 @@ class MonDataSpace(EvaDatasetBase):
                     'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]],
                                coords[dims_arr[2]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
-                        coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1),
-                        coords[dims_arr[2]]: np.arange(1, dims[dims_arr[2]]+1)},
+                coords={coords[dims_arr[0]]: x_range,
+                        coords[dims_arr[1]]: y_range,
+                        coords[dims_arr[2]]: z_range},
             )
+
         rtn_ds = rtn_ds.merge(new_cyc)
         return rtn_ds

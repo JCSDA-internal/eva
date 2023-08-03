@@ -60,7 +60,7 @@ class LinePlot():
         layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
                                                          'emcpy', 'defaults', 'line_plot.yaml'))
         config = get_schema(layer_schema, config, logger)
-        delvars = ['x', 'y', 'type', 'schema']
+        delvars = ['x', 'y', 'type', 'schema', 'channel']
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, logger)
