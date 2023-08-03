@@ -113,8 +113,9 @@ class MonDataSpace(EvaDatasetBase):
             # --------------------------------------
             for x in range(len(coord_dict)):
                 if drop_coord[x]:
-                    ds, channo, chan_assim, chan_nassim = self.subset_coordinate(ds, coord_dict[x][1],
-                               requested_coord[x], channo, chan_assim, chan_nassim)
+                    ds, channo, chan_assim, chan_nassim = \
+                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], channo,
+                                              chan_assim, chan_nassim)
 
             # If user specifies all variables set to group list
             # -------------------------------------------------
@@ -137,8 +138,8 @@ class MonDataSpace(EvaDatasetBase):
 
             # Conditionally add scan position as a variable using single dimension
             # --------------------------------------------------------------------
-            if 'scan' in group_vars:
-                ds['scan'] = (['scan'], scanpo)
+            if 'Scan' in coords.values():
+                ds['scan'] = (['Scan'], scanpo)
 
             # Rename variables with group
             rename_dict = {}
@@ -154,7 +155,7 @@ class MonDataSpace(EvaDatasetBase):
 
         # Add the dataset to the collections
         data_collections.create_or_add_to_collection(collection_name, ds, 'cycle')
-         
+
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
 
@@ -198,19 +199,19 @@ class MonDataSpace(EvaDatasetBase):
                                   ", but that is not a valid value. \n" +
                                   "Valid values for " + str(coordinate) + " are: \n" +
                                   f"{', '.join(str(i) for i in ds[coordinate].data)}")
-    
-            # if Channel coordinate has been reduced reset
-            # chan_assim/nassim and channo accordingly
+
+            # If Channel coordinate has been reduced from "all" (by yaml
+            # file) then reset chan_assim/nassim and channo accordingly
             if coordinate == 'Channel':
                 channo = requested_subset
                 new_chan_assim = []
                 new_chan_nassim = []
 
                 for x in channo:
-                   if x in chan_assim:
-                       new_chan_assim.append(x)
-                   elif x in chan_nassim:   
-                       new_chan_nassim.append(x)
+                    if x in chan_assim:
+                        new_chan_assim.append(x)
+                    elif x in chan_nassim:
+                        new_chan_nassim.append(x)
 
                 chan_assim = new_chan_assim
                 chan_nassim = new_chan_nassim
@@ -424,9 +425,6 @@ class MonDataSpace(EvaDatasetBase):
 
         if load_data:
             f.close()
-        else:
-            self.logger.info(f"cycle_tm: {cycle_tm}")
-
         return rtn_array, cycle_tm
 
     # ----------------------------------------------------------------------------------------------
@@ -532,15 +530,15 @@ class MonDataSpace(EvaDatasetBase):
                 {
                     'cycle': ((coords[dims_arr[0]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1)},
+                coords={coords[dims_arr[0]]: x_range},
             )
         if ndims_used == 2:
             new_cyc = Dataset(
                 {
                     'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
-                        coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1)},
+                coords={coords[dims_arr[0]]: x_range,
+                        coords[dims_arr[1]]: y_range},
             )
         if ndims_used == 3:
             new_cyc = Dataset(
@@ -548,9 +546,10 @@ class MonDataSpace(EvaDatasetBase):
                     'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]],
                                coords[dims_arr[2]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
-                        coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1),
-                        coords[dims_arr[2]]: np.arange(1, dims[dims_arr[2]]+1)},
+                coords={coords[dims_arr[0]]: x_range,
+                        coords[dims_arr[1]]: y_range,
+                        coords[dims_arr[2]]: z_range},
             )
+
         rtn_ds = rtn_ds.merge(new_cyc)
         return rtn_ds
