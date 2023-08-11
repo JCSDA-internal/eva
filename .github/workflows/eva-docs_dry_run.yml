@@ -1,0 +1,16 @@
+name: EVA Documentation Dry Run
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  run-evadocs-dry-run:
+    uses: JCSDA-internal/eva-docs/.github/workflows/docs_dry_run.yaml@develop
