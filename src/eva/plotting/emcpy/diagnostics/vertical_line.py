@@ -31,7 +31,7 @@ class VerticalLine():
         vertical_line_plot = VerticalLine(config, logger, None)
     """
 
-    def __init__(self, config, logger):
+    def __init__(self, config, logger, dataobj):
 
         # Get the x value to plot
         # -----------------------

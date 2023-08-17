@@ -30,7 +30,7 @@ class HorizontalLine():
         horizontal_line_plot = HorizontalLine(config, logger)
     """
 
-    def __init__(self, config, logger):
+    def __init__(self, config, logger, dataobj):
 
         # Get the y value to plot
         # -----------------------
