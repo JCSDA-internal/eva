@@ -31,16 +31,17 @@ def select_time(config, data_collections):
 
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
-        data_collections (DataCollections): An instance of the DataCollections class containing input data.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
 
     Returns:
         None
 
-    This function selects and processes data variables within the provided data collections based on specified
-    time cycles or a single time point (given as YYYYMMDDHH). It iterates over the specified collections, groups, and variables,
-    and selects data for the specified time period. If two time cycles are provided, it calculates the mean
-    of a time slice; otherwise, it selects data for a single time point. The resulting processed variables
-    are added to the data collections.
+    This function selects and processes data variables within the provided data collections based
+    on specified time cycles or a single time point (given as YYYYMMDDHH). It iterates over the
+    specified collections, groups, and variables, and selects data for the specified time period. If 
+    two time cycles are provided, it calculates the mean of a time slice; otherwise, it selects data
+    for a single time point. The resulting processed variables are added to the data collections.
 
     Example:
         config = {

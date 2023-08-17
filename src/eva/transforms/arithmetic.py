@@ -36,7 +36,8 @@ def isfloat(a_string):
     Returns:
         bool: True if the string can be converted to a float, False otherwise.
 
-    This function determines whether a given string can be successfully converted to a floating-point number.
+    This function determines whether a given string can be successfully converted to a
+    floating-point number.
 
     Example:
         result = isfloat("3.14")
@@ -58,15 +59,16 @@ def arithmetic(config, data_collections):
 
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
-        data_collections (DataCollections): An instance of the DataCollections class containing input data.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
 
     Returns:
         None
 
-    This function applies arithmetic transformations to data variables within the provided data collections.
-    It iterates over the specified collections, groups, and variables, and applies arithmetic expressions
-    as defined in the 'equals' expressions within the configuration. The resulting variables are added to
-    the data collections.
+    This function applies arithmetic transformations to data variables within the provided data
+    collections. It iterates over the specified collections, groups, and variables, and applies
+    arithmetic expressions as defined in the 'equals' expressions within the configuration. The
+    resulting variables are added to the data collections.
 
     Example:
         config = {
@@ -130,29 +132,5 @@ def arithmetic(config, data_collections):
                 cgv = split_collectiongroupvariable(logger, new_name)
                 data_collections.add_variable_to_collection(cgv[0], cgv[1], cgv[2], new_variable)
 
-
-# --------------------------------------------------------------------------------------------------
-
-def generate_arithmetic_config(new_name, expression, collection, var_list):
-
-    # Update new_name
-    updated_name = collection + '::' + new_name + '::${variable}'
-
-    # Fix expression
-    groups = re.split(r'\(|\)|-|\*|\+|\/', expression)
-    for group in groups:
-        expression = expression.replace(group, collection +
-                                        '::' + group + '::${variable}')
-
-    # Build dictionary
-    arithmetic_config = {
-                        'new name': updated_name,
-                        'transform': "arithmetic",
-                        'for': {
-                          'variable': var_list
-                         },
-                        'equals': expression
-                        }
-    return arithmetic_config
 
 # --------------------------------------------------------------------------------------------------

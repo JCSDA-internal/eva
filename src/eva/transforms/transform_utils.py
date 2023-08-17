@@ -18,17 +18,20 @@ from eva.utilities.utils import replace_vars_str
 
 def parse_for_dict(config, logger):
     """
-    Parses the 'for' dictionary from the configuration and extracts collection, group, and variable values.
+    Parses the 'for' dictionary from the configuration and extracts collection, group, and variable
+    values.
 
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
         logger (Logger): An instance of the logger for logging messages.
 
     Returns:
-        list: A list containing collection, group, and variable values extracted from the 'for' dictionary.
+        list: A list containing collection, group, and variable values extracted from the 'for'
+              dictionary.
 
-    This function parses the 'for' dictionary provided in the configuration and extracts the collection, group,
-    and variable values specified. It returns a list containing these extracted components.
+    This function parses the 'for' dictionary provided in the configuration and extracts the
+    collection, group, and variable values specified. It returns a list containing these extracted
+    components.
 
     Example:
         for_dict = {
@@ -77,11 +80,13 @@ def replace_cgv(logger, collection, group, variable, *argv):
     Returns:
         list: A list of template strings with placeholders replaced by corresponding values.
 
-    This function replaces placeholders in the provided template strings with the specified collection,
-    group, and variable values. It returns a list of template strings with replaced placeholders.
+    This function replaces placeholders in the provided template strings with the specified
+    collection, group, and variable values. It returns a list of template strings with replaced
+    placeholders.
 
     Example:
-        replaced_templates = replace_cgv(logger, 'my_collection', 'my_group', 'my_variable', template1, template2)
+        replaced_templates = replace_cgv(logger, 'my_collection', 'my_group', 'my_variable',
+                                         template1, template2)
     """
 
     # Create dictionary with templates
@@ -130,8 +135,8 @@ def split_collectiongroupvariable(logger, collectiongroupvariable):
     Returns:
         list: A list containing the collection, group, and variable components.
 
-    This function splits a collectiongroupvariable string into its components (collection, group, variable).
-    It returns a list containing these components.
+    This function splits a collectiongroupvariable string into its components (collection,
+    group, variable). It returns a list containing these components.
 
     Example:
         cgv = split_collectiongroupvariable(logger, 'my_collection::my_group::my_variable')

@@ -23,17 +23,19 @@ def transform_driver(config, data_collections, timing, logger):
 
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
-        data_collections (DataCollections): An instance of the DataCollections class containing input data.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
         timing (Timing): An instance of the Timing class for tracking execution times.
         logger (Logger): An instance of the logger for logging messages.
 
     Returns:
         None
 
-    This function applies a series of transformation methods to the provided data collections. It iterates over
-    a list of transform dictionaries specified in the configuration. For each transform, it identifies the
-    transform type, instantiates the corresponding transform object, and calls the transform method.
-    Execution times for each transform are tracked using the Timing instance.
+    This function applies a series of transformation methods to the provided data collections. It
+    iterates over a list of transform dictionaries specified in the configuration. For each
+    transform, it identifies the transform type, instantiates the corresponding transform object,
+    and calls the transform method. Execution times for each transform are tracked using the Timing
+    instance.
 
     """
 

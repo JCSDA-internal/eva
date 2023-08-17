@@ -25,7 +25,8 @@ def accept_where(config, data_collections):
 
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
-        data_collections (DataCollections): An instance of the DataCollections class containing input data.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
 
     Returns:
         None
@@ -33,10 +34,10 @@ def accept_where(config, data_collections):
     Raises:
         ValueError: If the 'where' expression format is incorrect.
 
-    This function applies a filtering transformation to data variables within the provided data collections.
-    It iterates over the specified collections, groups, and variables, and applies filtering conditions as
-    defined in the 'where' expressions within the configuration. The resulting filtered variables are added
-    to the data collections.
+    This function applies a filtering transformation to data variables within the provided
+    data collections. It iterates over the specified collections, groups, and variables, and
+    applies filtering conditions as defined in the 'where' expressions within the configuration.
+    The resulting filtered variables are added to the data collections.
 
     Example:
         config = {
@@ -102,30 +103,5 @@ def accept_where(config, data_collections):
                 cgv = split_collectiongroupvariable(logger, new_name)
                 data_collections.add_variable_to_collection(cgv[0], cgv[1], cgv[2], var_to_filter)
 
-
-# --------------------------------------------------------------------------------------------------
-
-def generate_accept_where_config(new_name, starting_field, where, collection, var_list):
-    # Update new_name
-    updated_name = collection + '::' + new_name + '::${variable}'
-    starting_field = collection + '::' + starting_field + '::${variable}'
-
-    for index, expression in enumerate(where):
-        # Get group
-        group, _, _ = expression.split(' ')
-        # Fix group name in expression
-        where[index] = expression.replace(group, collection +
-                                          '::' + group + '::${variable}')
-    # Build config
-    accept_where_config = {
-                            'new name': updated_name,
-                            'where': where,
-                            'transform': 'accept where',
-                            'starting field': starting_field,
-                            'for': {
-                                "variable": var_list
-                            }
-                          }
-    return accept_where_config
 
 # --------------------------------------------------------------------------------------------------
