@@ -18,9 +18,23 @@ from eva.utilities.utils import load_yaml_file
 
 class Config(dict):
 
-    # ----------------------------------------------------------------------------------------------
+    """
+    Class containing a configuration for tasks.
+    """
 
     def __init__(self, dict_or_yaml, logger):
+
+        """
+        Initialize the Config object.
+
+        Args:
+            dict_or_yaml (dict or str): Either a dictionary containing configuration parameters
+                                        or the path to a YAML file containing the configuration.
+            logger: An instance of the logger to handle log messages.
+
+        Returns:
+            None
+        """
 
         # Copy of logger
         self.logger = logger
@@ -37,6 +51,18 @@ class Config(dict):
     # ----------------------------------------------------------------------------------------------
 
     def get(self, key, default=None, abort_on_failure=True):
+
+        """
+        Get the value associated with a key from the configuration.
+
+        Args:
+            key (str): The key for which the value needs to be retrieved from the configuration.
+            default: The default value to return if the key is not found in the configuration.
+            abort_on_failure (bool): If True, aborts the program if the key is not found.
+
+        Returns:
+            The value associated with the key if found, otherwise the default value.
+        """
 
         if default is None:
 
@@ -56,6 +82,20 @@ class Config(dict):
 
 
 def get(dict, logger, key, default=None, abort_on_failure=True):
+
+    """
+    Get the value associated with a key from a given dictionary.
+
+    Args:
+        dict (dict): The dictionary from which the value needs to be retrieved.
+        logger: An instance of the logger to handle log messages.
+        key (str): The key for which the value needs to be retrieved from the dictionary.
+        default: The default value to return if the key is not found in the dictionary.
+        abort_on_failure (bool): If True, aborts the program if the key is not found.
+
+    Returns:
+        The value associated with the key if found, otherwise the default value.
+    """
 
     if default is None:
 

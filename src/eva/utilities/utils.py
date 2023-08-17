@@ -28,8 +28,15 @@ class fontColors:
 
 def camelcase_to_underscore(CamelCaseString):
 
-    # Convert a string that looks like e.g. ThisIsAString to this_is_a_string
-    # -----------------------------------------------------------------------
+    """
+    Convert a CamelCase string to underscore_separated lowercase string.
+
+    Args:
+        CamelCaseString (str): The CamelCase string to be converted.
+
+    Returns:
+        str: The underscore-separated lowercase string.
+    """
 
     # Create empty output string
     underscore_string = ''
@@ -68,7 +75,17 @@ def camelcase_to_underscore(CamelCaseString):
 
 
 def load_yaml_file(eva_config, logger):
-    # utility function to help load a yaml file into a dict.
+
+    """
+    Load a YAML file into a dictionary.
+
+    Args:
+        eva_config (str): Path to the YAML file.
+        logger (Logger): The logger object for logging messages.
+
+    Returns:
+        dict: A dictionary containing the contents of the YAML file.
+    """
 
     if logger is None:
         logger = Logger('LoadYamlFile')
@@ -87,8 +104,20 @@ def load_yaml_file(eva_config, logger):
 
 
 def get_schema(YamlFile, configDict={}, logger=None):
-    # read YamlFile into a dictionary containing a configuration,
-    # and overwrite the default configuration with the input configDict
+
+    """
+    Read a YAML file into a dictionary containing a configuration and overwrite the default
+    configuration with the input configDict.
+
+    Args:
+        YamlFile (str): Path to the YAML file.
+        configDict (dict, optional): Dictionary of configuration options to overwrite defaults.
+            Defaults to an empty dictionary.
+        logger (Logger, optional): The logger object for logging messages. Defaults to None.
+
+    Returns:
+        dict: A dictionary containing the configuration.
+    """
 
     if logger is None:
         logger = Logger('EvaSchema')
@@ -115,8 +144,20 @@ def get_schema(YamlFile, configDict={}, logger=None):
 
 
 def update_object(myObj, configDict, logger=None):
-    # update input object myObj attributes based on a dictionary
-    # and return a new, updated myObj
+
+    """
+    Update the attributes of the input object myObj based on a dictionary configDict and return a
+    new, updated myObj.
+
+    Args:
+        myObj (object): The object to be updated.
+        configDict (dict): Dictionary containing attribute names and their corresponding values to
+        update.
+        logger (Logger, optional): The logger object for logging messages. Defaults to None.
+
+    Returns:
+        object: The updated object with modified attributes.
+    """
 
     if logger is None:
         logger = Logger('EvaUpdateObject')
@@ -136,6 +177,23 @@ def update_object(myObj, configDict, logger=None):
 
 
 def parse_channel_list(channels_str_or_list, logger):
+
+    """
+    Parse the input channels_str_or_list and return a list of channel numbers.
+
+    This function handles parsing and converting various input types into a list of channel numbers.
+
+    Args:
+        channels_str_or_list (list, str, int): The input channels as a list, string, or integer.
+        logger (Logger): The logger object for logging error messages.
+
+    Returns:
+        list: A list of channel numbers.
+
+    Raises:
+        ValueError: If the input is not a valid list of integers or a string that can be parsed into
+                    a list of integers.
+    """
 
     # If the input is an empty list return an empty list
     if channels_str_or_list is []:
@@ -183,24 +241,24 @@ def parse_channel_list(channels_str_or_list, logger):
 
 
 def replace_vars_str(s, **defs):
-    """Interpolate/replace variables in string
 
-    Resolved variable formats is: ${var}. Undefined
-    variables remain unchanged in the returned string. This method will
-    recursively resolve variables of variables.
+    """
+    Interpolate and replace variables in the input string.
 
-    Parameters
-    ----------
-    s : string, required
-        Input string containing variables to be resolved.
-    defs: dict, required
-        dictionary of definitions for resolving variables expressed
-        as key-word arguments.
+    This function replaces variable placeholders in the input string with their corresponding values
+    provided in the 'defs' dictionary. It can handle recursive variable substitution.
 
-    Returns
-    -------
-    s_interp: string
-        Interpolated string. Undefined variables are left unchanged.
+    Parameters:
+        s (str): The input string containing variables to be resolved.
+        defs (dict): A dictionary of variable definitions for resolving variables, expressed as
+                     key-word arguments.
+
+    Returns:
+        str: The interpolated string. Undefined variables are left unchanged.
+
+    Example:
+        If defs = {'var1': 'value1', 'var2': 'value2'}, and s = 'This is ${var1} and ${var2}.',
+        the returned string would be 'This is value1 and value2.'
     """
 
     expr = s
@@ -224,23 +282,26 @@ def replace_vars_str(s, **defs):
 
 
 def replace_vars_dict(d, **defs):
+
     """
-    At the highest level of the dictionary are definitions, such as swell_dir: /path/to/swell.
-    Elsewhere in the dictionary is use of these definitions, such as key: $(swell_dir)/some/file.ext
-    In this script variables like $(swell_dir) are replaced everywhere in the dictionary using the
-    definition.
+    Replace variable placeholders in the dictionary values using provided definitions.
 
-    Parameters
-    ----------
-    d : dictionary, required
-        Dictionary to be modified
-    defs: dictionary, required
-          Dictionary of definitions for resolving variables expressed as key-word arguments.
+    This function replaces variable placeholders in the dictionary values with their corresponding
+    values provided in the 'defs' dictionary. It searches for placeholders in the dictionary
+    values and substitutes them with their definitions.
 
-    Returns
-    -------
-    d_interp: dictionary
-              Dictionary with any definitions resolved
+    Parameters:
+        d (dict): The dictionary to be modified.
+        defs (dict): A dictionary of variable definitions for resolving variables, expressed as
+                     key-word arguments.
+
+    Returns:
+        dict: The modified dictionary with variable placeholders replaced by their definitions.
+
+    Example:
+        If defs = {'swell_dir': '/path/to/swell'},
+        and d = {'key': '$(swell_dir)/some/file.ext'},
+        the returned dictionary would be {'key': '/path/to/swell/some/file.ext'}.
     """
 
     # Convert dictionary to string representation in yaml form
@@ -260,17 +321,25 @@ def replace_vars_dict(d, **defs):
 def replace_vars_notebook(nb, **defs):
 
     """
-    Parameters
-    ----------
-    nb : NotebookNode, required
-        nbconvert dict-like NotebookNode to be modified
-    defs: dictionary, required
-          Dictionary of definitions for resolving variables expressed as key-word arguments.
+    Replace variable placeholders in a nbconvert NotebookNode's cell source code.
 
-    Returns
-    -------
-    nb : NotebookNode
-              nbconvert NotebookNode with definitions resolved
+    This function iterates through the cells of a nbconvert NotebookNode, searching for variable
+    placeholders in the cell source code. Variable placeholders are then substituted with their
+    corresponding definitions provided in the 'defs' dictionary.
+
+    Parameters:
+        nb (NotebookNode): A nbconvert dict-like NotebookNode to be modified.
+        defs (dict): A dictionary of variable definitions for resolving variables, expressed as
+                     key-word arguments.
+
+    Returns:
+        NotebookNode: The modified nbconvert NotebookNode with variable placeholders in cell
+                      source code replaced by their definitions.
+
+    Example:
+        If defs = {'swell_dir': '/path/to/swell'},
+        and a cell source code contains 'file_path = $(swell_dir)/file.txt',
+        the modified cell source code will be 'file_path = /path/to/swell/file.txt'.
     """
 
     # Iterate through notebook cells, skipping notebook metadata
@@ -292,6 +361,16 @@ def replace_vars_notebook(nb, **defs):
 
 def remove_list_duplicates(input_list):
 
+    """
+    Remove duplicate elements from a list while preserving the order.
+
+    Parameters:
+        input_list (list): The input list containing elements.
+
+    Returns:
+        list: A new list with duplicate elements removed while preserving the order.
+    """
+
     output_list = []
     [output_list.append(x) for x in input_list if x not in output_list]
 
@@ -302,6 +381,16 @@ def remove_list_duplicates(input_list):
 
 
 def remove_empty_from_list_of_strings(list):
+
+    """
+    Remove empty strings from a list of strings.
+
+    Parameters:
+        lst (list): The input list of strings.
+
+    Returns:
+        list: A new list with empty strings removed.
+    """
 
     while ("" in list):
         list.remove("")
@@ -314,6 +403,19 @@ def remove_empty_from_list_of_strings(list):
 
 def string_does_not_contain(disallowed_chars, string_to_check):
 
+    """
+    Check if a string does not contain any of the specified characters.
+
+    Parameters:
+        disallowed_chars (str): A string containing characters that should not be present in
+                                'string_to_check'.
+        string_to_check (str): The string to be checked.
+
+    Returns:
+        bool: True if 'string_to_check' does not contain any of the 'disallowed_chars', False
+              otherwise.
+    """
+
     string_does_not_contain_flag = True
     if any(disallowed_char in string_to_check for disallowed_char in disallowed_chars):
         string_does_not_contain_flag = False
@@ -325,6 +427,21 @@ def string_does_not_contain(disallowed_chars, string_to_check):
 
 
 def slice_var_from_str(config, datavar, logger):
+
+    """
+    Slice a variable from an array based on the configuration.
+
+    This function evaluates the slicing configuration and applies it to the input variable 'datavar'.
+
+    Parameters:
+        config (dict): The configuration dictionary containing slicing information.
+        datavar: The input variable to be sliced.
+        logger: The logger object for logging messages.
+
+    Returns:
+        The sliced variable 'datavar'.
+    """
+
     if 'slices' in config.keys():
         try:
             datavar = eval("datavar"+config['slices'])
@@ -339,6 +456,17 @@ def slice_var_from_str(config, datavar, logger):
 
 
 def is_number(s):
+
+    """
+    Check if a given value can be converted to a number.
+
+    Parameters:
+        s: The value to be checked.
+
+    Returns:
+        bool: True if the value can be converted to a number, False otherwise.
+    """
+
     try:
         float(s)
         return True

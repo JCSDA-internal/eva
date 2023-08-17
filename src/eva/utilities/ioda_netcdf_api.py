@@ -10,6 +10,19 @@
 
 def read_ioda_variable(fh, group, variable, channel=None):
 
+    """
+    Read an IODA variable from a specified group and channel (if applicable).
+
+    Args:
+        fh: The IODA file handle.
+        group (str): The IODA group from which to read the variable.
+        variable (str): The variable to be read.
+        channel (int or None): The channel number for the variable if applicable. Default is None.
+
+    Returns:
+        ndarray: The data read from the IODA variable.
+    """
+
     # Set the variables to be read
     # ----------------------------
     if group == 'omb':
