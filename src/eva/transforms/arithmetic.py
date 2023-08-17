@@ -134,3 +134,51 @@ def arithmetic(config, data_collections):
 
 
 # --------------------------------------------------------------------------------------------------
+
+def generate_arithmetic_config(new_name, expression, collection, var_list):
+    """
+    Generates a configuration dictionary for the 'arithmetic' transformation.
+
+    Args:
+        new_name (str): The new variable name after the transformation.
+        expression (str): The arithmetic expression to be applied.
+        collection (str): The collection name.
+        var_list (list): A list of variables to apply the transformation to.
+
+    Returns:
+        dict: A configuration dictionary for the 'arithmetic' transformation.
+
+    This function generates a configuration dictionary for the 'arithmetic' transformation based
+    on the provided parameters. It updates the 'new name' field, adjusts the arithmetic expression
+    based on the provided collection and group names, and specifies the 'for' dictionary to apply
+    the transformation to the specified variables.
+
+    Example:
+        new_name = 'result_variable'
+        expression = '(${group1} + ${group2}) / 2'
+        collection = 'my_collection'
+        var_list = ['variable1', 'variable2']
+        config = generate_arithmetic_config(new_name, expression, collection, var_list)
+    """
+
+    # Update new_name
+    updated_name = collection + '::' + new_name + '::${variable}'
+
+    # Fix expression
+    groups = re.split(r'\(|\)|-|\*|\+|\/', expression)
+    for group in groups:
+        expression = expression.replace(group, collection +
+                                        '::' + group + '::${variable}')
+
+    # Build dictionary
+    arithmetic_config = {
+                        'new name': updated_name,
+                        'transform': "arithmetic",
+                        'for': {
+                          'variable': var_list
+                         },
+                        'equals': expression
+                        }
+    return arithmetic_config
+
+# --------------------------------------------------------------------------------------------------

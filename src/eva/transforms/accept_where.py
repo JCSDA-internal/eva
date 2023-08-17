@@ -105,3 +105,56 @@ def accept_where(config, data_collections):
 
 
 # --------------------------------------------------------------------------------------------------
+
+def generate_accept_where_config(new_name, starting_field, where, collection, var_list):
+    """
+    Generates a configuration dictionary for the 'accept where' transformation.
+
+    Args:
+        new_name (str): The new variable name after the transformation.
+        starting_field (str): The starting variable field for the transformation.
+        where (list): A list of filter expressions to be applied.
+        collection (str): The collection name.
+        var_list (list): A list of variables to apply the transformation to.
+
+    Returns:
+        dict: A configuration dictionary for the 'accept where' transformation.
+
+    This function generates a configuration dictionary for the 'accept where' transformation based
+    on the provided parameters. It updates the 'new name' and 'starting field' fields, adjusts
+    expressions in 'where' based on the provided collection and group names, and specifies the
+    'for' dictionary to apply the transformation to the specified variables.
+
+    Example:
+        new_name = 'filtered_variable'
+        starting_field = 'original_variable'
+        where = ['group1 >= 0', 'group2 < 10']
+        collection = 'my_collection'
+        var_list = ['variable1', 'variable2']
+        config = generate_accept_where_config(new_name, starting_field, where, collection,
+                                              var_list)
+    """
+
+    # Update new_name
+    updated_name = collection + '::' + new_name + '::${variable}'
+    starting_field = collection + '::' + starting_field + '::${variable}'
+
+    for index, expression in enumerate(where):
+        # Get group
+        group, _, _ = expression.split(' ')
+        # Fix group name in expression
+        where[index] = expression.replace(group, collection +
+                                          '::' + group + '::${variable}')
+    # Build config
+    accept_where_config = {
+                            'new name': updated_name,
+                            'where': where,
+                            'transform': 'accept where',
+                            'starting field': starting_field,
+                            'for': {
+                                "variable": var_list
+                            }
+                          }
+    return accept_where_config
+
+# --------------------------------------------------------------------------------------------------
