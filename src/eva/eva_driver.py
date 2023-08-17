@@ -6,6 +6,10 @@
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
+
+# --------------------------------------------------------------------------------------------------
+
+
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
 from eva.data.data_driver import data_driver
@@ -17,7 +21,24 @@ import argparse
 import os
 
 
+# --------------------------------------------------------------------------------------------------
+
+
 def eva(eva_config, eva_logger=None):
+
+    """
+    Execute the Evaluation and Visualization Analysis (EVA) process based on the provided
+    configuration.
+
+    Parameters:
+        eva_config (dict or str): Configuration data for the EVA process. It can be a dictionary or
+        the path to a YAML configuration file.
+        eva_logger (Logger, optional): An instance of the logger for logging messages. Default is
+        None.
+
+    Returns:
+        None
+    """
 
     # Create timing object
     timing = Timing()
@@ -71,6 +92,17 @@ def eva(eva_config, eva_logger=None):
 
 
 def main():
+
+    """
+    Entry point for main eva program. Reads configuration from a YAML file and executes eva
+    based on what is described in the configuration file.
+
+    Parameters:
+        config_file (str): The path to the configuration YAML file.
+
+    Returns:
+        None
+    """
 
     # Arguments
     # ---------

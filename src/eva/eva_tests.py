@@ -25,6 +25,13 @@ from eva.utilities.utils import load_yaml_file, replace_vars_dict, replace_vars_
 
 def application_tests(logger):
 
+    """
+    Run Eva application tests using specified configurations.
+
+    Args:
+        logger (Logger): An instance of the Logger class for logging messages.
+    """
+
     from eva.eva_driver import eva
 
     # Write some messaging
@@ -61,6 +68,13 @@ def application_tests(logger):
 
 
 def notebook_tests(logger):
+
+    """
+    Run Eva notebook tests by executing specified notebooks.
+
+    Args:
+        logger (Logger): An instance of the Logger class for logging messages.
+    """
 
     from eva.eva_driver import eva
     import nbformat
@@ -104,6 +118,10 @@ def notebook_tests(logger):
 
 
 def main():
+
+    """
+    Main function for running Eva test suite.
+    """
 
     # Parse arguments
     # ---------------
