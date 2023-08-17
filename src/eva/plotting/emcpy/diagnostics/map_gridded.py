@@ -4,7 +4,34 @@ import emcpy.plots.map_plots
 import os
 
 
+# --------------------------------------------------------------------------------------------------
+
+
 class MapGridded():
+    """
+    Creates a gridded map plot based on the provided configuration.
+
+    Args:
+        config (dict): A dictionary containing the configuration for the gridded map plot.
+        logger (Logger): An instance of the logger for logging messages.
+        dataobj: An instance of the data object containing input data.
+
+    This class initializes and configures a gridded map plot based on the provided configuration.
+    The gridded map plot is created using a declarative plotting library from EMCPy
+    (https://github.com/NOAA-EMC/emcpy).
+
+    Example:
+        config = {
+            "longitude": {"variable": "collection::group::variable"},
+            "latitude": {"variable": "collection::group::variable"},
+            "data": {"variable": "collection::group::variable"},
+            "plot_property": "property_value",
+            "plot_option": "option_value",
+            "schema": "path_to_schema_file.yaml"
+        }
+        logger = Logger()
+        map_plot = MapGridded(config, logger, None)
+    """
 
     def __init__(self, config, logger, dataobj):
         # prepare data based on config
@@ -31,3 +58,6 @@ class MapGridded():
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, logger)
+
+
+# --------------------------------------------------------------------------------------------------
