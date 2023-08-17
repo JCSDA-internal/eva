@@ -122,24 +122,15 @@ class MonDataSpace(EvaDatasetBase):
             if group_vars == 'all':
                 group_vars = list(ds.data_vars)
 
-            # Conditionally add channel as a variable using single dimension
-            # If channel is used then add chan_assim, chan_nassim, and
-            # chan_yaxis to allow plotting of channel markers.
-            # --------------------------------------------------------------
+            # Conditionally add channel related variables
+            # -------------------------------------------
             if 'Channel' in coords.values():
-                ds['channel'] = (['Channel'], channo)
-                if len(chan_assim) > 0:
-                    ds['chan_assim'] = (['Channel'], chan_assim)
-                if len(chan_nassim) > 0:
-                    ds['chan_nassim'] = (['Channel'], chan_nassim)
-                ds['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
-                ds['chan_yaxis_1p5'] = (['Channel'], [-1.5]*len(channo))
-                ds['chan_yaxis_p05'] = (['Channel'], [-0.05]*len(channo))
+                ds = self.loadChanItems(ds, chan_assim, chan_nassim, channo)
 
-            # Conditionally add scan position as a variable using single dimension
-            # --------------------------------------------------------------------
+            # Conditionally add scan position as a variable
+            # ---------------------------------------------
             if 'Scan' in coords.values():
-                ds['scan'] = (['Scan'], scanpo)
+                ds = self.loadScanItems(ds, scanpo)
 
             # Rename variables with group
             rename_dict = {}
@@ -553,3 +544,35 @@ class MonDataSpace(EvaDatasetBase):
 
         rtn_ds = rtn_ds.merge(new_cyc)
         return rtn_ds
+
+    # ----------------------------------------------------------------------------------------------
+
+    # Add channel as a variable using single dimension as well as chan_assim,
+    # chan_nassim, and chan_yaxis_* to allow plotting of channel markers.
+
+    def loadChanItems(self, dataset, chan_assim, chan_nassim, channo):
+
+        dataset['channel'] = (['Channel'], channo)
+        if len(chan_assim) > 0:
+            dataset['chan_assim'] = (['Channel'], chan_assim)
+        if len(chan_nassim) > 0:
+            dataset['chan_nassim'] = (['Channel'], chan_nassim)
+
+        dataset['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
+        dataset['chan_yaxis_1p5'] = (['Channel'], [-1.5]*len(channo))
+        dataset['chan_yaxis_p05'] = (['Channel'], [-0.05]*len(channo))
+
+        return dataset
+
+    # ----------------------------------------------------------------------------------------------
+
+    def loadScanItems(self, dataset, scanpo):
+        nscan = dataset.dims.get('Scan')
+        nchan = dataset.dims.get('Channel')	  # 'Channel' is always present with 'Scan'
+        scan_array = np.zeros(shape=(nscan, nchan))
+
+        for x in range(nchan):
+            scan_array[:, x] = np.array([scanpo])
+            dataset['scan'] = (['Scan', 'Channel'], scan_array)
+
+        return dataset
