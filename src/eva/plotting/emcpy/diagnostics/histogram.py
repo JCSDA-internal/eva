@@ -19,7 +19,7 @@ class Histogram():
         dataobj: An instance of the data object containing input data.
 
     This class initializes and configures a histogram plot based on the provided configuration and
-    data. The histogram  plot is created using a declarative plotting library from EMCPy
+    data. The histogram plot is created using a declarative plotting library from EMCPy
     (https://github.com/NOAA-EMC/emcpy).
 
     Example:
