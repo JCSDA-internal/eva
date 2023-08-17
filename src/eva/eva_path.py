@@ -15,6 +15,14 @@ import os
 
 
 def return_eva_path():
+
+    """
+    Return the directory path of the current script file.
+
+    Returns:
+        str: Directory path of the current script file.
+    """
+
     return os.path.split(__file__)[0]
 
 
