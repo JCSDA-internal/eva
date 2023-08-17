@@ -21,6 +21,38 @@ from eva.utilities.utils import replace_vars_dict
 
 
 def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
+    """
+    Computes colormap limits and adjustments based on provided data variable.
+
+    Args:
+        logger (Logger): An instance of the logger for logging messages.
+        option_dict (dict): A dictionary containing various options for the transformation.
+        plots_dict (dict): A dictionary containing plot-related information.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
+
+    Returns:
+        dict: A dictionary with adjusted values for colormap limits and colormap.
+
+    This function computes colormap limits and adjustments based on the provided data variable. It
+    calculates the minimum and maximum values for colormap limits, determines whether a sequential
+    or diverging colormap should be used, and updates the provided plots dictionary with the
+    adjusted values.
+
+    Example:
+        option_dict = {
+            'percentage capture': 95,
+            'data variable': 'my_collection::my_variable',
+            'sequential colormap': 'plasma',
+            'diverging colormap': 'coolwarm'
+        }
+        plots_dict = {
+            'dynamic_vmax': '1.0',
+            'dynamic_vmin': '-1.0',
+            'dynamic_cmap': 'viridis'
+        }
+        adjusted_plots_dict = vminvmaxcmap(logger, option_dict, plots_dict, data_collections)
+    """
 
     # Get percentage of data to use in computing limits. Code will sort the data
     # by size and then trim the minimum and maximum until this percentage of data
@@ -90,6 +122,33 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
 
 
 def histogram_bins(logger, option_dict, plots_dict, data_collections):
+    """
+    Computes the number of bins for a histogram based on the provided data variable.
+
+    Args:
+        logger (Logger): An instance of the logger for logging messages.
+        option_dict (dict): A dictionary containing various options for the transformation.
+        plots_dict (dict): A dictionary containing plot-related information.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
+
+    Returns:
+        dict: A dictionary with the number of bins for the histogram.
+
+    This function computes the number of bins for a histogram based on the provided data variable.
+    It applies various rules to calculate the appropriate number of bins and updates the provided
+    plots dictionary with the calculated value.
+
+    Example:
+        option_dict = {
+            'data variable': 'my_collection::my_variable',
+            'number of bins rule': 'sturges'
+        }
+        plots_dict = {
+            'dynamic_bins': '10'
+        }
+        adjusted_plots_dict = histogram_bins(logger, option_dict, plots_dict, data_collections)
+    """
 
     # Optionally the data might have a channel.
     channel = option_dict.get('channel', None)

@@ -4,7 +4,33 @@ import emcpy.plots.plots
 import os
 
 
+# --------------------------------------------------------------------------------------------------
+
+
 class VerticalLine():
+    """
+    Creates a vertical line plot based on the provided configuration.
+
+    Args:
+        config (dict): A dictionary containing the configuration for the vertical line plot.
+        logger (Logger): An instance of the logger for logging messages.
+        dataobj: Not used in this context.
+
+    This class initializes and configures a vertical line plot based on the provided
+    configuration. The vertical line plot is created using a declarative plotting library from
+    EMCPy (https://github.com/NOAA-EMC/emcpy).
+
+
+    Example:
+        config = {
+            "x": 10,
+            "plot_property": "property_value",
+            "plot_option": "option_value",
+            "schema": "path_to_schema_file.yaml"
+        }
+        logger = Logger()
+        vertical_line_plot = VerticalLine(config, logger, None)
+    """
 
     def __init__(self, config, logger, dataobj):
 
@@ -25,3 +51,6 @@ class VerticalLine():
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, logger)
+
+
+# --------------------------------------------------------------------------------------------------
