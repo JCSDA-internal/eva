@@ -81,7 +81,8 @@ def subset_channels(ds, channels, logger, add_channels_variable=False):
         ds (Dataset): The xarray Dataset to subset.
         channels (list): List of channel numbers to keep.
         logger: Logger instance for logging messages.
-        add_channels_variable (bool, optional): Whether to add 'channelNumber' variable. Default is False.
+        add_channels_variable (bool, optional): Whether to add 'channelNumber' variable. Default is
+        False.
     """
 
     if 'nchans' in list(ds.dims):

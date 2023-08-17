@@ -52,7 +52,8 @@ class DataCollections:
         Args:
             collection_name (str): Name of the collection.
             collection (Dataset): The xarray Dataset to add or create.
-            concat_dimension (str): Dimension along which to concatenate if adding to an existing collection.
+            concat_dimension (str): Dimension along which to concatenate if adding to an existing
+            collection.
 
         Raises:
             ValueError: If collection is not an xarray Dataset.
