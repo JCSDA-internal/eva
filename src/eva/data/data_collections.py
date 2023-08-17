@@ -30,7 +30,11 @@ disallowed_chars = '-+*/()'
 
 class DataCollections:
 
+    """Manage collections of xarray Datasets with variable manipulations."""
+
     def __init__(self):
+
+        """Initialize the DataCollections instance."""
 
         # Dictionary to map between collection name and collection itself
         self._collections = {}
@@ -41,6 +45,20 @@ class DataCollections:
     # ----------------------------------------------------------------------------------------------
 
     def create_or_add_to_collection(self, collection_name, collection, concat_dimension=None):
+
+        """
+        Create a new collection or add to an existing collection.
+
+        Args:
+            collection_name (str): Name of the collection.
+            collection (Dataset): The xarray Dataset to add or create.
+            concat_dimension (str): Dimension along which to concatenate if adding to an existing collection.
+
+        Raises:
+            ValueError: If collection is not an xarray Dataset.
+            ValueError: If an existing empty collection with the same name is detected.
+            ValueError: If concatenation dimension is missing or invalid.
+        """
 
         # Collections should only be xarray datasets
         if not isinstance(collection, Dataset):
@@ -83,6 +101,13 @@ class DataCollections:
 
     def adjust_channel_dimension_name(self, channel_dimension_name):
 
+        """
+        Adjust the name of the channel dimension in all collections.
+
+        Args:
+            channel_dimension_name (str): New name for the channel dimension.
+        """
+
         for collection in self._collections.keys():
             if channel_dimension_name in list(self._collections[collection].dims):
                 self._collections[collection] = \
@@ -94,6 +119,13 @@ class DataCollections:
 
     def adjust_location_dimension_name(self, location_dimension_name):
 
+        """
+        Adjust the name of the location dimension in all collections.
+
+        Args:
+            location_dimension_name (str): New name for the location dimension.
+        """
+
         for collection in self._collections.keys():
             if location_dimension_name in list(self._collections[collection].dims):
                 self._collections[collection] = \
@@ -102,6 +134,19 @@ class DataCollections:
     # ----------------------------------------------------------------------------------------------
 
     def add_variable_to_collection(self, collection_name, group_name, variable_name, variable):
+
+        """
+        Add a new variable to a collection.
+
+        Args:
+            collection_name (str): Name of the collection to add the variable to.
+            group_name (str): Name of the group where the variable belongs.
+            variable_name (str): Name of the variable.
+            variable (DataArray): The xarray DataArray to add.
+
+        Raises:
+            ValueError: If variable is not an xarray DataArray.
+        """
 
         # Assert that new variable is an xarray Dataarray
         if not isinstance(variable, DataArray):
@@ -124,6 +169,22 @@ class DataCollections:
     # ----------------------------------------------------------------------------------------------
 
     def get_variable_data_array(self, collection_name, group_name, variable_name, channels=None):
+
+        """
+        Retrieve a specific variable (as a DataArray) from a collection.
+
+        Args:
+            collection_name (str): Name of the collection.
+            group_name (str): Name of the group where the variable belongs.
+            variable_name (str): Name of the variable.
+            channels (int or list[int]): Indices of channels to select (optional).
+
+        Returns:
+            DataArray: The selected variable as an xarray DataArray.
+
+        Raises:
+            ValueError: If channels are provided but the 'Channel' dimension is missing.
+        """
 
         group_variable_name = group_name + '::' + variable_name
 
@@ -152,6 +213,19 @@ class DataCollections:
 
     def get_variable_data(self, collection_name, group_name, variable_name, channels=None):
 
+        """
+        Retrieve the data of a specific variable from a collection.
+
+        Args:
+            collection_name (str): Name of the collection.
+            group_name (str): Name of the group where the variable belongs.
+            variable_name (str): Name of the variable.
+            channels (int or list[int]): Indices of channels to select (optional).
+
+        Returns:
+            ndarray: The selected variable data as a NumPy array.
+        """
+
         variable_array = self.get_variable_data_array(collection_name, group_name, variable_name,
                                                       channels)
 
@@ -166,6 +240,8 @@ class DataCollections:
     # ----------------------------------------------------------------------------------------------
 
     def validate_names(self):
+
+        """Validate naming conventions for collections, groups, and variables."""
 
         # This code checks that the naming conventions are compliant with what is expected
 
@@ -203,6 +279,14 @@ class DataCollections:
 
     def nan_float_values_outside_threshold(self, threshold, cgv_to_screen=None):
 
+        """
+        Set values outside a threshold to NaN in selected collections, groups, and variables.
+
+        Args:
+            threshold (float): Threshold value for screening.
+            cgv_to_screen (str): Collection, group, and variable to screen (optional).
+        """
+
         # Set the collection, group and variables
         # ---------------------------------------
         if cgv_to_screen is None:
@@ -238,6 +322,8 @@ class DataCollections:
     # ----------------------------------------------------------------------------------------------
 
     def display_collections(self):
+
+        """Display information about available collections, groups, and variables."""
 
         minmaxrms_format_dict = {
             'float64': '{:+.4e}',

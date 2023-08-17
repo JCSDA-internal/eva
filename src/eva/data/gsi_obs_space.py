@@ -7,6 +7,7 @@
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 # --------------------------------------------------------------------------------------------------
+
 import os
 import numpy as np
 from itertools import groupby
@@ -20,10 +21,17 @@ from eva.utilities.utils import parse_channel_list
 
 
 def all_equal(iterable):
+
     """
-    Checks to see if array is all the same. Returns True
-    if they are else returns False.
+    Check if all elements in an iterable are equal.
+
+    Args:
+        iterable: An iterable object to check.
+
+    Returns:
+        bool: True if all elements are equal, False otherwise.
     """
+
     g = groupby(iterable)
     return next(g, True) and not next(g, False)
 
@@ -32,10 +40,17 @@ def all_equal(iterable):
 
 
 def uv(group_vars):
+
     """
-    Adds 'uv' suffix to beginning of specified variables
-    if they are included in input list of vars
+    Add 'uv' prefix to specified variables if present.
+
+    Args:
+        group_vars (list): List of variable names.
+
+    Returns:
+        list: List of variable names with 'uv' prefix added.
     """
+
     change_vars = ['Obs_Minus_Forecast_adjusted',
                    'Obs_Minus_Forecast_unadjusted',
                    'Observation']
@@ -58,6 +73,16 @@ def uv(group_vars):
 
 
 def subset_channels(ds, channels, logger, add_channels_variable=False):
+
+    """
+    Subset the dataset based on specified channels.
+
+    Args:
+        ds (Dataset): The xarray Dataset to subset.
+        channels (list): List of channel numbers to keep.
+        logger: Logger instance for logging messages.
+        add_channels_variable (bool, optional): Whether to add 'channelNumber' variable. Default is False.
+    """
 
     if 'nchans' in list(ds.dims):
 
@@ -87,10 +112,17 @@ def subset_channels(ds, channels, logger, add_channels_variable=False):
 
 
 def satellite_dataset(ds):
+
     """
-    Builds a new dataset_config to reshape satellite
-    data.
+    Build a new dataset to reshape satellite data.
+
+    Args:
+        ds (Dataset): The input xarray Dataset.
+
+    Returns:
+        Dataset: Reshaped xarray Dataset.
     """
+
     nchans = ds.dims['nchans']
     iters = int(ds.dims['nobs']/nchans)
 
@@ -147,9 +179,22 @@ def satellite_dataset(ds):
 
 class GsiObsSpace(EvaDatasetBase):
 
+    """
+    Eva dataset class for processing GSI observation space data.
+    """
+
     # ----------------------------------------------------------------------------------------------
 
     def execute(self, dataset_config, data_collections, timeing):
+
+        """
+        Execute the GSI observation space data processing.
+
+        Args:
+            dataset_config (dict): Configuration settings for the dataset processing.
+            data_collections (DataCollections): Instance of the DataCollections class.
+            timing (Timing): Timing instance for performance measurement.
+        """
 
         # Get channels for radiances
         # --------------------------
@@ -254,7 +299,21 @@ class GsiObsSpace(EvaDatasetBase):
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
 
+    # ----------------------------------------------------------------------------------------------
+
     def generate_default_config(self, filenames, collection_name):
+
+        """
+        Generate the default configuration for the GSI observation space dataset.
+
+        Args:
+            filenames (list): List of filenames associated with the dataset.
+            collection_name (str): Name of the collection.
+
+        Returns:
+            dict: Default configuration settings for the dataset.
+        """
+
         # Create config template
         eva_dict = {'datasets': [{'filenames': filenames,
                                   'groups': [{'name': 'eva_interactive'}],
@@ -275,3 +334,5 @@ class GsiObsSpace(EvaDatasetBase):
             eva_dict['datasets'][0]['sensor'] = sensor
 
         return eva_dict
+
+    # ----------------------------------------------------------------------------------------------

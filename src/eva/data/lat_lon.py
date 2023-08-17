@@ -8,9 +8,20 @@ valid_groups = ['state', 'increment']
 
 class LatLon(EvaDatasetBase):
 
-    # ----------------------------------------------------------------------------------------------
+    """
+    A class for handling LatLon dataset configuration and processing.
+    """
 
     def execute(self, dataset_config, data_collections, timing):
+
+        """
+        Executes the processing of LatLon dataset.
+
+        Args:
+            dataset_config (dict): Configuration dictionary for the dataset.
+            data_collections: Object for managing data collections.
+            timing: Timing object for tracking execution time.
+        """
 
         # Filename to be read into this collection
         filename = get(dataset_config, self.logger, 'filename')
@@ -53,5 +64,23 @@ class LatLon(EvaDatasetBase):
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
 
+    # ----------------------------------------------------------------------------------------------
+
     def generate_default_config(self, filenames, collection_name):
+
+        """
+        Generates a default configuration for LatLon dataset.
+
+        Args:
+            filenames (list): List of file names.
+            collection_name (str): Name of the data collection.
+
+        Returns:
+            dict: Default configuration dictionary.
+        """
+
+        # Needs to be implemented
+
         pass
+
+    # ----------------------------------------------------------------------------------------------
