@@ -20,6 +20,35 @@ from eva.utilities.logger import Logger
 
 
 def accept_where(config, data_collections):
+    """
+    Applies a filtering transformation to data variables based on specified conditions.
+
+    Args:
+        config (dict): A configuration dictionary containing transformation parameters.
+        data_collections (DataCollections): An instance of the DataCollections class containing input data.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the 'where' expression format is incorrect.
+
+    This function applies a filtering transformation to data variables within the provided data collections.
+    It iterates over the specified collections, groups, and variables, and applies filtering conditions as
+    defined in the 'where' expressions within the configuration. The resulting filtered variables are added
+    to the data collections.
+
+    Example:
+        config = {
+            'collections': [...],
+            'groups': [...],
+            'variables': [...],
+            'new name': 'filtered_variable',
+            'starting field': 'original_variable',
+            'where': ['${collection}::${group}::${variable} >= 0.0']
+        }
+        accept_where(config, data_collections)
+    """
 
     # Create a logger
     logger = Logger('AcceptWhereTransform')

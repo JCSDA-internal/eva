@@ -4,7 +4,6 @@
 # National Aeronautics and Space Administration. All Rights Reserved.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
-# This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 # --------------------------------------------------------------------------------------------------
@@ -18,6 +17,27 @@ from eva.utilities.utils import replace_vars_str
 
 
 def parse_for_dict(config, logger):
+    """
+    Parses the 'for' dictionary from the configuration and extracts collection, group, and variable values.
+
+    Args:
+        config (dict): A configuration dictionary containing transformation parameters.
+        logger (Logger): An instance of the logger for logging messages.
+
+    Returns:
+        list: A list containing collection, group, and variable values extracted from the 'for' dictionary.
+
+    This function parses the 'for' dictionary provided in the configuration and extracts the collection, group,
+    and variable values specified. It returns a list containing these extracted components.
+
+    Example:
+        for_dict = {
+            'collection': 'my_collection',
+            'group': 'my_group',
+            'variable': 'my_variable'
+        }
+        cgv = parse_for_dict(config, logger)
+    """
 
     # Get the for dict (might not be provided so default to empty dict)
     for_dict = get(config, logger, 'for', {})
@@ -44,6 +64,25 @@ def parse_for_dict(config, logger):
 
 
 def replace_cgv(logger, collection, group, variable, *argv):
+    """
+    Replaces placeholders in template strings with collection, group, and variable values.
+
+    Args:
+        logger (Logger): An instance of the logger for logging messages.
+        collection (str): The collection value.
+        group (str): The group value.
+        variable (str): The variable value.
+        *argv (str): Variable number of template strings to replace.
+
+    Returns:
+        list: A list of template strings with placeholders replaced by corresponding values.
+
+    This function replaces placeholders in the provided template strings with the specified collection,
+    group, and variable values. It returns a list of template strings with replaced placeholders.
+
+    Example:
+        replaced_templates = replace_cgv(logger, 'my_collection', 'my_group', 'my_variable', template1, template2)
+    """
 
     # Create dictionary with templates
     tmplt_dict = {}
@@ -81,6 +120,22 @@ def replace_cgv(logger, collection, group, variable, *argv):
 
 
 def split_collectiongroupvariable(logger, collectiongroupvariable):
+    """
+    Splits a collectiongroupvariable string into its components.
+
+    Args:
+        logger (Logger): An instance of the logger for logging messages.
+        collectiongroupvariable (str): The collectiongroupvariable string to split.
+
+    Returns:
+        list: A list containing the collection, group, and variable components.
+
+    This function splits a collectiongroupvariable string into its components (collection, group, variable).
+    It returns a list containing these components.
+
+    Example:
+        cgv = split_collectiongroupvariable(logger, 'my_collection::my_group::my_variable')
+    """
 
     # Split by double colon
     cgv = collectiongroupvariable.split('::')

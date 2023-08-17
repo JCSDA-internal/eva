@@ -27,6 +27,21 @@ from eva.utilities.utils import remove_empty_from_list_of_strings
 
 
 def isfloat(a_string):
+    """
+    Checks if a string can be converted to a floating-point number.
+
+    Args:
+        a_string (str): The string to be checked.
+
+    Returns:
+        bool: True if the string can be converted to a float, False otherwise.
+
+    This function determines whether a given string can be successfully converted to a floating-point number.
+
+    Example:
+        result = isfloat("3.14")
+    """
+
     try:
         float(a_string)
         return True
@@ -38,6 +53,31 @@ def isfloat(a_string):
 
 
 def arithmetic(config, data_collections):
+    """
+    Applies arithmetic transformations to data variables using specified expressions.
+
+    Args:
+        config (dict): A configuration dictionary containing transformation parameters.
+        data_collections (DataCollections): An instance of the DataCollections class containing input data.
+
+    Returns:
+        None
+
+    This function applies arithmetic transformations to data variables within the provided data collections.
+    It iterates over the specified collections, groups, and variables, and applies arithmetic expressions
+    as defined in the 'equals' expressions within the configuration. The resulting variables are added to
+    the data collections.
+
+    Example:
+        config = {
+            'collections': [...],
+            'groups': [...],
+            'variables': [...],
+            'new name': 'result_variable',
+            'equals': '(${collection}::${group}::${var1} + ${collection}::${group}::${var2}) / 2'
+        }
+        arithmetic(config, data_collections)
+    """
 
     # Create a logger
     logger = Logger('ArithmeticTransform')

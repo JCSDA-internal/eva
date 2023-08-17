@@ -26,6 +26,32 @@ from eva.utilities.utils import remove_empty_from_list_of_strings
 
 
 def channel_stats(config, data_collections):
+    """
+    Calculates statistical measures for data variables along a specified dimension.
+
+    Args:
+        config (dict): A configuration dictionary containing transformation parameters.
+        data_collections (DataCollections): An instance of the DataCollections class containing input data.
+
+    Returns:
+        None
+
+    This function calculates statistical measures for specified channel data variables within the provided 
+    data collections. It iterates over the specified collections, groups, and variables, and calculates statistical
+    measures as defined in the 'statistic list' expressions within the configuration. The resulting variables are
+    added to the data collections.
+
+    Example:
+        config = {
+            'collections': [...],
+            'groups': [...],
+            'variables': [...],
+            'variable_name': 'data_variable',
+            'statistic list': ['Mean', 'Std', 'Count'],
+            'statistic_dimension': 'Location'
+        }
+        channel_stats(config, data_collections)
+    """
 
     # Create a logger
     logger = Logger('ChannelStatsTransform')
