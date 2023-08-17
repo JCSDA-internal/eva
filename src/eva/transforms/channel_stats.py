@@ -36,7 +36,7 @@ def channel_stats(config, data_collections):
     Returns:
         None
 
-    This function calculates statistical measures for specified channel data variables within the provided 
+    This function calculates statistical measures for specified channel data variables within the provided
     data collections. It iterates over the specified collections, groups, and variables, and calculates statistical
     measures as defined in the 'statistic list' expressions within the configuration. The resulting variables are
     added to the data collections.
