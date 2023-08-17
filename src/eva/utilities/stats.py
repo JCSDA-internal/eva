@@ -20,6 +20,18 @@ from eva.utilities.utils import slice_var_from_str
 
 def get_field_data(logger, field, data_collections):
 
+    """
+    Retrieve field data based on the field configuration.
+
+    Args:
+        logger: The logger object for logging messages.
+        field (dict): The field configuration containing the field name and optional channel.
+        data_collections: The data collections object to retrieve data from.
+
+    Returns:
+        ndarray: The flattened and masked field data.
+    """
+
     # Field name
     field_name = field['field_name']
 
@@ -52,13 +64,18 @@ def get_field_data(logger, field, data_collections):
 
 
 def stats_helper(logger, plot_obj, data_collections, config):
+
     """
-    Add specified statistics to a plot
+    Add specified statistics to a plot.
+
     Args:
-        logger : logging object
-        plotobj : declarative plotting object
-        data_collections : eva data collections object
-        config : input configuration dictionary
+        logger: The logging object.
+        plot_obj: The declarative plotting object.
+        data_collections: The eva data collections object.
+        config (dict): The input configuration dictionary.
+
+    Returns:
+        None
     """
 
     # List of data to make stats for

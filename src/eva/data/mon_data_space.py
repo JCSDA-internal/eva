@@ -26,9 +26,20 @@ from eva.utilities.utils import parse_channel_list, is_number
 
 class MonDataSpace(EvaDatasetBase):
 
-    # ----------------------------------------------------------------------------------------------
+    """
+    A class for handling MonDataSpace dataset configuration and processing.
+    """
 
     def execute(self, dataset_config, data_collections, timing):
+
+        """
+        Executes the processing of MonDataSpace dataset.
+
+        Args:
+            dataset_config (dict): Configuration dictionary for the dataset.
+            data_collections: Object for managing data collections.
+            timing: Timing object for tracking execution time.
+        """
 
         # Set the collection name
         # -----------------------
@@ -156,6 +167,19 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def generate_default_config(self, filenames, collection_name, control_file):
+
+        """
+        Generates a default configuration for MonDataSpace dataset.
+
+        Args:
+            filenames (list): List of file names.
+            collection_name (str): Name of the data collection.
+            control_file (str): Path to the control file.
+
+        Returns:
+            dict: Default configuration dictionary.
+        """
+
         eva_dict = {'satellite': None,
                     'sensor': None,
                     'control_file': control_file,
@@ -170,6 +194,25 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def subset_coordinate(self, ds, coordinate, requested_subset, channo, chan_assim, chan_nassim):
+
+        """
+        Subset the input dataset along the specified coordinate dimension and update channel
+        information.
+
+        Args:
+            ds (xarray.Dataset): Input dataset to be subset.
+            coordinate (str): Name of the coordinate dimension to subset.
+            requested_subset (list): List of values to keep along the specified coordinate.
+            channo (list): List of channel numbers.
+            chan_assim (list): List of assimilated channel numbers.
+            chan_nassim (list): List of non-assimilated channel numbers.
+
+        Returns:
+            xarray.Dataset: Subset of the input dataset.
+            list: Updated list of channel numbers.
+            list: Updated list of assimilated channel numbers.
+            list: Updated list of non-assimilated channel numbers.
+        """
 
         if coordinate in list(ds.dims):
 
@@ -222,6 +265,24 @@ class MonDataSpace(EvaDatasetBase):
 
     # Parse control file and return elements in dictionaries
     def get_ctl_dict(self, control_file):
+
+        """
+        Parse the control file and extract information into dictionaries.
+
+        Args:
+            control_file (str): Path to the control file.
+
+        Returns:
+            dict: Dictionary containing various coordinates and information.
+            dict: Dictionary containing dimension sizes.
+            dict: Dictionary containing sensor and satellite attributes.
+            int: Number of variables.
+            list: List of variable names.
+            list: List of channel numbers.
+            list: List of scan positions.
+            list: List of assimilated channel numbers.
+            list: List of non-assimilated channel numbers.
+        """
 
         coords = {'xdef': None, 'ydef': None, 'zdef': None}
         coord_list = []
@@ -345,6 +406,24 @@ class MonDataSpace(EvaDatasetBase):
 
     def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars, file_path=None):
 
+        """
+        Read data from an IEEE file and arrange it into a numpy array.
+
+        Args:
+            file_name (str): Name of the IEEE file to read.
+            coords (dict): Dictionary of coordinates.
+            dims (dict): Dictionary of dimension sizes.
+            ndims_used (int): Number of dimensions used.
+            dims_arr (list): List of dimension names used.
+            nvars (int): Number of variables.
+            vars (list): List of variable names.
+            file_path (str, optional): Path to the directory containing the file. Defaults to None.
+
+        Returns:
+            numpy.ndarray: Numpy array containing the read data.
+            datetime.datetime: Cycle time extracted from the filename.
+        """
+
         # find cycle time in filename and create cycle_tm as datetime object
         cycle_tm = None
         cycstrs = file_name.replace('/', '.').split('.')
@@ -422,6 +501,20 @@ class MonDataSpace(EvaDatasetBase):
 
     def var_to_np_array(self, dims, ndims_used, dims_arr, var):
 
+        """
+        Create a numpy array with specified dimensions and fill it with a given value.
+
+        Args:
+            dims (dict): Dictionary of dimension sizes.
+            ndims_used (int): Number of dimensions used.
+            dims_arr (list): List of dimension names used.
+            var: Value to fill the array with.
+
+        Returns:
+            numpy.ndarray: Numpy array with the requested dimensions and filled with the given
+            value.
+        """
+
         # build numpy array with requested dimensions
         d = {
             1: np.reshape([[var] * dims[dims_arr[0]]], (dims[dims_arr[0]])),
@@ -441,6 +534,22 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def get_dim_ranges(self, coords, dims, channo):
+
+        """
+        Get the valid ranges for each dimension based on the specified coordinates and channel
+        numbers.
+
+        Args:
+            coords (dict): Dictionary of coordinates.
+            dims (dict): Dictionary of dimension sizes.
+            channo (list): List of channel numbers.
+
+        Returns:
+            numpy.ndarray or None: Valid x coordinate range or None.
+            numpy.ndarray or None: Valid y coordinate range or None.
+            numpy.ndarray or None: Valid z coordinate range or None.
+        """
+
         x_range = None
         y_range = None
         z_range = None
@@ -464,6 +573,18 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def get_ndims_used(self, dims):
+
+        """
+        Determine the number of dimensions used based on the provided dimension sizes.
+
+        Args:
+            dims (dict): Dictionary of dimension sizes.
+
+        Returns:
+            int: Number of dimensions used.
+            list: List of dimension names used.
+        """
+
         # Some ieee files (ozn) can be 1 or 2 dimensions depending on the
         # number of levels used.  Levels is the xdef, Regions is the ydef.
         # All Ozn files use ydef, but many have xdef = 1.  The dims_arr[]
@@ -487,6 +608,27 @@ class MonDataSpace(EvaDatasetBase):
 
     def load_dset(self, vars, nvars, coords, darr, dims, ndims_used,
                   dims_arr, x_range, y_range, z_range, cyc_darr, channo):
+
+        """
+        Create a dataset from various components.
+
+        Args:
+            vars (list): List of variable names.
+            nvars (int): Number of variables.
+            coords (dict): Dictionary of coordinates.
+            darr (numpy.ndarray): Numpy array of data.
+            dims (dict): Dictionary of dimension sizes.
+            ndims_used (int): Number of dimensions used.
+            dims_arr (list): List of dimension names used.
+            x_range (numpy.ndarray or None): Valid x coordinate range.
+            y_range (numpy.ndarray or None): Valid y coordinate range.
+            z_range (numpy.ndarray or None): Valid z coordinate range.
+            cyc_darr (numpy.ndarray): Numpy array of cycle data.
+            channo (list): List of channel numbers.
+
+        Returns:
+            xarray.Dataset: Created dataset.
+        """
 
         # create dataset from file components
         rtn_ds = None
@@ -547,10 +689,21 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    # Add channel as a variable using single dimension as well as chan_assim,
-    # chan_nassim, and chan_yaxis_* to allow plotting of channel markers.
-
     def loadChanItems(self, dataset, chan_assim, chan_nassim, channo):
+
+        """
+        Add channel as a variable using single dimension as well as chan_assim, chan_nassim, and
+        chan_yaxis_* to allow plotting of channel markers.
+
+        Args:
+            dataset (xarray.Dataset): Dataset to which variables will be added.
+            chan_assim (list): List of assimilated channel numbers.
+            chan_nassim (list): List of non-assimilated channel numbers.
+            channo (list): List of channel numbers.
+
+        Returns:
+            xarray.Dataset: Dataset with added channel-related variables.
+        """
 
         dataset['channel'] = (['Channel'], channo)
         if len(chan_assim) > 0:
@@ -567,6 +720,18 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def loadScanItems(self, dataset, scanpo):
+
+        """
+        Add scan-related variables to the dataset.
+
+        Args:
+            dataset (xarray.Dataset): Dataset to which variables will be added.
+            scanpo (list): List of scan positions.
+
+        Returns:
+            xarray.Dataset: Dataset with added scan-related variables.
+        """
+
         nscan = dataset.dims.get('Scan')
         nchan = dataset.dims.get('Channel')	  # 'Channel' is always present with 'Scan'
         scan_array = np.zeros(shape=(nscan, nchan))
@@ -576,3 +741,5 @@ class MonDataSpace(EvaDatasetBase):
             dataset['scan'] = (['Scan', 'Channel'], scan_array)
 
         return dataset
+
+    # ----------------------------------------------------------------------------------------------

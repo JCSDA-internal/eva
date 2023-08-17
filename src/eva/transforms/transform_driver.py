@@ -4,7 +4,6 @@
 # National Aeronautics and Space Administration. All Rights Reserved.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
-# This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
 
@@ -19,6 +18,26 @@ import os
 
 
 def transform_driver(config, data_collections, timing, logger):
+    """
+    Applies a series of transformation methods to data collections.
+
+    Args:
+        config (dict): A configuration dictionary containing transformation parameters.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
+        timing (Timing): An instance of the Timing class for tracking execution times.
+        logger (Logger): An instance of the logger for logging messages.
+
+    Returns:
+        None
+
+    This function applies a series of transformation methods to the provided data collections. It
+    iterates over a list of transform dictionaries specified in the configuration. For each
+    transform, it identifies the transform type, instantiates the corresponding transform object,
+    and calls the transform method. Execution times for each transform are tracked using the Timing
+    instance.
+
+    """
 
     # Get list of transform dictionaries
     transforms = get(config, logger, 'transforms')

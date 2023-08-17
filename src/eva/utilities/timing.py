@@ -23,7 +23,18 @@ from eva.utilities.logger import Logger
 
 class Timing():
 
+    """
+    A class for managing timing profiling of eva code.
+    """
+
     def __init__(self):
+
+        """
+        Initialize the Timing object.
+
+        Returns:
+            None
+        """
 
         # Logger
         self.logger = Logger('Timers')
@@ -37,6 +48,16 @@ class Timing():
     # ----------------------------------------------------------------------------------------------
 
     def start(self, timer_name):
+
+        """
+        Start a timer with the given name.
+
+        Args:
+            timer_name (str): The name of the timer.
+
+        Returns:
+            None
+        """
 
         # Create this timer and set count to zero
         if timer_name not in self.timing_dict.keys():
@@ -63,6 +84,16 @@ class Timing():
 
     def stop(self, timer_name):
 
+        """
+        Stop a timer with the given name.
+
+        Args:
+            timer_name (str): The name of the timer.
+
+        Returns:
+            None
+        """
+
         # Check that this timer was initialized
         if timer_name not in self.timing_dict.keys():
             self.logger.abort(f'Trying to stop the timer for {timer_name} but it was never ' +
@@ -86,6 +117,13 @@ class Timing():
     # ----------------------------------------------------------------------------------------------
 
     def finalize(self):
+
+        """
+        Finalize the timing measurements and log the results.
+
+        Returns:
+            None
+        """
 
         import time
 
