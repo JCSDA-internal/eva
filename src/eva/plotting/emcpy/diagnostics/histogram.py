@@ -6,7 +6,7 @@ import os
 import numpy as np
 
 
-class Density():
+class Histogram():
 
     def __init__(self, config, logger, dataobj):
 
@@ -16,7 +16,7 @@ class Density():
         var_cgv = varstr.split('::')
 
         if len(var_cgv) != 3:
-            logger.abort('In Density the variable \'var_cgv\' does not appear to ' +
+            logger.abort('In Histogram the variable \'var_cgv\' does not appear to ' +
                          'be in the required format of collection::group::variable.')
 
         # Optionally get the channel to plot
@@ -29,21 +29,21 @@ class Density():
         # See if we need to slice data
         data = slice_var_from_str(config['data'], data, logger)
 
-        # Density data should be flattened
+        # Histogram data should be flattened
         data = data.flatten()
 
         # Missing data should also be removed
         mask = ~np.isnan(data)
         data = data[mask]
 
-        # Create declarative plotting density object
+        # Create declarative plotting histogram object
         # --------------------------------------------
-        self.plotobj = emcpy.plots.plots.Density(data)
+        self.plotobj = emcpy.plots.plots.Histogram(data)
 
         # Get defaults from schema
         # ------------------------
-        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'defaults',
-                                  'density.yaml'))
+        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
+                                                         'emcpy', 'defaults', 'histogram.yaml'))
         config = get_schema(layer_schema, config, logger)
         delvars = ['type', 'schema', 'data']
         for d in delvars:

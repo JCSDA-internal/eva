@@ -12,7 +12,7 @@
 
 
 from eva.utilities.config import get
-from eva.eva_base import EvaFactory
+from eva.data.eva_dataset_base import EvaDatasetFactory
 
 import importlib
 import os
@@ -37,11 +37,10 @@ def data_driver(config, data_collections, timing, logger):
             raise KeyError(msg)
 
         # Create the data object
-        creator = EvaFactory()
+        creator = EvaDatasetFactory()
         timing.start('DataObjectConstructor')
         eva_data_object = creator.create_eva_object(eva_data_class_name,
                                                     'data',
-                                                    dataset,
                                                     logger,
                                                     timing)
         timing.stop('DataObjectConstructor')

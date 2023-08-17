@@ -36,7 +36,8 @@ class MapScatter():
         # get defaults from schema
         layer_schema = config.get("schema",
                                   os.path.join(return_eva_path(),
-                                               'defaults',
+                                               'plotting',
+                                               'emcpy', 'defaults',
                                                'map_scatter.yaml'))
         config = get_schema(layer_schema, config, logger)
         delvars = ['longitude', 'latitude', 'data', 'type', 'schema']

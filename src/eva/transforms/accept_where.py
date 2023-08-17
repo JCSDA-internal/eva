@@ -104,3 +104,28 @@ def accept_where(config, data_collections):
 
 
 # --------------------------------------------------------------------------------------------------
+
+def generate_accept_where_config(new_name, starting_field, where, collection, var_list):
+    # Update new_name
+    updated_name = collection + '::' + new_name + '::${variable}'
+    starting_field = collection + '::' + starting_field + '::${variable}'
+
+    for index, expression in enumerate(where):
+        # Get group
+        group, _, _ = expression.split(' ')
+        # Fix group name in expression
+        where[index] = expression.replace(group, collection +
+                                          '::' + group + '::${variable}')
+    # Build config
+    accept_where_config = {
+                            'new name': updated_name,
+                            'where': where,
+                            'transform': 'accept where',
+                            'starting field': starting_field,
+                            'for': {
+                                "variable": var_list
+                            }
+                          }
+    return accept_where_config
+
+# --------------------------------------------------------------------------------------------------

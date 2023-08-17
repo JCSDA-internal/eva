@@ -132,3 +132,27 @@ def arithmetic(config, data_collections):
 
 
 # --------------------------------------------------------------------------------------------------
+
+def generate_arithmetic_config(new_name, expression, collection, var_list):
+
+    # Update new_name
+    updated_name = collection + '::' + new_name + '::${variable}'
+
+    # Fix expression
+    groups = re.split(r'\(|\)|-|\*|\+|\/', expression)
+    for group in groups:
+        expression = expression.replace(group, collection +
+                                        '::' + group + '::${variable}')
+
+    # Build dictionary
+    arithmetic_config = {
+                        'new name': updated_name,
+                        'transform': "arithmetic",
+                        'for': {
+                          'variable': var_list
+                         },
+                        'equals': expression
+                        }
+    return arithmetic_config
+
+# --------------------------------------------------------------------------------------------------

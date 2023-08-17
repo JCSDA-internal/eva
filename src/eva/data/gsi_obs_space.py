@@ -12,7 +12,7 @@ import numpy as np
 from itertools import groupby
 from xarray import Dataset, open_dataset
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list
 
@@ -145,7 +145,7 @@ def satellite_dataset(ds):
 # --------------------------------------------------------------------------------------------------
 
 
-class GsiObsSpace(EvaBase):
+class GsiObsSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
@@ -253,3 +253,25 @@ class GsiObsSpace(EvaBase):
 
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
+
+    def generate_default_config(self, filenames, collection_name):
+        # Create config template
+        eva_dict = {'datasets': [{'filenames': filenames,
+                                  'groups': [{'name': 'eva_interactive'}],
+                                  'missing_value_threshold': 1.0e06,
+                                  'name': collection_name}]}
+
+        # Find either satellite/sensor or variable and add to config template
+        eva_filename = filenames[0]
+        name = eva_filename.split('.')[1]
+        name_parts = name.split('_')
+        if name_parts[0] == 'conv':
+            variable = name_parts[1]
+            eva_dict['datasets'][0]['variable'] = variable
+        else:
+            satellite = name_parts[1]
+            sensor = name_parts[0]
+            eva_dict['datasets'][0]['satellite'] = satellite
+            eva_dict['datasets'][0]['sensor'] = sensor
+
+        return eva_dict

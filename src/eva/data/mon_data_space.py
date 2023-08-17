@@ -17,14 +17,14 @@ from xarray import Dataset, concat
 from scipy.io import FortranFile
 from datetime import datetime
 
-from eva.eva_base import EvaBase
+from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list, is_number
 
 # --------------------------------------------------------------------------------------------------
 
 
-class MonDataSpace(EvaBase):
+class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
@@ -87,7 +87,7 @@ class MonDataSpace(EvaBase):
             timestep_ds = None
 
             timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
-                                         dims_arr, x_range, y_range, z_range, cyc_darr)
+                                         dims_arr, x_range, y_range, z_range, cyc_darr, channo)
 
             if attribs['sat']:
                 timestep_ds.attrs['satellite'] = attribs['sat']
@@ -113,39 +113,29 @@ class MonDataSpace(EvaBase):
             # --------------------------------------
             for x in range(len(coord_dict)):
                 if drop_coord[x]:
-                    ds = self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x])
+                    ds, channo, chan_assim, chan_nassim = \
+                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], channo,
+                                              chan_assim, chan_nassim)
 
             # If user specifies all variables set to group list
             # -------------------------------------------------
             if group_vars == 'all':
                 group_vars = list(ds.data_vars)
 
-            # Conditionally add channel as a variable using single dimension
-            # If channel is used then add chan_assim, chan_nassim, and
-            # chan_yaxis to allow plotting of channel markers.
-            # --------------------------------------------------------------
-            if 'channel' in group_vars:
-                ds['channel'] = (['Channel'], channo)
-                ds['chan_assim'] = (['Channel'], chan_assim)
-                ds['chan_nassim'] = (['Channel'], chan_nassim)
-                ds['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
-                ds['chan_yaxis_3'] = (['Channel'], [-3]*len(channo))
+            # Conditionally add channel related variables
+            # -------------------------------------------
+            if 'Channel' in coords.values():
+                ds = self.loadChanItems(ds, chan_assim, chan_nassim, channo)
 
-            # Conditionally add scan position as a variable using single dimension
-            # --------------------------------------------------------------------
-            if 'scan' in group_vars:
-                ds['scan'] = (['scan'], scanpo)
-
-            # Drop data variables not in user requested variables
-            # ---------------------------------------------------
-            vars_to_remove = list(set(list(ds.keys())) - set(group_vars))
-            ds = ds.drop_vars(vars_to_remove)
+            # Conditionally add scan position as a variable
+            # ---------------------------------------------
+            if 'Scan' in coords.values():
+                ds = self.loadScanItems(ds, scanpo)
 
             # Rename variables with group
             rename_dict = {}
-            for group_var in group_vars:
-                rename_dict[group_var] = group_name + '::' + group_var
-
+            for var in list(ds.data_vars):
+                rename_dict[var] = group_name + '::' + var
             ds = ds.rename(rename_dict)
 
             # Assert that the collection contains at least one variable
@@ -165,7 +155,21 @@ class MonDataSpace(EvaBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def subset_coordinate(self, ds, coordinate, requested_subset):
+    def generate_default_config(self, filenames, collection_name, control_file):
+        eva_dict = {'satellite': None,
+                    'sensor': None,
+                    'control_file': control_file,
+                    'filenames': filenames,
+                    'channels': [],
+                    'regions': [],
+                    'levels': [],
+                    'groups': [],
+                    'name': collection_name}
+        return eva_dict
+
+    # ----------------------------------------------------------------------------------------------
+
+    def subset_coordinate(self, ds, coordinate, requested_subset, channo, chan_assim, chan_nassim):
 
         if coordinate in list(ds.dims):
 
@@ -186,11 +190,33 @@ class MonDataSpace(EvaBase):
                                   ", but that is not a valid value. \n" +
                                   "Valid values for " + str(coordinate) + " are: \n" +
                                   f"{', '.join(str(i) for i in ds[coordinate].data)}")
+
+            # If Channel coordinate has been reduced from "all" (by yaml
+            # file) then reset chan_assim/nassim and channo accordingly
+            if coordinate == 'Channel':
+                channo = requested_subset
+                new_chan_assim = []
+                new_chan_nassim = []
+
+                for x in channo:
+                    if x in chan_assim:
+                        new_chan_assim.append(x)
+                    elif x in chan_nassim:
+                        new_chan_nassim.append(x)
+
+                chan_assim = new_chan_assim
+                chan_nassim = new_chan_nassim
+
+                for x in range(len(chan_assim), len(channo)):
+                    chan_assim.append(0)
+                for x in range(len(chan_nassim), len(channo)):
+                    chan_nassim.append(0)
+
         else:
             self.logger.info('Warning:  requested coordinate, ' + str(coordinate) + ' is not in ' +
                              ' dataset dimensions valid dimensions include ' + str(ds.dims))
 
-        return ds
+        return ds, channo, chan_assim, chan_nassim
 
     # ----------------------------------------------------------------------------------------------
 
@@ -347,7 +373,7 @@ class MonDataSpace(EvaBase):
             rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]]), float)
             if not load_data:
                 zarray = np.zeros((dims[dims_arr[0]], dims[dims_arr[1]]), float)
-            dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
+            dimensions = [dims[dims_arr[1]], dims[dims_arr[0]]]
 
         if ndims_used == 3:		# RadMon angle
             rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]],
@@ -383,7 +409,7 @@ class MonDataSpace(EvaBase):
                     if ndims_used == 1:
                         arr = np.fromfile(file_name, dtype='f4').reshape(dimensions)
                     else:
-                        arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions)
+                        arr = np.transpose(f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions))
                 else:
                     arr = zarray
                 rtn_array = np.append(rtn_array, [arr], axis=0)
@@ -460,7 +486,7 @@ class MonDataSpace(EvaBase):
     # ----------------------------------------------------------------------------------------------
 
     def load_dset(self, vars, nvars, coords, darr, dims, ndims_used,
-                  dims_arr, x_range, y_range, z_range, cyc_darr):
+                  dims_arr, x_range, y_range, z_range, cyc_darr, channo):
 
         # create dataset from file components
         rtn_ds = None
@@ -482,6 +508,9 @@ class MonDataSpace(EvaBase):
                               "data": darr[x, :, :]}
                 }
 
+            if 'Channel' in coords.values():
+                d.update({"Channel": {"dims": ("Channel"), "data": channo}})
+
             new_ds = Dataset.from_dict(d)
             rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
 
@@ -492,15 +521,15 @@ class MonDataSpace(EvaBase):
                 {
                     'cycle': ((coords[dims_arr[0]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1)},
+                coords={coords[dims_arr[0]]: x_range},
             )
         if ndims_used == 2:
             new_cyc = Dataset(
                 {
                     'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
-                        coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1)},
+                coords={coords[dims_arr[0]]: x_range,
+                        coords[dims_arr[1]]: y_range},
             )
         if ndims_used == 3:
             new_cyc = Dataset(
@@ -508,9 +537,42 @@ class MonDataSpace(EvaBase):
                     'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]],
                                coords[dims_arr[2]]), cyc_darr),
                 },
-                coords={coords[dims_arr[0]]: np.arange(1, dims[dims_arr[0]]+1),
-                        coords[dims_arr[1]]: np.arange(1, dims[dims_arr[1]]+1),
-                        coords[dims_arr[2]]: np.arange(1, dims[dims_arr[2]]+1)},
+                coords={coords[dims_arr[0]]: x_range,
+                        coords[dims_arr[1]]: y_range,
+                        coords[dims_arr[2]]: z_range},
             )
+
         rtn_ds = rtn_ds.merge(new_cyc)
         return rtn_ds
+
+    # ----------------------------------------------------------------------------------------------
+
+    # Add channel as a variable using single dimension as well as chan_assim,
+    # chan_nassim, and chan_yaxis_* to allow plotting of channel markers.
+
+    def loadChanItems(self, dataset, chan_assim, chan_nassim, channo):
+
+        dataset['channel'] = (['Channel'], channo)
+        if len(chan_assim) > 0:
+            dataset['chan_assim'] = (['Channel'], chan_assim)
+        if len(chan_nassim) > 0:
+            dataset['chan_nassim'] = (['Channel'], chan_nassim)
+
+        dataset['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
+        dataset['chan_yaxis_1p5'] = (['Channel'], [-1.5]*len(channo))
+        dataset['chan_yaxis_p05'] = (['Channel'], [-0.05]*len(channo))
+
+        return dataset
+
+    # ----------------------------------------------------------------------------------------------
+
+    def loadScanItems(self, dataset, scanpo):
+        nscan = dataset.dims.get('Scan')
+        nchan = dataset.dims.get('Channel')	  # 'Channel' is always present with 'Scan'
+        scan_array = np.zeros(shape=(nscan, nchan))
+
+        for x in range(nchan):
+            scan_array[:, x] = np.array([scanpo])
+            dataset['scan'] = (['Scan', 'Channel'], scan_array)
+
+        return dataset

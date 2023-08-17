@@ -6,7 +6,7 @@ import os
 import numpy as np
 
 
-class LinePlot():
+class Scatter():
 
     def __init__(self, config, logger, dataobj):
 
@@ -31,13 +31,14 @@ class LinePlot():
             channel = config.get('channel')
 
         xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel)
+        xdata1 = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2])
         ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel)
 
         # see if we need to slice data
         xdata = slice_var_from_str(config['x'], xdata, logger)
         ydata = slice_var_from_str(config['y'], ydata, logger)
 
-        # line plot data should be flattened
+        # scatter data should be flattened
         xdata = xdata.flatten()
         ydata = ydata.flatten()
 
@@ -51,14 +52,14 @@ class LinePlot():
         xdata = xdata[mask]
         ydata = ydata[mask]
 
-        # Create declarative plotting LinePlot object
-        # -------------------------------------------
-        self.plotobj = emcpy.plots.plots.LinePlot(xdata, ydata)
+        # Create declarative plotting Scatter object
+        # ------------------------------------------
+        self.plotobj = emcpy.plots.plots.Scatter(xdata, ydata)
 
         # Get defaults from schema
         # ------------------------
-        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'defaults',
-                                  'line_plot.yaml'))
+        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
+                                                         'emcpy', 'defaults', 'scatter.yaml'))
         config = get_schema(layer_schema, config, logger)
         delvars = ['x', 'y', 'type', 'schema']
         for d in delvars:
