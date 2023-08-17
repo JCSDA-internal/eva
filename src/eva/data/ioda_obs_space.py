@@ -20,7 +20,33 @@ import netCDF4 as nc
 # --------------------------------------------------------------------------------------------------
 
 
-def subset_channels(ds, channels, add_channels_variable=False):
+def subset_channels(ds, channels):
+
+    """
+    Subsets a dataset to include specific channels, if provided.
+
+    This function subsets a dataset based on the provided channel numbers.
+    It can be used to retain only a subset of channels from the dataset while potentially
+    resetting the dimension in the dataset.
+
+    Args:
+        ds (xarray.Dataset): The input dataset to be subsetted.
+        channels (list-like): List of channel numbers to retain.
+
+    Returns:
+        xarray.Dataset: The subsetted dataset containing only the specified channels.
+
+    Notes:
+        - If the dataset contains a dimension named 'Channel', the function
+          will attempt to subset based on this dimension.
+        - If no 'channels' are provided, all channels in the dataset will be retained.
+        - If the number of requested channels is less than the number of channels in
+          the dataset, the function will perform the subset operation.
+
+    Example:
+        # Subset the dataset 'data' to include only channels 1, 5 and 10:
+        subset_ds = subset_channels(data, [1, 5, 10])
+    """
 
     if 'Channel' in list(ds.dims):
 
@@ -46,9 +72,67 @@ def subset_channels(ds, channels, add_channels_variable=False):
 
 class IodaObsSpace(EvaDatasetBase):
 
-    # ----------------------------------------------------------------------------------------------
+    """
+    A class for executing data collection processing using IODA observation space.
+
+    This class inherits from `EvaDatasetBase` and implements the execute method to read the data
+    and process into the eva data collection format.
+
+    Args:
+        EvaDatasetBase (class): The base class for dataset processing.
+
+    Attributes:
+        N/A
+
+    Methods:
+        execute(dataset_config, data_collections, timing):
+            Executes data read and transition to data collection for IODA observation space.
+
+        generate_default_config(filenames, collection_name):
+            Generates a default configuration dictionary for IODA observation space, used for
+            more easily accessing the class interactively.
+
+    Notes:
+        - The class inherits from `EvaDatasetBase` and extends its functionality.
+        - (Additional notes, if applicable)
+
+    Example:
+        # Instantiate the class
+        ioda_instance = IodaObsSpace()
+
+        # Execute data collection processing using IODA observation space
+        ioda_instance.execute(dataset_config, data_collections, timing)
+
+        # Generate a default configuration dictionary for IODA observation space
+        default_config = ioda_instance.generate_default_config(filenames, collection_name)
+    """
 
     def execute(self, dataset_config, data_collections, timing):
+
+        """
+        Executes data collection processing using IODA observation space.
+
+        This method reads and processes data based on the provided configuration, which contains
+        file names, variables etc. It iterates over files, groups, and variables.
+
+        Args:
+            dataset_config (dict): Configuration settings for the dataset.
+            data_collections (DataCollection): The data collection to store read data.
+            timing (Timing): Timing information for profiling.
+
+        Returns:
+            None
+
+        Notes:
+            - This method operates on instance-specific attributes.
+
+        Example:
+            # Instantiate the class
+            ioda_instance = IodaObsSpace()
+
+            # Execute data collection processing using IODA observation space
+            ioda_instance.execute(dataset_config, data_collections, timing)
+        """
 
         # Get channels for radiances
         # --------------------------
@@ -105,7 +189,7 @@ class IodaObsSpace(EvaDatasetBase):
             ds_header.close()
 
             # Set the channels based on user selection and add channels variable
-            ds_groups = subset_channels(ds_groups, channels, True)
+            ds_groups = subset_channels(ds_groups, channels)
 
             # If groups is empty, read in file to retrieve group list
             groups_present = True
@@ -191,6 +275,31 @@ class IodaObsSpace(EvaDatasetBase):
         data_collections.display_collections()
 
     def generate_default_config(self, filenames, collection_name):
+
+        """
+        Generates a default configuration dictionary for IODA observation space.
+
+        This method generates a default configuration dictionary for IODA observation space. It sets
+        default values for file names, groups, missing value threshold, and collection name.
+
+        Args:
+            filenames (list): List of filenames for the data collection.
+            collection_name (str): Name of the data collection.
+
+        Returns:
+            dict: A dictionary containing default configuration settings.
+
+        Notes:
+            - This method operates on instance-specific attributes.
+
+        Example:
+            # Instantiate the class
+            ioda_instance = IodaObsSpace()
+
+            # Generate a default configuration dictionary for IODA observation space
+            default_config = ioda_instance.generate_default_config(filenames, collection_name)
+        """
+
         eva_dict = {'filenames': filenames,
                     'groups': [],
                     'missing_value_threshold': 1.0e06,

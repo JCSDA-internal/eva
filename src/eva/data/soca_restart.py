@@ -19,9 +19,43 @@ from eva.data.eva_dataset_base import EvaDatasetBase
 
 class SocaRestart(EvaDatasetBase):
 
-    # ----------------------------------------------------------------------------------------------
+    """
+    A class for reading and processing SOCA restart data.
+
+    This class inherits from `EvaDatasetBase` and provides methods to read and process SOCA restart
+    data, including orographic fields and SOCA variables. The processed data is added to the data
+    collections.
+
+    Args:
+        EvaDatasetBase (class): The base class for EVITA dataset operations.
+
+    Methods:
+        execute(dataset_config, data_collections, timing):
+            Process SOCA restart data and add it to the data collections.
+            Args:
+                dataset_config (dict): Configuration for the dataset.
+                data_collections (EvaDataCollections): Data collections to which the processed data
+                will be added.
+                timing: Timing information.
+
+        generate_default_config(filenames, collection_name):
+            Generate the default configuration for the dataset.
+            Args:
+                filenames: Filenames.
+                collection_name: Name of the collection.
+    """
 
     def execute(self, dataset_config, data_collections, timing):
+
+        """
+        Process SOCA restart data and add it to the data collections.
+
+        Args:
+            dataset_config (dict): Configuration for the dataset.
+            data_collections (EvaDataCollections): Data collections to which the processed data will
+            be added.
+            timing: Timing information.
+        """
 
         # Filenames to be read into this collection
         # -----------------------------------------
@@ -81,15 +115,42 @@ class SocaRestart(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def generate_default_config(self, filenames, collection_name):
+
+        """
+        Generate a default configuration for the dataset.
+
+        This method generates a default configuration for the dataset based on the provided
+        filenames and collection name. It can be used as a starting point for creating a
+        configuration for the dataset.
+
+        Args:
+            filenames: Filenames or file paths relevant to the dataset.
+            collection_name (str): Name of the collection for the dataset.
+
+        Returns:
+            dict: A dictionary representing the default configuration for the dataset.
+        """
+
         pass
 
 # --------------------------------------------------------------------------------------------------
 
 
 def read_soca(file, variable, logger):
+
     """
-    Get true coordinates from the soca_gridspec file
+    Read SOCA data from the specified file for the given variable.
+
+    Args:
+        file (str): Path to the SOCA data file.
+        variable (str): Name of the variable to read.
+        logger: Logger for logging messages.
+
+    Returns:
+        tuple: A tuple containing dimensions (list) and data (numpy.ndarray) for the specified
+        variable.
     """
+
     with Dataset(file, mode='r') as f:
         try:
             dims = ["lon", "lat"]

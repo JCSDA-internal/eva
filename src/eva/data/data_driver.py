@@ -22,6 +22,17 @@ import os
 
 def data_driver(config, data_collections, timing, logger):
 
+    """
+    Driver for executing data processing.
+
+    Args:
+        config (dict): Configuration settings for data processing.
+        data_collections (DataCollections): Instance of the DataCollections class.
+        timing (Timing): Timing instance for performance measurement.
+        logger (Logger): Logger instance for logging messages.
+
+    """
+
     # Get list of dataset dictionaries
     datasets = get(config, logger, 'datasets')
 

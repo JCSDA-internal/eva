@@ -29,6 +29,20 @@ space = ' '
 
 def get_data_from_line(jedi_log_line, search_term, separator, position):
 
+    """
+    Extracts data from a line in a Jedi log based on the specified search term,
+    separator, and position.
+
+    Args:
+        jedi_log_line (str): Line from the Jedi log.
+        search_term (str): Search term to look for in the line.
+        separator (str): Separator used to split the line.
+        position (int): Position of the desired data after splitting.
+
+    Returns:
+        str: Extracted data value or None if not found.
+    """
+
     if search_term in jedi_log_line:
         return jedi_log_line.split(separator)[position]
 
@@ -38,9 +52,20 @@ def get_data_from_line(jedi_log_line, search_term, separator, position):
 
 class JediLog(EvaDatasetBase):
 
-    # ----------------------------------------------------------------------------------------------
+    """
+    A class for handling Jedi log data.
+    """
 
     def execute(self, dataset_config, data_collections, timing):
+
+        """
+        Executes the processing of Jedi log data.
+
+        Args:
+            dataset_config (dict): Configuration dictionary for the dataset.
+            data_collections: Object for managing data collections.
+            timing: Timing object for tracking execution time.
+        """
 
         # Get name of the log file to parse
         jedi_log_to_parse = dataset_config.get('jedi_log_to_parse')
@@ -102,7 +127,18 @@ class JediLog(EvaDatasetBase):
 
     def get_from_log(self, search_term, separator, position, custom_log=None):
 
-        # This method will search every line of the log for the search term
+        """
+        Searches the Jedi log for a specified term and extracts the corresponding data.
+
+        Args:
+            search_term (str): Search term to look for in the Jedi log.
+            separator (str): Separator used to split the log line.
+            position (int): Position of the desired data after splitting.
+            custom_log: Custom log to search in (optional).
+
+        Returns:
+            str: Extracted data value or None if not found.
+        """
 
         if custom_log is None:
             log = self.jedi_log_lines
@@ -119,6 +155,16 @@ class JediLog(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def get_matching_chunks(self, search_terms):
+
+        """
+        Finds log chunks that match a list of search terms.
+
+        Args:
+            search_terms (list): List of search terms to match in log chunks.
+
+        Returns:
+            list: List of matching log chunks.
+        """
 
         # Create array to hold chunks that match
         matching_chunks = []
@@ -140,6 +186,13 @@ class JediLog(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def parse_convergence(self):
+
+        """
+        Parses convergence data from the Jedi log.
+
+        Returns:
+            xr.Dataset: Dataset containing the parsed convergence data.
+        """
 
         # Get the name of the minimizer
         minimizer_algorithm = self.get_from_log('Minimizer algorithm', '=', 1)
@@ -285,8 +338,21 @@ class JediLog(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def generate_default_config(self, filenames, collection_name):
-        # Create default config
+
+        """
+        Generates a default configuration for Jedi log data ingest.
+
+        Args:
+            filenames (list): List of file names.
+            collection_name (str): Name of the data collection.
+
+        Returns:
+            dict: Default configuration dictionary.
+        """
+
         eva_dict = {'datasets': [{'jedi_log_to_parse': filenames[0],
                                   'collection_name': collection_name,
                                   'data_to_parse': {'convergence': 'true'}}]}
         return eva_dict
+
+    # ----------------------------------------------------------------------------------------------

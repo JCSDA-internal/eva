@@ -8,6 +8,7 @@
 
 # --------------------------------------------------------------------------------------------------
 
+
 import numpy as np
 import xarray as xr
 from netCDF4 import Dataset
@@ -19,10 +20,20 @@ from eva.utilities.config import get
 
 
 def read_fms_tiles(files, variable, logger):
+
     """
-    Given list of FMS netCDF files and a variable name,
-    stitch the files together into N+1 dimension variable
+    Given a list of FMS netCDF files and a variable name,
+    stitches the files together into an N+1 dimension variable.
+
+    Args:
+        files (list): List of netCDF file paths.
+        variable (str): Name of the variable to extract.
+        logger: Logger object for logging messages.
+
+    Returns:
+        np.ndarray: Combined variable array from input files.
     """
+
     # Check there are no duplicates in files
     if len(files) != len(set(files)):
         logger.abort('Duplicate files were found in input file ' +
@@ -55,9 +66,20 @@ def read_fms_tiles(files, variable, logger):
 
 class CubedSphereRestart(EvaDatasetBase):
 
-    # ----------------------------------------------------------------------------------------------
+    """
+    A class for handling Cubed Sphere Restart data.
+    """
 
     def execute(self, dataset_config, data_collections, timing):
+
+        """
+        Executes the processing of Cubed Sphere Restart data.
+
+        Args:
+            dataset_config (dict): Configuration dictionary for the dataset.
+            data_collections: Object for managing data collections.
+            timing: Timing object for tracking execution time.
+        """
 
         # Filenames to be read into this collection
         # -----------------------------------------
@@ -127,4 +149,18 @@ class CubedSphereRestart(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def generate_default_config(self, filenames, collection_name):
+
+        """
+        Generates a default configuration for Cubed Sphere Restart data.
+
+        Args:
+            filenames (list): List of file names.
+            collection_name (str): Name of the data collection.
+
+        Returns:
+            dict: Default configuration dictionary.
+        """
+
+        # Needs to be implemented
+
         pass
