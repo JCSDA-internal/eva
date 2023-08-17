@@ -431,7 +431,8 @@ def slice_var_from_str(config, datavar, logger):
     """
     Slice a variable from an array based on the configuration.
 
-    This function evaluates the slicing configuration and applies it to the input variable 'datavar'.
+    This function evaluates the slicing configuration and applies it to the input variable
+    'datavar'.
 
     Parameters:
         config (dict): The configuration dictionary containing slicing information.
