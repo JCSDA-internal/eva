@@ -8,7 +8,8 @@ import os
 
 
 class VerticalLine():
-    """Creates a vertical line plot based on the provided configuration.
+    """
+    Creates a vertical line plot based on the provided configuration.
 
     Args:
         config (dict): A dictionary containing the configuration for the vertical line plot.
