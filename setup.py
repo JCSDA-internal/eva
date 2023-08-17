@@ -41,6 +41,7 @@ setuptools.setup(
         'xarray>=0.11.3',
         'emcpy @ git+https://github.com/NOAA-EMC/' +
         'emcpy@9b6756341e9ae963baa7d3a256b8ada3da688d04#egg=emcpy',
+
         # Option dependency for making density plots
         # 'seaborn>=0.12',
     ],
