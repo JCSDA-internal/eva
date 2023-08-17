@@ -20,6 +20,36 @@ from eva.utilities.logger import Logger
 
 
 def accept_where(config, data_collections):
+    """
+    Applies a filtering transformation to data variables based on specified conditions.
+
+    Args:
+        config (dict): A configuration dictionary containing transformation parameters.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the 'where' expression format is incorrect.
+
+    This function applies a filtering transformation to data variables within the provided
+    data collections. It iterates over the specified collections, groups, and variables, and
+    applies filtering conditions as defined in the 'where' expressions within the configuration.
+    The resulting filtered variables are added to the data collections.
+
+    Example:
+        config = {
+            'collections': [...],
+            'groups': [...],
+            'variables': [...],
+            'new name': 'filtered_variable',
+            'starting field': 'original_variable',
+            'where': ['${collection}::${group}::${variable} >= 0.0']
+        }
+        accept_where(config, data_collections)
+    """
 
     # Create a logger
     logger = Logger('AcceptWhereTransform')
@@ -77,6 +107,34 @@ def accept_where(config, data_collections):
 # --------------------------------------------------------------------------------------------------
 
 def generate_accept_where_config(new_name, starting_field, where, collection, var_list):
+    """
+    Generates a configuration dictionary for the 'accept where' transformation.
+
+    Args:
+        new_name (str): The new variable name after the transformation.
+        starting_field (str): The starting variable field for the transformation.
+        where (list): A list of filter expressions to be applied.
+        collection (str): The collection name.
+        var_list (list): A list of variables to apply the transformation to.
+
+    Returns:
+        dict: A configuration dictionary for the 'accept where' transformation.
+
+    This function generates a configuration dictionary for the 'accept where' transformation based
+    on the provided parameters. It updates the 'new name' and 'starting field' fields, adjusts
+    expressions in 'where' based on the provided collection and group names, and specifies the
+    'for' dictionary to apply the transformation to the specified variables.
+
+    Example:
+        new_name = 'filtered_variable'
+        starting_field = 'original_variable'
+        where = ['group1 >= 0', 'group2 < 10']
+        collection = 'my_collection'
+        var_list = ['variable1', 'variable2']
+        config = generate_accept_where_config(new_name, starting_field, where, collection,
+                                              var_list)
+    """
+
     # Update new_name
     updated_name = collection + '::' + new_name + '::${variable}'
     starting_field = collection + '::' + starting_field + '::${variable}'

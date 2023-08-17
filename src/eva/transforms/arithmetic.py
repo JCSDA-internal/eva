@@ -27,6 +27,22 @@ from eva.utilities.utils import remove_empty_from_list_of_strings
 
 
 def isfloat(a_string):
+    """
+    Checks if a string can be converted to a floating-point number.
+
+    Args:
+        a_string (str): The string to be checked.
+
+    Returns:
+        bool: True if the string can be converted to a float, False otherwise.
+
+    This function determines whether a given string can be successfully converted to a
+    floating-point number.
+
+    Example:
+        result = isfloat("3.14")
+    """
+
     try:
         float(a_string)
         return True
@@ -38,6 +54,32 @@ def isfloat(a_string):
 
 
 def arithmetic(config, data_collections):
+    """
+    Applies arithmetic transformations to data variables using specified expressions.
+
+    Args:
+        config (dict): A configuration dictionary containing transformation parameters.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
+
+    Returns:
+        None
+
+    This function applies arithmetic transformations to data variables within the provided data
+    collections. It iterates over the specified collections, groups, and variables, and applies
+    arithmetic expressions as defined in the 'equals' expressions within the configuration. The
+    resulting variables are added to the data collections.
+
+    Example:
+        config = {
+            'collections': [...],
+            'groups': [...],
+            'variables': [...],
+            'new name': 'result_variable',
+            'equals': '(${collection}::${group}::${var1} + ${collection}::${group}::${var2}) / 2'
+        }
+        arithmetic(config, data_collections)
+    """
 
     # Create a logger
     logger = Logger('ArithmeticTransform')
@@ -94,6 +136,30 @@ def arithmetic(config, data_collections):
 # --------------------------------------------------------------------------------------------------
 
 def generate_arithmetic_config(new_name, expression, collection, var_list):
+    """
+    Generates a configuration dictionary for the 'arithmetic' transformation.
+
+    Args:
+        new_name (str): The new variable name after the transformation.
+        expression (str): The arithmetic expression to be applied.
+        collection (str): The collection name.
+        var_list (list): A list of variables to apply the transformation to.
+
+    Returns:
+        dict: A configuration dictionary for the 'arithmetic' transformation.
+
+    This function generates a configuration dictionary for the 'arithmetic' transformation based
+    on the provided parameters. It updates the 'new name' field, adjusts the arithmetic expression
+    based on the provided collection and group names, and specifies the 'for' dictionary to apply
+    the transformation to the specified variables.
+
+    Example:
+        new_name = 'result_variable'
+        expression = '(${group1} + ${group2}) / 2'
+        collection = 'my_collection'
+        var_list = ['variable1', 'variable2']
+        config = generate_arithmetic_config(new_name, expression, collection, var_list)
+    """
 
     # Update new_name
     updated_name = collection + '::' + new_name + '::${variable}'
