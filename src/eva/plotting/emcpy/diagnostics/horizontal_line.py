@@ -8,7 +8,7 @@ import os
 
 
 class HorizontalLine():
-    
+
     """Base class for creating horizontal line plots."""
 
     def __init__(self, config, logger, dataobj):

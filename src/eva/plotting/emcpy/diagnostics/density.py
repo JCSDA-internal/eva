@@ -14,7 +14,7 @@ class Density():
     """Base class for creating density plots."""
 
     def __init__(self, config, logger, dataobj):
-        
+
         """
         Creates a density plot based on the provided configuration and data.
 

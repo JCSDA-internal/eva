@@ -21,9 +21,9 @@ class MapGridded():
             logger (Logger): An instance of the logger for logging messages.
             dataobj: An instance of the data object containing input data.
 
-        This class initializes and configures a gridded map plot based on the provided configuration.
-        The gridded map plot is created using a declarative plotting library from EMCPy
-        (https://github.com/NOAA-EMC/emcpy).
+        This class initializes and configures a gridded map plot based on the provided
+        configuration. The gridded map plot is created using a declarative plotting library from
+        EMCPy (https://github.com/NOAA-EMC/emcpy).
 
         Example:
             config = {

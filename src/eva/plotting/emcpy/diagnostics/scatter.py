@@ -10,7 +10,7 @@ import numpy as np
 
 
 class Scatter():
-    
+
     """Base class for creating scatter plots."""
 
     def __init__(self, config, logger, dataobj):
