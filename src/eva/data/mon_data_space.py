@@ -486,7 +486,7 @@ class MonDataSpace(EvaDatasetBase):
             for x in range(nvars):
                 if load_data:
                     if ndims_used == 1:
-                        arr = np.fromfile(file_name, dtype='f4').reshape(dimensions)
+                        arr = f.read_reals(dtype=np.dtype('>f4'))
                     else:
                         arr = np.transpose(f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions))
                 else:
