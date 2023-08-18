@@ -23,6 +23,20 @@ import os
 
 
 def figure_driver(config, data_collections, timing, logger):
+    """
+    Generates and saves multiple figures based on the provided configuration.
+
+    Args:
+        config (dict): A dictionary containing the configuration for generating figures.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
+        timing: A timing instance to measure the execution time.
+        logger (Logger): An instance of the logger for logging messages.
+
+    This function generates and saves multiple figures based on the provided configuration. It
+    processes each graphic specified in the configuration and creates corresponding figures with
+    plots.
+    """
 
     # Get list of graphics from configuration
     # -------------------
@@ -92,7 +106,25 @@ def figure_driver(config, data_collections, timing, logger):
     timing.stop('Graphics Loop')
 
 
+# --------------------------------------------------------------------------------------------------
+
+
 def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
+    """
+    Generates a figure based on the provided configuration and plots.
+
+    Args:
+        figure_conf (dict): A dictionary containing the configuration for the figure layout
+                            and appearance.
+        plots (list): A list of dictionaries containing plot configurations.
+        dynamic_options (list): A list of dictionaries containing dynamic configuration options.
+        data_collections (DataCollections): An instance of the DataCollections class containing
+                                            input data.
+        logger (Logger): An instance of the logger for logging messages.
+
+    This function generates a figure based on the provided configuration and plot settings. It
+    processes the specified plots, applies dynamic options, and saves the generated figure.
+    """
 
     # Adjust the plots configs if there are dynamic options
     # -----------------------------------------------------
@@ -166,7 +198,32 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
     fig.close_figure()
 
 
+# --------------------------------------------------------------------------------------------------
+
+
 def get_saveargs(figure_conf):
+    """
+    Gets arguments for saving a figure based on the provided configuration.
+
+    Args:
+        figure_conf (dict): A dictionary containing the figure configuration.
+
+    Returns:
+        out_conf (dict): A dictionary containing arguments for saving the figure.
+
+    This function extracts relevant arguments from the provided figure configuration to be used
+    for saving the generated figure.
+
+    Example:
+        figure_conf = {
+            "layout": [2, 2],
+            "figure file type": "png",
+            "output path": "./output_folder",
+            "output name": "example_figure"
+        }
+        save_args = get_saveargs(figure_conf)
+    """
+
     out_conf = figure_conf
     delvars = ['layout', 'figure file type', 'output path', 'figure size', 'title']
     out_conf['format'] = figure_conf['figure file type']
@@ -175,8 +232,34 @@ def get_saveargs(figure_conf):
     return out_conf
 
 
+# --------------------------------------------------------------------------------------------------
+
+
 def get_output_file(figure_conf):
+    """
+    Gets the output file path for saving the figure.
+
+    Args:
+        figure_conf (dict): A dictionary containing the figure configuration.
+
+    Returns:
+        output_file (str): The complete path for saving the figure.
+
+    This function constructs the complete file path for saving the generated figure based on the
+    provided figure configuration.
+
+    Example:
+        figure_conf = {
+            "output path": "./output_folder",
+            "output name": "example_figure"
+        }
+        output_file = get_output_file(figure_conf)
+    """
+
     file_path = figure_conf.get("output path", "./")
     output_name = figure_conf.get("output name", "")
     output_file = os.path.join(file_path, output_name)
     return output_file
+
+
+# --------------------------------------------------------------------------------------------------

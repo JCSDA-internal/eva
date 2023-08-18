@@ -10,6 +10,13 @@
 
 def ioda_platform_dict():
 
+    """
+    Get a dictionary mapping IODA instrument IDs to their corresponding full names.
+
+    Returns:
+        dict: A dictionary mapping platform codes to their corresponding full names.
+    """
+
     ioda_platform_dictionary = {
       "aircraft": "Aircraft",
       "airs_aqua": "AIRS AQUA",
@@ -56,6 +63,17 @@ def ioda_platform_dict():
 
 def find_instrument_from_string(full_string):
 
+    """
+    Find the matching IODA instrument ID and its corresponding variable from a given string.
+
+    Args:
+        full_string (str): The input string to search for platform codes.
+
+    Returns:
+        tuple or None: A tuple containing the found platform code and its corresponding variable,
+                       or None if no match is found.
+    """
+
     # Get the platform dictionary
     ioda_platform_dictionary = ioda_platform_dict()
 
@@ -75,6 +93,17 @@ def find_instrument_from_string(full_string):
 
 def ioda_platform_to_full_name(ioda_platform, logger):
 
+    """
+    Convert an IODA instrument ID to its corresponding full name.
+
+    Args:
+        ioda_platform (str): The IODA platform code.
+        logger: An instance of the logger to handle log messages.
+
+    Returns:
+        str: The corresponding full name of the IODA platform code.
+    """
+
     # Get the platform dictionary
     ioda_platform_dictionary = ioda_platform_dict()
 
@@ -91,6 +120,17 @@ def ioda_platform_to_full_name(ioda_platform, logger):
 
 
 def ioda_group_dict(ioda_group, logger):
+
+    """
+    Get the description of an IODA group based on its code.
+
+    Args:
+        ioda_group (str): The IODA group name.
+        logger: An instance of the logger to handle log messages.
+
+    Returns:
+        str: The description of the IODA group.
+    """
 
     ioda_group_dictionary = {
       "omb": "Observation minus h(x)",

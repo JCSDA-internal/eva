@@ -27,8 +27,20 @@ from eva.data.data_collections import DataCollections
 
 class EvaDatasetBase(ABC):
 
+    """Abstract base class for EVA dataset objects."""
+
     # Base class constructor
     def __init__(self, eva_class_name, eva_logger, timing):
+
+        """
+        Initialize the base class for eva dataset objects.
+
+        Args:
+            eva_class_name (str): Name of the eva class to instantiate.
+            eva_logger (Logger): Logger instance for logging messages.
+            timing (Timing): Timing instance for performance measurement.
+
+        """
 
         # Replace logger
         # --------------
@@ -47,16 +59,30 @@ class EvaDatasetBase(ABC):
 
     @abstractmethod
     def execute(self, config, data_collections, timing):
-        '''
-        Each class must implement this method and it is where it will do all of its work.
-        '''
+
+        """
+        Execute the dataset processing.
+
+        Args:
+            config (dict): Configuration settings for dataset processing.
+            data_collections (DataCollections): Instance of the DataCollections class.
+            timing (Timing): Timing instance for performance measurement.
+        """
+
         pass
 
     @abstractmethod
     def generate_default_config(self, filenames, collection_name, control_file=None):
-        '''
-        Each class must implement this method and it is where it will do all of its work.
-        '''
+
+        """
+        Generate the default configuration for the dataset.
+
+        Args:
+            filenames (list): List of filenames associated with the dataset.
+            collection_name (str): Name of the collection.
+            control_file (str): Path to the control file (optional).
+        """
+
         pass
 
 # --------------------------------------------------------------------------------------------------
@@ -64,7 +90,22 @@ class EvaDatasetBase(ABC):
 
 class EvaDatasetFactory():
 
+    """Factory class for creating eva data ingest objects."""
+
     def create_eva_object(self, eva_class_name, eva_group_name, eva_logger, timing):
+
+        """
+        Create an eva dataset ingest object.
+
+        Args:
+            eva_class_name (str): Name of the EVA class.
+            eva_group_name (str): Name of the EVA group.
+            eva_logger (Logger): Logger instance for logging messages.
+            timing (Timing): Timing instance for performance measurement.
+
+        Returns:
+            EvaDatasetBase: An instance of the specified EVA dataset class.
+        """
 
         # Create temporary logger
         logger = Logger('EvaDatasetFactory')

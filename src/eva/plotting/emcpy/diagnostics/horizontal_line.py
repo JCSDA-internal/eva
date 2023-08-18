@@ -4,7 +4,31 @@ import emcpy.plots.plots
 import os
 
 
+# --------------------------------------------------------------------------------------------------
+
+
 class HorizontalLine():
+    """
+    Creates a horizontal line plot based on the provided configuration.
+
+    Args:
+        config (dict): A dictionary containing the configuration for the horizontal line plot.
+        logger (Logger): An instance of the logger for logging messages.
+
+    This class initializes and configures a horizontal line plot based on the provided
+    configuration. The horizontal line plot is created using a declarative plotting library from
+    EMCPy (https://github.com/NOAA-EMC/emcpy).
+
+    Example:
+        config = {
+            "y": 0.5,
+            "plot_property": "property_value",
+            "plot_option": "option_value",
+            "schema": "path_to_schema_file.yaml"
+        }
+        logger = Logger()
+        horizontal_line_plot = HorizontalLine(config, logger)
+    """
 
     def __init__(self, config, logger, dataobj):
 
@@ -26,3 +50,6 @@ class HorizontalLine():
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, logger)
+
+
+# --------------------------------------------------------------------------------------------------
