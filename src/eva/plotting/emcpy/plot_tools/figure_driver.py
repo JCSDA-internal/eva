@@ -29,7 +29,7 @@ def figure_driver(config, data_collections, timing, logger):
     Args:
         config (dict): A dictionary containing the configuration for generating figures.
         data_collections (DataCollections): An instance of the DataCollections class containing
-                                            input data.
+        input data.
         timing: A timing instance to measure the execution time.
         logger (Logger): An instance of the logger for logging messages.
 
@@ -119,7 +119,7 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
         plots (list): A list of dictionaries containing plot configurations.
         dynamic_options (list): A list of dictionaries containing dynamic configuration options.
         data_collections (DataCollections): An instance of the DataCollections class containing
-                                            input data.
+        input data.
         logger (Logger): An instance of the logger for logging messages.
 
     This function generates a figure based on the provided configuration and plot settings. It

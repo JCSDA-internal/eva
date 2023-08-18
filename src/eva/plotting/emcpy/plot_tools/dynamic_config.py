@@ -29,7 +29,7 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
         option_dict (dict): A dictionary containing various options for the transformation.
         plots_dict (dict): A dictionary containing plot-related information.
         data_collections (DataCollections): An instance of the DataCollections class containing
-                                            input data.
+        input data.
 
     Returns:
         dict: A dictionary with adjusted values for colormap limits and colormap.
@@ -130,7 +130,7 @@ def histogram_bins(logger, option_dict, plots_dict, data_collections):
         option_dict (dict): A dictionary containing various options for the transformation.
         plots_dict (dict): A dictionary containing plot-related information.
         data_collections (DataCollections): An instance of the DataCollections class containing
-                                            input data.
+        input data.
 
     Returns:
         dict: A dictionary with the number of bins for the histogram.

@@ -10,32 +10,35 @@ import numpy as np
 
 
 class Scatter():
-    """
-    Creates a scatter plot on a map based on the provided configuration.
 
-    Args:
-        config (dict): A dictionary containing the configuration for the scatter plot on a map.
-        logger (Logger): An instance of the logger for logging messages.
-        dataobj: An instance of the data object containing input data.
-
-    This class initializes and configures a scatter plot on a map based on the provided
-    configuration. The scatter plot is created using a declarative plotting library from EMCPy
-    (https://github.com/NOAA-EMC/emcpy).
-
-    Example:
-        config = {
-            "longitude": {"variable": "collection::group::variable"},
-            "latitude": {"variable": "collection::group::variable"},
-            "data": {"variable": "collection::group::variable", "channel": "channel_name"},
-            "plot_property": "property_value",
-            "plot_option": "option_value",
-            "schema": "path_to_schema_file.yaml"
-        }
-        logger = Logger()
-        map_scatter_plot = MapScatter(config, logger, None)
-    """
+    """Base class for creating scatter plots."""
 
     def __init__(self, config, logger, dataobj):
+
+        """
+        Creates a scatter plot on a map based on the provided configuration.
+
+        Args:
+            config (dict): A dictionary containing the configuration for the scatter plot on a map.
+            logger (Logger): An instance of the logger for logging messages.
+            dataobj: An instance of the data object containing input data.
+
+        This class initializes and configures a scatter plot on a map based on the provided
+        configuration. The scatter plot is created using a declarative plotting library from EMCPy
+        (https://github.com/NOAA-EMC/emcpy).
+
+        Example:
+            config = {
+                "longitude": {"variable": "collection::group::variable"},
+                "latitude": {"variable": "collection::group::variable"},
+                "data": {"variable": "collection::group::variable", "channel": "channel_name"},
+                "plot_property": "property_value",
+                "plot_option": "option_value",
+                "schema": "path_to_schema_file.yaml"
+            }
+            logger = Logger()
+            map_scatter_plot = MapScatter(config, logger, None)
+        """
 
         # Get the data to plot from the data_collection
         # ---------------------------------------------
