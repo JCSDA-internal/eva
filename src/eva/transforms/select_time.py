@@ -32,7 +32,7 @@ def select_time(config, data_collections):
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
         data_collections (DataCollections): An instance of the DataCollections class containing
-                                            input data.
+        input data.
 
     Returns:
         None
@@ -44,18 +44,20 @@ def select_time(config, data_collections):
     for a single time point. The resulting processed variables are added to the data collections.
 
     Example:
-        config = {
-            'collections': [...],
-            'groups': [...],
-            'variables': [...],
-            'new name': 'time_selected_variable',
-            'starting field': 'original_variable',
-            'cycle': 'YYYYMMDDHH',
-            # OR
-            'start cycle': 'YYYYMMDDHH',
-            'end cycle': 'YYYYMMDDHH'
-        }
-        select_time(config, data_collections)
+        ::
+
+                config = {
+                    'collections': [...],
+                    'groups': [...],
+                    'variables': [...],
+                    'new name': 'time_selected_variable',
+                    'starting field': 'original_variable',
+                    'cycle': 'YYYYMMDDHH',
+                    # OR
+                    'start cycle': 'YYYYMMDDHH',
+                    'end cycle': 'YYYYMMDDHH'
+                }
+                select_time(config, data_collections)
     """
 
     # Create a logger

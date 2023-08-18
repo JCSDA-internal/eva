@@ -40,7 +40,9 @@ def isfloat(a_string):
     floating-point number.
 
     Example:
-        result = isfloat("3.14")
+        ::
+
+                result = isfloat("3.14")
     """
 
     try:
@@ -60,7 +62,7 @@ def arithmetic(config, data_collections):
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
         data_collections (DataCollections): An instance of the DataCollections class containing
-                                            input data.
+        input data.
 
     Returns:
         None
@@ -71,14 +73,17 @@ def arithmetic(config, data_collections):
     resulting variables are added to the data collections.
 
     Example:
-        config = {
-            'collections': [...],
-            'groups': [...],
-            'variables': [...],
-            'new name': 'result_variable',
-            'equals': '(${collection}::${group}::${var1} + ${collection}::${group}::${var2}) / 2'
-        }
-        arithmetic(config, data_collections)
+        ::
+
+                config = {
+                    'collections': [...],
+                    'groups': [...],
+                    'variables': [...],
+                    'new name': 'result_variable',
+                    'equals': '(${collection}::${group}::${var1} + ${collection}::${group}::${var2})
+                               / 2'
+                }
+                arithmetic(config, data_collections)
     """
 
     # Create a logger
@@ -154,11 +159,13 @@ def generate_arithmetic_config(new_name, expression, collection, var_list):
     the transformation to the specified variables.
 
     Example:
-        new_name = 'result_variable'
-        expression = '(${group1} + ${group2}) / 2'
-        collection = 'my_collection'
-        var_list = ['variable1', 'variable2']
-        config = generate_arithmetic_config(new_name, expression, collection, var_list)
+        ::
+
+                new_name = 'result_variable'
+                expression = '(${group1} + ${group2}) / 2'
+                collection = 'my_collection'
+                var_list = ['variable1', 'variable2']
+                config = generate_arithmetic_config(new_name, expression, collection, var_list)
     """
 
     # Update new_name

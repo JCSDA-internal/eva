@@ -27,19 +27,21 @@ def parse_for_dict(config, logger):
 
     Returns:
         list: A list containing collection, group, and variable values extracted from the 'for'
-              dictionary.
+        dictionary.
 
     This function parses the 'for' dictionary provided in the configuration and extracts the
     collection, group, and variable values specified. It returns a list containing these extracted
     components.
 
     Example:
-        for_dict = {
-            'collection': 'my_collection',
-            'group': 'my_group',
-            'variable': 'my_variable'
-        }
-        cgv = parse_for_dict(config, logger)
+        ::
+
+                for_dict = {
+                    'collection': 'my_collection',
+                    'group': 'my_group',
+                    'variable': 'my_variable'
+                }
+                cgv = parse_for_dict(config, logger)
     """
 
     # Get the for dict (might not be provided so default to empty dict)
@@ -85,8 +87,10 @@ def replace_cgv(logger, collection, group, variable, *argv):
     placeholders.
 
     Example:
-        replaced_templates = replace_cgv(logger, 'my_collection', 'my_group', 'my_variable',
-                                         template1, template2)
+        ::
+
+                replaced_templates = replace_cgv(logger, 'my_collection', 'my_group',
+                                                 'my_variable', template1, template2)
     """
 
     # Create dictionary with templates
@@ -139,7 +143,9 @@ def split_collectiongroupvariable(logger, collectiongroupvariable):
     group, variable). It returns a list containing these components.
 
     Example:
-        cgv = split_collectiongroupvariable(logger, 'my_collection::my_group::my_variable')
+        ::
+
+                cgv = split_collectiongroupvariable(logger, 'my_collection::my_group::my_variable')
     """
 
     # Split by double colon
