@@ -215,13 +215,15 @@ def get_saveargs(figure_conf):
     for saving the generated figure.
 
     Example:
-        figure_conf = {
-            "layout": [2, 2],
-            "figure file type": "png",
-            "output path": "./output_folder",
-            "output name": "example_figure"
-        }
-        save_args = get_saveargs(figure_conf)
+        ::
+
+                figure_conf = {
+                    "layout": [2, 2],
+                    "figure file type": "png",
+                    "output path": "./output_folder",
+                    "output name": "example_figure"
+                }
+                save_args = get_saveargs(figure_conf)
     """
 
     out_conf = figure_conf
@@ -249,11 +251,13 @@ def get_output_file(figure_conf):
     provided figure configuration.
 
     Example:
-        figure_conf = {
-            "output path": "./output_folder",
-            "output name": "example_figure"
-        }
-        output_file = get_output_file(figure_conf)
+        ::
+
+            figure_conf = {
+                "output path": "./output_folder",
+                "output name": "example_figure"
+            }
+            output_file = get_output_file(figure_conf)
     """
 
     file_path = figure_conf.get("output path", "./")

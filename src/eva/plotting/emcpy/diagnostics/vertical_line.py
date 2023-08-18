@@ -26,14 +26,17 @@ class VerticalLine():
         EMCPy (https://github.com/NOAA-EMC/emcpy).
 
         Example:
-            config = {
-                "x": 10,
-                "plot_property": "property_value",
-                "plot_option": "option_value",
-                "schema": "path_to_schema_file.yaml"
-            }
-            logger = Logger()
-            vertical_line_plot = VerticalLine(config, logger, None)
+
+            ::
+
+                    config = {
+                        "x": 10,
+                        "plot_property": "property_value",
+                        "plot_option": "option_value",
+                        "schema": "path_to_schema_file.yaml"
+                    }
+                    logger = Logger()
+                    vertical_line_plot = VerticalLine(config, logger, None)
         """
 
         # Get the x value to plot
