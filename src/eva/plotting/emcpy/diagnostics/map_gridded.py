@@ -26,16 +26,19 @@ class MapGridded():
         EMCPy (https://github.com/NOAA-EMC/emcpy).
 
         Example:
-            config = {
-                "longitude": {"variable": "collection::group::variable"},
-                "latitude": {"variable": "collection::group::variable"},
-                "data": {"variable": "collection::group::variable"},
-                "plot_property": "property_value",
-                "plot_option": "option_value",
-                "schema": "path_to_schema_file.yaml"
-            }
-            logger = Logger()
-            map_plot = MapGridded(config, logger, None)
+
+            ::
+
+                    config = {
+                        "longitude": {"variable": "collection::group::variable"},
+                        "latitude": {"variable": "collection::group::variable"},
+                        "data": {"variable": "collection::group::variable"},
+                        "plot_property": "property_value",
+                        "plot_option": "option_value",
+                        "schema": "path_to_schema_file.yaml"
+                    }
+                    logger = Logger()
+                    map_plot = MapGridded(config, logger, None)
         """
 
         # prepare data based on config
