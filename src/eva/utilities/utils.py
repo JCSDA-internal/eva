@@ -437,7 +437,7 @@ def slice_var_from_str(config, datavar, logger):
     Parameters:
         config (dict): The configuration dictionary containing slicing information.
         datavar: The input variable to be sliced.
-        logger: The logger object for logging messages.
+        logger (Logger): The logger object for logging messages.
 
     Returns:
         The sliced variable 'datavar'.

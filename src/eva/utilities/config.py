@@ -30,7 +30,7 @@ class Config(dict):
         Args:
             dict_or_yaml (dict or str): Either a dictionary containing configuration parameters
                                         or the path to a YAML file containing the configuration.
-            logger: An instance of the logger to handle log messages.
+            logger (Logger): An instance of the logger to handle log messages.
 
         Returns:
             None
@@ -88,7 +88,7 @@ def get(dict, logger, key, default=None, abort_on_failure=True):
 
     Args:
         dict (dict): The dictionary from which the value needs to be retrieved.
-        logger: An instance of the logger to handle log messages.
+        logger (Logger): An instance of the logger to handle log messages.
         key (str): The key for which the value needs to be retrieved from the dictionary.
         default: The default value to return if the key is not found in the dictionary.
         abort_on_failure (bool): If True, aborts the program if the key is not found.

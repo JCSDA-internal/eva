@@ -24,9 +24,9 @@ def get_field_data(logger, field, data_collections):
     Retrieve field data based on the field configuration.
 
     Args:
-        logger: The logger object for logging messages.
+        logger (Logger): The logger object for logging messages.
         field (dict): The field configuration containing the field name and optional channel.
-        data_collections: The data collections object to retrieve data from.
+        data_collections (DataCollections): The data collections object to retrieve data from.
 
     Returns:
         ndarray: The flattened and masked field data.
@@ -69,9 +69,9 @@ def stats_helper(logger, plot_obj, data_collections, config):
     Add specified statistics to a plot.
 
     Args:
-        logger: The logging object.
+        logger (Logger): The logging object.
         plot_obj: The declarative plotting object.
-        data_collections: The eva data collections object.
+        data_collections (DataCollections): The eva data collections object.
         config (dict): The input configuration dictionary.
 
     Returns:
