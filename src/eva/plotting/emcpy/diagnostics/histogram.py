@@ -28,19 +28,21 @@ class Histogram():
         (https://github.com/NOAA-EMC/emcpy).
 
         Example:
-            config = {
-                "data": {
-                    "variable": "collection::group::variable",
-                    "channel": "channel_name",
-                    "slicing": "slice expression"
-                },
-                "plot_property": "property_value",
-                "plot_option": "option_value",
-                "schema": "path_to_schema_file.yaml"
-            }
-            logger = Logger()
-            dataobj = DataObject()
-            histogram_plot = Histogram(config, logger, dataobj)
+            ::
+
+                    config = {
+                        "data": {
+                            "variable": "collection::group::variable",
+                            "channel": "channel_name",
+                            "slicing": "slice expression"
+                        },
+                        "plot_property": "property_value",
+                        "plot_option": "option_value",
+                        "schema": "path_to_schema_file.yaml"
+                    }
+                    logger = Logger()
+                    dataobj = DataObject()
+                    histogram_plot = Histogram(config, logger, dataobj)
         """
 
         # Get the data to plot from the data_collection

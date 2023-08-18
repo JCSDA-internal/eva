@@ -27,16 +27,19 @@ class MapScatter():
         (https://github.com/NOAA-EMC/emcpy).
 
         Example:
-            config = {
-                "longitude": {"variable": "collection::group::variable"},
-                "latitude": {"variable": "collection::group::variable"},
-                "data": {"variable": "collection::group::variable", "channel": "channel_name"},
-                "plot_property": "property_value",
-                "plot_option": "option_value",
-                "schema": "path_to_schema_file.yaml"
-            }
-            logger = Logger()
-            map_scatter_plot = MapScatter(config, logger, None)
+            ::
+
+                    config = {
+                        "longitude": {"variable": "collection::group::variable"},
+                        "latitude": {"variable": "collection::group::variable"},
+                        "data": {"variable": "collection::group::variable", 
+                                 "channel": "channel_name"},
+                        "plot_property": "property_value",
+                        "plot_option": "option_value",
+                        "schema": "path_to_schema_file.yaml"
+                    }
+                    logger = Logger()
+                    map_scatter_plot = MapScatter(config, logger, None)
         """
 
         # prepare data based on config

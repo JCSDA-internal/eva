@@ -25,14 +25,16 @@ class HorizontalLine():
         EMCPy (https://github.com/NOAA-EMC/emcpy).
 
         Example:
-            config = {
-                "y": 0.5,
-                "plot_property": "property_value",
-                "plot_option": "option_value",
-                "schema": "path_to_schema_file.yaml"
-            }
-            logger = Logger()
-            horizontal_line_plot = HorizontalLine(config, logger)
+            ::
+
+                    config = {
+                        "y": 0.5,
+                        "plot_property": "property_value",
+                        "plot_option": "option_value",
+                        "schema": "path_to_schema_file.yaml"
+                    }
+                    logger = Logger()
+                    horizontal_line_plot = HorizontalLine(config, logger)
         """
 
         # Get the y value to plot
