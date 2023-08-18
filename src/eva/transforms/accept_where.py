@@ -26,7 +26,7 @@ def accept_where(config, data_collections):
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
         data_collections (DataCollections): An instance of the DataCollections class containing
-                                            input data.
+        input data.
 
     Returns:
         None
@@ -40,15 +40,17 @@ def accept_where(config, data_collections):
     The resulting filtered variables are added to the data collections.
 
     Example:
-        config = {
-            'collections': [...],
-            'groups': [...],
-            'variables': [...],
-            'new name': 'filtered_variable',
-            'starting field': 'original_variable',
-            'where': ['${collection}::${group}::${variable} >= 0.0']
-        }
-        accept_where(config, data_collections)
+        ::
+
+                config = {
+                    'collections': [...],
+                    'groups': [...],
+                    'variables': [...],
+                    'new name': 'filtered_variable',
+                    'starting field': 'original_variable',
+                    'where': ['${collection}::${group}::${variable} >= 0.0']
+                }
+                accept_where(config, data_collections)
     """
 
     # Create a logger
@@ -126,13 +128,14 @@ def generate_accept_where_config(new_name, starting_field, where, collection, va
     'for' dictionary to apply the transformation to the specified variables.
 
     Example:
-        new_name = 'filtered_variable'
-        starting_field = 'original_variable'
-        where = ['group1 >= 0', 'group2 < 10']
-        collection = 'my_collection'
-        var_list = ['variable1', 'variable2']
-        config = generate_accept_where_config(new_name, starting_field, where, collection,
-                                              var_list)
+        ::
+                new_name = 'filtered_variable'
+                starting_field = 'original_variable'
+                where = ['group1 >= 0', 'group2 < 10']
+                collection = 'my_collection'
+                var_list = ['variable1', 'variable2']
+                config = generate_accept_where_config(new_name, starting_field, where,
+                                                      collection, var_list)
     """
 
     # Update new_name

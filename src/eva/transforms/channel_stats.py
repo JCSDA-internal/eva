@@ -43,15 +43,17 @@ def channel_stats(config, data_collections):
     configuration. The resulting variables are added to the data collections.
 
     Example:
-        config = {
-            'collections': [...],
-            'groups': [...],
-            'variables': [...],
-            'variable_name': 'data_variable',
-            'statistic list': ['Mean', 'Std', 'Count'],
-            'statistic_dimension': 'Location'
-        }
-        channel_stats(config, data_collections)
+        ::
+
+                config = {
+                    'collections': [...],
+                    'groups': [...],
+                    'variables': [...],
+                    'variable_name': 'data_variable',
+                    'statistic list': ['Mean', 'Std', 'Count'],
+                    'statistic_dimension': 'Location'
+                }
+                channel_stats(config, data_collections)
     """
 
     # Create a logger

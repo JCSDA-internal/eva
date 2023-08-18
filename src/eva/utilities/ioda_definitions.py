@@ -98,7 +98,7 @@ def ioda_platform_to_full_name(ioda_platform, logger):
 
     Args:
         ioda_platform (str): The IODA platform code.
-        logger: An instance of the logger to handle log messages.
+        logger (Logger): An instance of the logger to handle log messages.
 
     Returns:
         str: The corresponding full name of the IODA platform code.
@@ -126,7 +126,7 @@ def ioda_group_dict(ioda_group, logger):
 
     Args:
         ioda_group (str): The IODA group name.
-        logger: An instance of the logger to handle log messages.
+        logger (Logger): An instance of the logger to handle log messages.
 
     Returns:
         str: The description of the IODA group.

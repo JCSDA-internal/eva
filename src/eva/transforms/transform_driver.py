@@ -24,7 +24,7 @@ def transform_driver(config, data_collections, timing, logger):
     Args:
         config (dict): A configuration dictionary containing transformation parameters.
         data_collections (DataCollections): An instance of the DataCollections class containing
-                                            input data.
+        input data.
         timing (Timing): An instance of the Timing class for tracking execution times.
         logger (Logger): An instance of the logger for logging messages.
 

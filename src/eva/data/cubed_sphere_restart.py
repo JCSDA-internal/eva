@@ -28,7 +28,7 @@ def read_fms_tiles(files, variable, logger):
     Args:
         files (list): List of netCDF file paths.
         variable (str): Name of the variable to extract.
-        logger: Logger object for logging messages.
+        logger (Logger): Logger object for logging messages.
 
     Returns:
         np.ndarray: Combined variable array from input files.
@@ -77,7 +77,7 @@ class CubedSphereRestart(EvaDatasetBase):
 
         Args:
             dataset_config (dict): Configuration dictionary for the dataset.
-            data_collections: Object for managing data collections.
+            data_collections (DataCollections): Object for managing data collections.
             timing: Timing object for tracking execution time.
         """
 

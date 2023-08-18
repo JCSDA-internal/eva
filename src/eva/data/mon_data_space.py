@@ -37,8 +37,8 @@ class MonDataSpace(EvaDatasetBase):
 
         Args:
             dataset_config (dict): Configuration dictionary for the dataset.
-            data_collections: Object for managing data collections.
-            timing: Timing object for tracking execution time.
+            data_collections (DataCollections): Object for managing data collections.
+            timing (Timing): Timing object for tracking execution time.
         """
 
         # Set the collection name
