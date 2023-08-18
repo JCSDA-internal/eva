@@ -40,21 +40,18 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
     adjusted values.
 
     Example:
-        ::
-
-                option_dict = {
-                    'percentage capture': 95,
-                    'data variable': 'my_collection::my_variable',
-                    'sequential colormap': 'plasma',
-                    'diverging colormap': 'coolwarm'
-                }
-                plots_dict = {
-                    'dynamic_vmax': '1.0',
-                    'dynamic_vmin': '-1.0',
-                    'dynamic_cmap': 'viridis'
-                }
-                adjusted_plots_dict = vminvmaxcmap(logger, option_dict, plots_dict,
-                                                   data_collections)
+        option_dict = {
+            'percentage capture': 95,
+            'data variable': 'my_collection::my_variable',
+            'sequential colormap': 'plasma',
+            'diverging colormap': 'coolwarm'
+        }
+        plots_dict = {
+            'dynamic_vmax': '1.0',
+            'dynamic_vmin': '-1.0',
+            'dynamic_cmap': 'viridis'
+        }
+        adjusted_plots_dict = vminvmaxcmap(logger, option_dict, plots_dict, data_collections)
     """
 
     # Get percentage of data to use in computing limits. Code will sort the data
@@ -143,17 +140,14 @@ def histogram_bins(logger, option_dict, plots_dict, data_collections):
     plots dictionary with the calculated value.
 
     Example:
-        ::
-
-                option_dict = {
-                    'data variable': 'my_collection::my_variable',
-                    'number of bins rule': 'sturges'
-                }
-                plots_dict = {
-                    'dynamic_bins': '10'
-                }
-                adjusted_plots_dict = histogram_bins(logger, option_dict, plots_dict,
-                                                     data_collections)
+        option_dict = {
+            'data variable': 'my_collection::my_variable',
+            'number of bins rule': 'sturges'
+        }
+        plots_dict = {
+            'dynamic_bins': '10'
+        }
+        adjusted_plots_dict = histogram_bins(logger, option_dict, plots_dict, data_collections)
     """
 
     # Optionally the data might have a channel.

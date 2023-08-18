@@ -28,19 +28,16 @@ class LinePlot():
         (https://github.com/NOAA-EMC/emcpy).
 
         Example:
-
-            ::
-
-                    config = {
-                        "x": {"variable": "collection::group::variable"},
-                        "y": {"variable": "collection::group::variable"},
-                        "channel": "channel_name",
-                        "plot_property": "property_value",
-                        "plot_option": "option_value",
-                        "schema": "path_to_schema_file.yaml"
-                    }
-                    logger = Logger()
-                    line_plot = LinePlot(config, logger, None)
+            config = {
+                "x": {"variable": "collection::group::variable"},
+                "y": {"variable": "collection::group::variable"},
+                "channel": "channel_name",
+                "plot_property": "property_value",
+                "plot_option": "option_value",
+                "schema": "path_to_schema_file.yaml"
+            }
+            logger = Logger()
+            line_plot = LinePlot(config, logger, None)
         """
 
         # Get the data to plot from the data_collection
