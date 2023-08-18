@@ -144,7 +144,7 @@ def read_soca(file, variable, logger):
     Args:
         file (str): Path to the SOCA data file.
         variable (str): Name of the variable to read.
-        logger: Logger for logging messages.
+        logger (Logger): Logger for logging messages.
 
     Returns:
         tuple: A tuple containing dimensions (list) and data (numpy.ndarray) for the specified

@@ -44,8 +44,10 @@ def subset_channels(ds, channels):
           the dataset, the function will perform the subset operation.
 
     Example:
-        # Subset the dataset 'data' to include only channels 1, 5 and 10:
-        subset_ds = subset_channels(data, [1, 5, 10])
+        ::
+
+                # Subset the dataset 'data' to include only channels 1, 5 and 10:
+                subset_ds = subset_channels(data, [1, 5, 10])
     """
 
     if 'Channel' in list(ds.dims):
@@ -97,14 +99,16 @@ class IodaObsSpace(EvaDatasetBase):
         - (Additional notes, if applicable)
 
     Example:
-        # Instantiate the class
-        ioda_instance = IodaObsSpace()
+        ::
 
-        # Execute data collection processing using IODA observation space
-        ioda_instance.execute(dataset_config, data_collections, timing)
+                # Instantiate the class
+                ioda_instance = IodaObsSpace()
 
-        # Generate a default configuration dictionary for IODA observation space
-        default_config = ioda_instance.generate_default_config(filenames, collection_name)
+                # Execute data collection processing using IODA observation space
+                ioda_instance.execute(dataset_config, data_collections, timing)
+
+                # Generate a default configuration dictionary for IODA observation space
+                default_config = ioda_instance.generate_default_config(filenames, collection_name)
     """
 
     def execute(self, dataset_config, data_collections, timing):
@@ -127,11 +131,13 @@ class IodaObsSpace(EvaDatasetBase):
             - This method operates on instance-specific attributes.
 
         Example:
-            # Instantiate the class
-            ioda_instance = IodaObsSpace()
+            ::
 
-            # Execute data collection processing using IODA observation space
-            ioda_instance.execute(dataset_config, data_collections, timing)
+                    # Instantiate the class
+                    ioda_instance = IodaObsSpace()
+
+                    # Execute data collection processing using IODA observation space
+                    ioda_instance.execute(dataset_config, data_collections, timing)
         """
 
         # Get channels for radiances
@@ -293,11 +299,13 @@ class IodaObsSpace(EvaDatasetBase):
             - This method operates on instance-specific attributes.
 
         Example:
-            # Instantiate the class
-            ioda_instance = IodaObsSpace()
+            ::
 
-            # Generate a default configuration dictionary for IODA observation space
-            default_config = ioda_instance.generate_default_config(filenames, collection_name)
+                    # Instantiate the class
+                    ioda_instance = IodaObsSpace()
+
+                    # Generate a default configuration dictionary for IODA observation space
+                    default_config = ioda_instance.generate_default_config(filenames, collection_name)
         """
 
         eva_dict = {'filenames': filenames,
