@@ -41,7 +41,7 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
 
     Example:
         ::
-        
+
                 option_dict = {
                     'percentage capture': 95,
                     'data variable': 'my_collection::my_variable',
@@ -53,7 +53,8 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
                     'dynamic_vmin': '-1.0',
                     'dynamic_cmap': 'viridis'
                 }
-                adjusted_plots_dict = vminvmaxcmap(logger, option_dict, plots_dict, data_collections)
+                adjusted_plots_dict = vminvmaxcmap(logger, option_dict, plots_dict,
+                                                   data_collections)
     """
 
     # Get percentage of data to use in computing limits. Code will sort the data
@@ -143,7 +144,7 @@ def histogram_bins(logger, option_dict, plots_dict, data_collections):
 
     Example:
         ::
-        
+
                 option_dict = {
                     'data variable': 'my_collection::my_variable',
                     'number of bins rule': 'sturges'
@@ -151,7 +152,8 @@ def histogram_bins(logger, option_dict, plots_dict, data_collections):
                 plots_dict = {
                     'dynamic_bins': '10'
                 }
-                adjusted_plots_dict = histogram_bins(logger, option_dict, plots_dict, data_collections)
+                adjusted_plots_dict = histogram_bins(logger, option_dict, plots_dict,
+                                                     data_collections)
     """
 
     # Optionally the data might have a channel.

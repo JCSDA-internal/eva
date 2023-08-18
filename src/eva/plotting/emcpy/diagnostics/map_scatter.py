@@ -32,7 +32,7 @@ class MapScatter():
                     config = {
                         "longitude": {"variable": "collection::group::variable"},
                         "latitude": {"variable": "collection::group::variable"},
-                        "data": {"variable": "collection::group::variable", 
+                        "data": {"variable": "collection::group::variable",
                                  "channel": "channel_name"},
                         "plot_property": "property_value",
                         "plot_option": "option_value",
