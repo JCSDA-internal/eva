@@ -305,7 +305,8 @@ class IodaObsSpace(EvaDatasetBase):
                     ioda_instance = IodaObsSpace()
 
                     # Generate a default configuration dictionary for IODA observation space
-                    default_config = ioda_instance.generate_default_config(filenames, collection_name)
+                    default_config = ioda_instance.generate_default_config(filenames,
+                                                                           collection_name)
         """
 
         eva_dict = {'filenames': filenames,
