@@ -30,7 +30,7 @@ def figure_driver(config, data_collections, timing, logger):
         config (dict): A dictionary containing the configuration for generating figures.
         data_collections (DataCollections): An instance of the DataCollections class containing
         input data.
-        timing: A timing instance to measure the execution time.
+        timing (Timing): A timing instance to measure the execution time.
         logger (Logger): An instance of the logger for logging messages.
 
     This function generates and saves multiple figures based on the provided configuration. It
