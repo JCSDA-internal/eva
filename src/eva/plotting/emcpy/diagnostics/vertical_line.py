@@ -25,7 +25,6 @@ class VerticalLine():
         configuration. The vertical line plot is created using a declarative plotting library from
         EMCPy (https://github.com/NOAA-EMC/emcpy).
 
-
         Example:
             config = {
                 "x": 10,
