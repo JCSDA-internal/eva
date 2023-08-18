@@ -28,6 +28,7 @@ class Scatter():
         (https://github.com/NOAA-EMC/emcpy).
 
         Example:
+
             ::
 
                     config = {

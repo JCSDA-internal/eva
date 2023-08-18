@@ -28,6 +28,7 @@ class Histogram():
         (https://github.com/NOAA-EMC/emcpy).
 
         Example:
+
             ::
 
                     config = {

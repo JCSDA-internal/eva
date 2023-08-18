@@ -28,6 +28,7 @@ class Density():
         (https://github.com/NOAA-EMC/emcpy).
 
         Example:
+
             ::
 
                     config = {
