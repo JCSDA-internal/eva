@@ -48,7 +48,7 @@ class MonDataSpace(EvaDatasetBase):
         # Get control file and parse
         # --------------------------
         control_file = get(dataset_config, self.logger, 'control_file')
-        coords, dims, attribs, nvars, vars, channo, scanpo, chan_assim, chan_nassim = (
+        coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict = (
                                                       self.get_ctl_dict(control_file[0]))
         ndims_used, dims_arr = self.get_ndims_used(dims)
 
@@ -74,6 +74,7 @@ class MonDataSpace(EvaDatasetBase):
 
         # Set coordinate ranges
         # ---------------------
+        channo = chans_dict["chan_nums"] if chans_dict is not None else None
         x_range, y_range, z_range = self.get_dim_ranges(coords, dims, channo)
 
         # Filenames to be read into this collection
@@ -124,24 +125,12 @@ class MonDataSpace(EvaDatasetBase):
             # --------------------------------------
             for x in range(len(coord_dict)):
                 if drop_coord[x]:
-                    ds, channo, chan_assim, chan_nassim = \
-                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], channo,
-                                              chan_assim, chan_nassim)
+                    ds, chans_dict = \
+                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], chans_dict)
 
-            # If user specifies all variables set to group list
-            # -------------------------------------------------
-            if group_vars == 'all':
-                group_vars = list(ds.data_vars)
-
-            # Conditionally add channel related variables
-            # -------------------------------------------
-            if 'Channel' in coords.values():
-                ds = self.loadChanItems(ds, chan_assim, chan_nassim, channo)
-
-            # Conditionally add scan position as a variable
-            # ---------------------------------------------
-            if 'Scan' in coords.values():
-                ds = self.loadScanItems(ds, scanpo)
+            # Conditionally add channel, level, and scan related variables
+            # ------------------------------------------------------------
+            ds = self.loadConditionalItems(ds, chans_dict, levs_dict, scanpo)
 
             # Rename variables with group
             rename_dict = {}
@@ -193,7 +182,7 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def subset_coordinate(self, ds, coordinate, requested_subset, channo, chan_assim, chan_nassim):
+    def subset_coordinate(self, ds, coordinate, requested_subset, chans_dict):
 
         """
         Subset the input dataset along the specified coordinate dimension and update channel
@@ -203,15 +192,10 @@ class MonDataSpace(EvaDatasetBase):
             ds (xarray.Dataset): Input dataset to be subset.
             coordinate (str): Name of the coordinate dimension to subset.
             requested_subset (list): List of values to keep along the specified coordinate.
-            channo (list): List of channel numbers.
-            chan_assim (list): List of assimilated channel numbers.
-            chan_nassim (list): List of non-assimilated channel numbers.
-
+            chans_dict (dict): Dictionary of channel components.
         Returns:
             xarray.Dataset: Subset of the input dataset.
-            list: Updated list of channel numbers.
-            list: Updated list of assimilated channel numbers.
-            list: Updated list of non-assimilated channel numbers.
+            chans_dict (dict): Updated dictionary of channel components.
         """
 
         if coordinate in list(ds.dims):
@@ -237,29 +221,29 @@ class MonDataSpace(EvaDatasetBase):
             # If Channel coordinate has been reduced from "all" (by yaml
             # file) then reset chan_assim/nassim and channo accordingly
             if coordinate == 'Channel':
-                channo = requested_subset
                 new_chan_assim = []
                 new_chan_nassim = []
 
-                for x in channo:
-                    if x in chan_assim:
+                for x in requested_subset:
+                    if x in chans_dict['chans_assim']:
                         new_chan_assim.append(x)
-                    elif x in chan_nassim:
+                    elif x in chans_dict['chans_nassim']:
                         new_chan_nassim.append(x)
 
-                chan_assim = new_chan_assim
-                chan_nassim = new_chan_nassim
+                for x in range(len(new_chan_assim), len(requested_subset)):
+                    new_chan_assim.append(0)
+                for x in range(len(new_chan_nassim), len(requested_subset)):
+                    new_chan_nassim.append(0)
 
-                for x in range(len(chan_assim), len(channo)):
-                    chan_assim.append(0)
-                for x in range(len(chan_nassim), len(channo)):
-                    chan_nassim.append(0)
+                chans_dict['chan_nums'] = requested_subset
+                chans_dict['chans_assim'] = new_chan_assim
+                chans_dict['chans_nassim'] = new_chan_nassim
 
         else:
             self.logger.info('Warning:  requested coordinate, ' + str(coordinate) + ' is not in ' +
                              ' dataset dimensions valid dimensions include ' + str(ds.dims))
 
-        return ds, channo, chan_assim, chan_nassim
+        return ds, chans_dict
 
     # ----------------------------------------------------------------------------------------------
 
@@ -278,10 +262,9 @@ class MonDataSpace(EvaDatasetBase):
             dict: Dictionary containing sensor and satellite attributes.
             int: Number of variables.
             list: List of variable names.
-            list: List of channel numbers.
             list: List of scan positions.
-            list: List of assimilated channel numbers.
-            list: List of non-assimilated channel numbers.
+            dict: Dictionary containing channel information.
+            dict: Dictionary containing level information.
         """
 
         coords = {'xdef': None, 'ydef': None, 'zdef': None}
@@ -291,11 +274,16 @@ class MonDataSpace(EvaDatasetBase):
         attribs = {'sensor': None, 'sat': None}
         vars = []
         nvars = 0
+        chans_dict = None
         channo = []
         chan_assim = []
         chan_nassim = []
         scanpo = None
         scan_info = []
+        levs_dict = None
+        levs = []
+        level_assim = []
+        level_nassim = []
 
         coord_dict = {
                      'channel': 'Channel',
@@ -369,6 +357,16 @@ class MonDataSpace(EvaDatasetBase):
                     if strs[7] == '-1':
                         chan_nassim.append(int(strs[4]))
 
+                if line.find('level=') != -1:
+                    strs = line.split()
+                    tlev = strs[2].replace(',', '')
+                    if tlev.isdigit():
+                        levs.append(int(tlev))
+                    if strs[7] == '1':
+                        level_assim.append(int(tlev))
+                    if strs[7] == '-1':
+                        level_nassim.append(int(tlev))
+
             # The list of variables is at the end of the file between the lines
             # "vars" and "end vars".
             start = len(lines) - (nvars + 1)
@@ -401,8 +399,20 @@ class MonDataSpace(EvaDatasetBase):
                     chan_assim.append(0)
                 for x in range(len(chan_nassim), len(channo)):
                     chan_nassim.append(0)
+                chans_dict = {'chan_nums': channo,
+                              'chans_assim': chan_assim,
+                              'chans_nassim': chan_nassim}
 
-        return coords, dims, attribs, nvars, vars, channo, scanpo, chan_assim, chan_nassim
+            if 'Level' in coords.values():
+                for x in range(len(level_assim), len(levs)):
+                    level_assim.append(0)
+                for x in range(len(level_nassim), len(levs)):
+                    level_nassim.append(0)
+                levs_dict = {'levels': levs,
+                             'levels_assim': level_assim,
+                             'levels_nassim': level_nassim}
+
+        return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict
 
     def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars, file_path=None):
 
@@ -689,56 +699,51 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def loadChanItems(self, dataset, chan_assim, chan_nassim, channo):
+    def loadConditionalItems(self, dataset, chans_dict, levs_dict, scanpo):
 
         """
-        Add channel as a variable using single dimension as well as chan_assim, chan_nassim, and
-        chan_yaxis_* to allow plotting of channel markers.
+        Add channel, level, and scan related variables to the dataset.
 
         Args:
             dataset (xarray.Dataset): Dataset to which variables will be added.
-            chan_assim (list): List of assimilated channel numbers.
-            chan_nassim (list): List of non-assimilated channel numbers.
-            channo (list): List of channel numbers.
-
-        Returns:
-            xarray.Dataset: Dataset with added channel-related variables.
-        """
-
-        dataset['channel'] = (['Channel'], channo)
-        if len(chan_assim) > 0:
-            dataset['chan_assim'] = (['Channel'], chan_assim)
-        if len(chan_nassim) > 0:
-            dataset['chan_nassim'] = (['Channel'], chan_nassim)
-
-        dataset['chan_yaxis_100'] = (['Channel'], [-100]*len(channo))
-        dataset['chan_yaxis_1p5'] = (['Channel'], [-1.5]*len(channo))
-        dataset['chan_yaxis_p05'] = (['Channel'], [-0.05]*len(channo))
-
-        return dataset
-
-    # ----------------------------------------------------------------------------------------------
-
-    def loadScanItems(self, dataset, scanpo):
-
-        """
-        Add scan-related variables to the dataset.
-
-        Args:
-            dataset (xarray.Dataset): Dataset to which variables will be added.
+            chans_dict (dict): Dictionary of channel components.
+            levs_dict (dict): Dictionary of level components.
             scanpo (list): List of scan positions.
 
         Returns:
             xarray.Dataset: Dataset with added scan-related variables.
         """
 
-        nscan = dataset.dims.get('Scan')
-        nchan = dataset.dims.get('Channel')	  # 'Channel' is always present with 'Scan'
-        scan_array = np.zeros(shape=(nscan, nchan))
+        if chans_dict is not None:
+            dataset['channel'] = (['Channel'], chans_dict["chan_nums"])
+            if len(chans_dict["chans_assim"]) > 0:
+                dataset['chan_assim'] = (['Channel'], chans_dict["chans_assim"])
+            if len(chans_dict["chans_nassim"]) > 0:
+                dataset['chan_nassim'] = (['Channel'], chans_dict["chans_nassim"])
 
-        for x in range(nchan):
-            scan_array[:, x] = np.array([scanpo])
-            dataset['scan'] = (['Scan', 'Channel'], scan_array)
+            dataset['chan_yaxis_100'] = (['Channel'], [-100]*len(chans_dict["chan_nums"]))
+            dataset['chan_yaxis_n1p5'] = (['Channel'], [-1.5]*len(chans_dict["chan_nums"]))
+            dataset['chan_yaxis_np05'] = (['Channel'], [-0.05]*len(chans_dict["chan_nums"]))
+
+        if levs_dict is not None:
+            dataset['level'] = (['Level'], levs_dict["levels"])
+            if len(levs_dict["levels_assim"]) > 0:
+                dataset['level_assim'] = (['Level'], levs_dict["levels_assim"])
+            if len(levs_dict["levels_nassim"]) > 0:
+                dataset['level_nassim'] = (['Level'], levs_dict["levels_nassim"])
+
+            dataset['level_yaxis_100'] = (['Level'], [100]*len(levs_dict["levels"]))
+            dataset['level_yaxis_np5'] = (['Level'], [-0.5]*len(levs_dict["levels"]))
+            dataset['level_yaxis_n5'] = (['Level'], [-5]*len(levs_dict["levels"]))
+
+        if scanpo is not None:
+            nscan = dataset.dims.get('Scan')
+            nchan = dataset.dims.get('Channel')	      # 'Channel' is always present with 'Scan'
+            scan_array = np.zeros(shape=(nscan, nchan))
+
+            for x in range(nchan):
+                scan_array[:, x] = np.array([scanpo])
+                dataset['scan'] = (['Scan', 'Channel'], scan_array)
 
         return dataset
 
