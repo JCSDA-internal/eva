@@ -25,6 +25,13 @@ jobs:
     - name: Set Branch Name
       run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Dependencies
+      run: npm install @actions/github
 
     - name: Trigger Workflow
       uses: actions/github-script@v4
