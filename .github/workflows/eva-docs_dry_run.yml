@@ -35,6 +35,13 @@ jobs:
             repo: 'eva-docs'
           });
 
+          workflows.workflows.forEach(workflow => {
+            console.log(`Workflow Name: ${workflow.name}`);
+            console.log(`Workflow ID: ${workflow.id}`);
+            console.log(`Workflow State: ${workflow.state}`);
+            console.log('---');
+          });
+
           const workflowToTrigger = workflows.workflows.find(workflow => workflow.name === 'docs_dry_run');
           console.log(workflowToTrigger)
           await github.actions.createWorkflowDispatch({
