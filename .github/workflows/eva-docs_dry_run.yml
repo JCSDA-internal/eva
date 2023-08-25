@@ -15,29 +15,33 @@ defaults:
 #  run-evadocs-dry-run:
 #    uses: JCSDA-internal/eva-docs/.github/workflows/docs_dry_run.yaml@bugfix/docs_dry_run
 
-steps:
+jobs:
+  run-evadocs-dry-run:
+    name: Dry run build of eva documentation
 
-  - name: Set Branch Name
-    run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+    steps:
+
+    - name: Set Branch Name
+      run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
 
-  - name: Trigger Workflow
-    uses: actions/github-script@v4
-    with:
-      script: |
-        const { data: workflows } = await github.actions.listRepoWorkflows({
-          owner: 'JCSDA-internal',
-          repo: 'eva-docs'
-        });
+    - name: Trigger Workflow
+      uses: actions/github-script@v4
+      with:
+        script: |
+          const { data: workflows } = await github.actions.listRepoWorkflows({
+            owner: 'JCSDA-internal',
+            repo: 'eva-docs'
+          });
 
-        const workflowToTrigger = workflows.workflows.find(workflow => workflow.name === 'docs_dry_run');
+          const workflowToTrigger = workflows.workflows.find(workflow => workflow.name === 'docs_dry_run');
 
-        await github.actions.createWorkflowDispatch({
-                owner: 'JCSDA-internal',
-                repo: 'eva-docs',
-                workflow_id: workflowToTrigger.id,
-                ref: 'bugfix/docs_dry_run',
-                inputs: {
-                  branchName: process.env.BRANCH_NAME
-                }
-        });
+          await github.actions.createWorkflowDispatch({
+                  owner: 'JCSDA-internal',
+                  repo: 'eva-docs',
+                  workflow_id: workflowToTrigger.id,
+                  ref: 'bugfix/docs_dry_run',
+                  inputs: {
+                    branchName: process.env.BRANCH_NAME
+                  }
+          });
