@@ -36,7 +36,7 @@ jobs:
           });
 
           const workflowToTrigger = workflows.workflows.find(workflow => workflow.name === 'docs_dry_run');
-
+          echo workflowToTrigger
           await github.actions.createWorkflowDispatch({
                   owner: 'JCSDA-internal',
                   repo: 'eva-docs',
