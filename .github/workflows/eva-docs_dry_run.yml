@@ -48,8 +48,11 @@ jobs:
                   owner: 'JCSDA-internal',
                   repo: 'eva-docs',
                   workflow_id: workflowToTrigger.id,
-                  ref: 'bugfix/docs_dry_run',
+                  ref: 'develop',
                   inputs: {
                     branchName: process.env.BRANCH_NAME
                   }
           });
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
