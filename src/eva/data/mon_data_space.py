@@ -716,25 +716,21 @@ class MonDataSpace(EvaDatasetBase):
 
         if chans_dict is not None:
             dataset['channel'] = (['Channel'], chans_dict["chan_nums"])
+            dataset['chan_yaxis_z'] = (['Channel'], [0.0]*len(chans_dict["chan_nums"]))
+
             if len(chans_dict["chans_assim"]) > 0:
                 dataset['chan_assim'] = (['Channel'], chans_dict["chans_assim"])
             if len(chans_dict["chans_nassim"]) > 0:
                 dataset['chan_nassim'] = (['Channel'], chans_dict["chans_nassim"])
 
-            dataset['chan_yaxis_100'] = (['Channel'], [-100]*len(chans_dict["chan_nums"]))
-            dataset['chan_yaxis_n1p5'] = (['Channel'], [-1.5]*len(chans_dict["chan_nums"]))
-            dataset['chan_yaxis_np05'] = (['Channel'], [-0.05]*len(chans_dict["chan_nums"]))
-
         if levs_dict is not None:
             dataset['level'] = (['Level'], levs_dict["levels"])
+            dataset['level_yaxis_z'] = (['Level'], [0.0]*len(levs_dict["levels"]))
+
             if len(levs_dict["levels_assim"]) > 0:
                 dataset['level_assim'] = (['Level'], levs_dict["levels_assim"])
             if len(levs_dict["levels_nassim"]) > 0:
                 dataset['level_nassim'] = (['Level'], levs_dict["levels_nassim"])
-
-            dataset['level_yaxis_100'] = (['Level'], [100]*len(levs_dict["levels"]))
-            dataset['level_yaxis_np5'] = (['Level'], [-0.5]*len(levs_dict["levels"]))
-            dataset['level_yaxis_n5'] = (['Level'], [-5]*len(levs_dict["levels"]))
 
         if scanpo is not None:
             nscan = dataset.dims.get('Scan')
