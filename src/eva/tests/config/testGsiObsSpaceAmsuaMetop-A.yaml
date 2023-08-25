@@ -4,8 +4,7 @@ datasets:
     satellite: metop-a
     sensor: amsua
     filenames:
-#      - ${data_input_path}/gsi_obs_space.amsua_metop-a_ges.2020092200.nc4
-      - ../data/gsi_obs_space.amsua_metop-a_ges.2020092200.nc4
+      - ${data_input_path}/gsi_obs_space.amsua_metop-a_ges.2020092200.nc4
     channels: &channels 3,8
     groups:
       - name: GsiNcDiag
