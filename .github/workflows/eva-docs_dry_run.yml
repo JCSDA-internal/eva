@@ -18,6 +18,7 @@ defaults:
 jobs:
   run-evadocs-dry-run:
     name: Dry run build of eva documentation
+    runs-on: ubuntu-latest
 
     steps:
 
