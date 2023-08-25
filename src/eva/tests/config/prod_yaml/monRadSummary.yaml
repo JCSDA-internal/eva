@@ -1,0 +1,573 @@
+#
+#  Summary plots for RadMon gfs
+# 
+#    Make 4 plots:
+#      - Obs counts from last 4 cycles
+#      - Avg total bias correction for 1 cycle, 1 day, and 30 days
+#      - Avg omgbc for 1 cycle and 30 days
+#      - Avg penalty for 1 cycle, 1 day, and 30 days
+
+diagnostics:
+
+# Data read
+# ---------
+datasets:
+  - name: summary
+    satellite: g16
+    sensor: abi
+    type: MonDataSpace
+    control_file:
+      - ../data/rad_data/time.abi_g16.ctl
+    filenames:
+      - ../data/rad_data/time.abi_g16.2023070218.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070212.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070206.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070200.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070118.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070112.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070106.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070100.ieee_d
+      - ../data/rad_data/time.abi_g16.2023063018.ieee_d
+      - ../data/rad_data/time.abi_g16.2023063012.ieee_d
+      - ../data/rad_data/time.abi_g16.2023063006.ieee_d
+      - ../data/rad_data/time.abi_g16.2023063000.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062918.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062912.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062906.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062900.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062818.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062812.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062806.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062800.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062718.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062712.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062706.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062700.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062618.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062612.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062606.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062600.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062518.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062512.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062506.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062500.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062418.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062412.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062406.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062400.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062318.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062312.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062306.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062300.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062218.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062212.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062206.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062200.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062118.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062112.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062106.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062100.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062018.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062012.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062006.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062000.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061918.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061912.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061906.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061900.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061818.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061812.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061806.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061800.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061718.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061712.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061706.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061700.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061618.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061612.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061606.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061600.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061518.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061512.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061506.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061500.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061418.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061412.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061406.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061400.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061318.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061312.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061306.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061300.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061218.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061212.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061206.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061200.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061118.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061112.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061106.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061100.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061018.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061012.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061006.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061000.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060918.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060912.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060906.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060900.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060818.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060812.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060806.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060800.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060718.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060712.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060706.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060700.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060618.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060612.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060606.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060600.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060518.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060512.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060506.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060500.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060418.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060412.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060406.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060400.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060318.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060312.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060306.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060300.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060218.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060212.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060206.ieee_d
+
+    channels: &channels 7,8,9,10,11,12,13,14,15,16
+    regions: &regions 1
+    groups:
+      - name: GsiIeee
+
+transforms:
+  - transform: accept where
+    new name: summary::GsiIeee::nassim
+    starting field: summary::GsiIeee::chan_nassim
+    where:
+      - summary::GsiIeee::chan_nassim > 0
+    for:
+      variable: [none]
+
+  - transform: accept where
+    new name: summary::GsiIeee::assim
+    starting field: summary::GsiIeee::chan_assim
+    where:
+      - summary::GsiIeee::chan_assim > 0
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: summary::GsiIeee::count_cyc1
+    starting field: summary::GsiIeee::count
+    cycle: 2023070218
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: summary::GsiIeee::count_cyc2
+    starting field: summary::GsiIeee::count
+    cycle: 2023070212
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: summary::GsiIeee::count_cyc3
+    starting field: summary::GsiIeee::count
+    cycle: 2023070206
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: summary::GsiIeee::count_cyc4
+    starting field: summary::GsiIeee::count
+    cycle: 2023070200
+    for:
+      variable: [none]
+
+  # Note that total is the total bias correction for a given
+  # channel/region.  To find the average divide total by count.
+  - transform: arithmetic
+    new name: summary::GsiIeee::total_avg
+    equals: summary::GsiIeee::total/summary::GsiIeee::count
+    for:
+      variable: [none]
+
+  # Note that omgbc is the total omgbc for a given
+  # channel/region.  To find the average divide omgbc by count.
+  - transform: arithmetic
+    new name: summary::GsiIeee::omgbc_avg
+    equals: summary::GsiIeee::omgbc/summary::GsiIeee::count
+    for:
+      variable: [none]
+
+  # Single cycle total bias correction
+  - transform: select time
+    new name: summary::GsiIeee::total_1cyc
+    starting field: summary::GsiIeee::total_avg
+    cycle: 2023070218
+    for:
+      variable: [none]
+
+  # 4 cycle total bias correction using time slice
+  - transform: select time
+    new name: summary::GsiIeee::total_1d
+    starting field: summary::GsiIeee::total_avg
+    start cycle: 2023070218
+    end cycle: 2023070200
+    for:
+      variable: [none]
+
+  # 120 cycle total bias correction using time slice
+  - transform: select time
+    new name: summary::GsiIeee::total_30d
+    starting field: summary::GsiIeee::total_avg
+    start cycle: 2023070218
+    end cycle: 2023060300
+    for:
+      variable: [none]
+
+  # 1 day omgbc using time slice
+  - transform: select time
+    new name: summary::GsiIeee::omgbc_1c
+    starting field: summary::GsiIeee::omgbc_avg
+    cycle: 2023070218
+    for:
+      variable: [none]
+
+  # 30 day omgbc using time slice
+  - transform: select time
+    new name: summary::GsiIeee::omgbc_30d
+    starting field: summary::GsiIeee::omgbc_avg
+    start cycle: 2023070218
+    end cycle: 2023060300
+    for:
+      variable: [none]
+
+  # Note that penalty is the total penalty for a given
+  # channel/region.  To find the average divide penalty by count.
+  - transform: arithmetic
+    new name: summary::GsiIeee::penalty_avg
+    equals: summary::GsiIeee::penalty/summary::GsiIeee::count
+    for:
+      variable: [none]
+
+  # 1 cycle penalty using time slice
+  - transform: select time
+    new name: summary::GsiIeee::penalty_1c
+    starting field: summary::GsiIeee::penalty_avg
+    cycle: 2023070218
+    for:
+      variable: [none]
+
+  # 1 day penalty using time slice
+  - transform: select time
+    new name: summary::GsiIeee::penalty_1d
+    starting field: summary::GsiIeee::penalty_avg
+    start cycle: 2023070218
+    end cycle: 2023070200
+    for:
+      variable: [none]
+
+  # 30 day penalty using time slice
+  - transform: select time
+    new name: summary::GsiIeee::penalty_30d
+    starting field: summary::GsiIeee::penalty_avg
+    start cycle: 2023070218
+    end cycle: 2023060300
+    for:
+      variable: [none]
+
+  - transform: arithmetic
+    new name: summary::GsiIeee::yaxis_100  
+    equals: summary::GsiIeee::chan_yaxis_z + 100.0
+    for:
+      variable: [none]
+
+  - transform: arithmetic
+    new name: summary::GsiIeee::yaxis_n1p5  
+    equals: summary::GsiIeee::chan_yaxis_z + -1.5
+    for:
+      variable: [none]
+
+  - transform: arithmetic
+    new name: summary::GsiIeee::yaxis_np05  
+    equals: summary::GsiIeee::chan_yaxis_z + -0.05
+    for:
+      variable: [none]
+
+graphics:
+
+    - figure:
+        layout: [4,1]
+        figure size: [20,18]
+        tight layout:
+        title: "Summary Plot abi_g16 \n Valid: 2023070218"
+        output name: lineplots/abi_g16/summary.abi_g16.png
+        plot logo:
+          which: 'noaa/nws'
+          loc: 'center left'
+          subplot_orientation: 'first'
+      plots:
+        # Obs counts, last 4 cycles
+        # -------------------------
+        - add_xlabel: 'Channel'
+          add_ylabel: 'Observation Count'
+          add_legend:
+            loc: 'upper right'
+          set_xticks: [7,8,9,10,11,12,13,14,15,16]
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+          add_title: 
+            label: "Number of Obs Passing QC \n 2023070218"
+            loc: 'Left'
+          layers:
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::count_cyc1
+            color: 'blue'
+            label: '2023070218'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::count_cyc2
+            color: 'green'
+            label: '2023070212'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::count_cyc3
+            color: 'orange'
+            label: '2023070206'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::count_cyc4
+            color: 'red'
+            label: '2023070200'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::assim
+            y: 
+              variable: summary::GsiIeee::yaxis_100
+            color: 'green'
+            label: 'chan assim'
+            linestyle: ''
+            marker: 's'
+            markersize: '6'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::nassim
+            y: 
+              variable: summary::GsiIeee::yaxis_100
+            color: 'red'
+            label: 'chan not assim'
+            linestyle: ''
+            marker: 's'
+            markersize: '6'
+
+        # Avg total bias correction, 1 cycle, 1 day, 30 days
+        # --------------------------------------------------
+        - add_xlabel: 'Channel'
+          add_ylabel: 'Total Bias Correction (K)'
+          add_legend:
+            loc: 'upper right'
+          set_xticks: [7,8,9,10,11,12,13,14,15,16]
+          set_yticks: [-1.0, -0.5, 0, 0.5, 1.0]
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+          add_title: 
+            label: "Total Bias Correction(K) \n 2023070218"
+            loc: 'Left'
+          layers:
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::total_1cyc
+            color: 'blue'
+            label: '1 cycle'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::total_1d
+            color: 'red'
+            label: '1 day'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::total_30d
+            color: 'green'
+            label: '30 days'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::assim
+            y: 
+              variable: summary::GsiIeee::yaxis_n1p5
+            color: 'green'
+            label: 'chan assim'
+            linestyle: ''
+            marker: 's'
+            markersize: '6'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::nassim
+            y: 
+              variable: summary::GsiIeee::yaxis_n1p5
+            color: 'red'
+            label: 'chan not assim'
+            linestyle: ''
+            marker: 's'
+            markersize: '6'
+
+          - type: HorizontalLine
+            y: 0
+            linewidth: 1.0
+            label: ''
+
+        # Avg omgbc 1 cycle, 30 days
+        # --------------------------
+        - add_xlabel: 'Channel'
+          add_ylabel: 'Obs - Ges with BC (K)'
+          add_legend:
+            loc: 'upper right'
+          set_xticks: [7,8,9,10,11,12,13,14,15,16]
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+          add_title: 
+            label: "Observed - Ges with Bias Cor(K) \n 2023070218"
+            loc: 'Left'
+          layers:
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::omgbc_1c
+            color: 'blue'
+            label: '1 cycle'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::omgbc_30d
+            color: 'red'
+            label: '30 days'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::assim
+            y: 
+              variable: summary::GsiIeee::yaxis_np05
+            color: 'green'
+            label: 'chan assim'
+            linestyle: ''
+            marker: 's'
+            markersize: '6'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::nassim
+            y: 
+              variable: summary::GsiIeee::yaxis_np05
+            color: 'red'
+            label: 'chan not assim'
+            linestyle: ''
+            marker: 's'
+            markersize: '6'
+
+        # Avg penalty value 1 cycle, 1 day, 30 days
+        # -----------------------------------------
+        - add_xlabel: 'Channel'
+          add_ylabel: "Contribution to Penalty"
+          add_legend:
+            loc: 'upper right'
+          set_xticks: [7,8,9,10,11,12,13,14,15,16]
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+          add_title: 
+            label: "Contribution to Penalty \n 2023070218"
+            loc: 'Left'
+          layers:
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::penalty_1c
+            color: 'blue'
+            label: '1 cycle'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::penalty_1d
+            color: 'red'
+            label: '1 day'
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::channel
+            y:
+              variable: summary::GsiIeee::penalty_30d
+            color: 'orange'
+            label: '30 days'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::assim
+            y: 
+              variable: summary::GsiIeee::yaxis_np05
+            color: 'green'
+            label: 'chan assim'
+            linestyle: ''
+            marker: 's'
+            markersize: '6'
+
+          - type: LinePlot
+            x:
+              variable: summary::GsiIeee::nassim
+            y: 
+              variable: summary::GsiIeee::yaxis_np05
+            color: 'red'
+            label: 'chan not assim'
+            linestyle: ''
+            marker: 's'
+            markersize: '6'
+
+

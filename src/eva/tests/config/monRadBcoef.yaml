@@ -1,0 +1,194 @@
+# RadMon bcoef time series plots for RadMon gfs
+#    1.  Load binary monitor bcoef data for 120 cycles.  
+#    2.  Generate time series plots for the specified files (cycle times, generally 30 days):
+#          mean
+#          lapse
+#          lapse2
+#          emiss
+#          ordang1
+#          ordang2
+#          ordang3
+#          ordang4
+#
+#   Note that atmpath, clw, cos, and sin, which are available in the binary
+#   files are not included in this plot script.  Presently they are all zero values
+#   so there is no need to add the extra processing time.  This script is slow enough
+#   as is.
+#
+#   It's worth considering how much of what this plots is really useful as a 
+#   routinely available plot and how much belongs in a script to be used for more 
+#   in-depth investigations.
+#
+#   Also I'll need to consider a means to substitute the control file variable name
+#   for the more descriptive term in plot labels (i.e. "ordang1" = "1st Order Angle").
+#
+#
+diagnostics:
+
+# Data read
+# ---------
+datasets:
+  - name: bcoef
+    satellite: j1
+    sensor: viirs-m
+    type: MonDataSpace
+    control_file:
+      - ../data/rad_data/bcoef.viirs-m_j1.ctl
+    filenames:
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081518.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081512.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081506.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081500.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081418.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081412.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081406.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081400.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081318.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081312.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081306.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081300.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081218.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081212.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081206.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081200.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081118.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081112.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081106.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081100.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081018.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081012.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081006.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023081000.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080918.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080912.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080906.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080900.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080818.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080812.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080806.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080800.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080718.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080712.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080706.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080700.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080618.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080612.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080606.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080600.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080518.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080512.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080506.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080500.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080418.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080412.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080406.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080400.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080318.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080312.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080306.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080300.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080218.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080212.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080206.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080200.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080118.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080112.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080106.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023080100.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023073118.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023073112.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023073106.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023073100.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023073018.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023073012.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023073006.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023073000.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072918.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072912.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072906.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072900.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072818.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072812.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072806.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072800.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072718.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072712.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072706.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072700.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072618.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072612.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072606.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072600.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072518.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072512.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072506.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072500.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072418.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072412.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072406.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072400.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072318.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072312.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072306.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072300.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072218.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072212.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072206.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072200.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072118.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072112.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072106.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072100.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072018.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072012.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072006.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023072000.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071918.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071912.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071906.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071900.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071818.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071812.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071806.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071800.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071718.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071712.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071706.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071700.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071618.ieee_d
+      - ../data/rad_data/bcoef.viirs-m_j1.2023071612.ieee_d
+
+    channels: &channels 12,13,14,15,16
+    regions: &regions 1
+    groups:
+      - name: GsiIeee
+        variables: &variables ['mean', 'lapse', 'lapse2', 'emiss', 'ordang1', 'ordang2', 'ordang3', 'ordang4']
+
+graphics:
+
+    # All defined variables
+    # ---------------------
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      figure:
+        layout: [1,1]
+        figure size: [20,18]
+        tight layout:
+        title: "${variable}, viirs-m_j1 channel ${channel}  \n Valid: 2023081518"
+        output name: lineplots/viirs-m_j1/bcoef.viirs-m_j1.${channel}.${variable}.png
+        plot logo:
+          which: 'noaa/nws'
+          loc: 'upper right'
+
+      plots:
+        - add_xlabel: 'Cycle'
+          add_ylabel: "${variable}"
+          layers:
+          - type: LinePlot
+            x:
+              variable: bcoef::GsiIeee::cycle
+            y:
+              variable: bcoef::GsiIeee::${variable}
+            color: 'blue'
+            channel: ${channel}

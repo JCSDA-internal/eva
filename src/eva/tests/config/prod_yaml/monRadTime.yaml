@@ -1,0 +1,216 @@
+#
+# Time series plots for RadMon gfs
+#
+# Generate separate 30 day time series plots for:
+#   - number of obs 
+#   - penalty
+#   - omgnbc
+#   - bias correction
+#   - omgbc
+
+diagnostics:
+
+# Data read
+# ---------
+datasets:
+  - name: time
+    satellite: g16
+    sensor: abi
+    type: MonDataSpace
+    control_file:
+      - ../data/rad_data/time.abi_g16.ctl
+    filenames:
+      - ../data/rad_data/time.abi_g16.2023070218.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070212.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070206.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070200.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070118.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070112.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070106.ieee_d
+      - ../data/rad_data/time.abi_g16.2023070100.ieee_d
+      - ../data/rad_data/time.abi_g16.2023063018.ieee_d
+      - ../data/rad_data/time.abi_g16.2023063012.ieee_d
+      - ../data/rad_data/time.abi_g16.2023063006.ieee_d
+      - ../data/rad_data/time.abi_g16.2023063000.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062918.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062912.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062906.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062900.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062818.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062812.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062806.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062800.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062718.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062712.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062706.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062700.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062618.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062612.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062606.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062600.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062518.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062512.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062506.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062500.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062418.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062412.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062406.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062400.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062318.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062312.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062306.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062300.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062218.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062212.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062206.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062200.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062118.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062112.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062106.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062100.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062018.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062012.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062006.ieee_d
+      - ../data/rad_data/time.abi_g16.2023062000.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061918.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061912.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061906.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061900.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061818.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061812.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061806.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061800.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061718.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061712.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061706.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061700.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061618.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061612.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061606.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061600.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061518.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061512.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061506.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061500.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061418.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061412.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061406.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061400.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061318.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061312.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061306.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061300.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061218.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061212.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061206.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061200.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061118.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061112.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061106.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061100.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061018.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061012.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061006.ieee_d
+      - ../data/rad_data/time.abi_g16.2023061000.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060918.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060912.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060906.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060900.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060818.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060812.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060806.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060800.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060718.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060712.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060706.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060700.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060618.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060612.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060606.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060600.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060518.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060512.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060506.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060500.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060418.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060412.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060406.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060400.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060318.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060312.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060306.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060300.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060218.ieee_d
+      - ../data/rad_data/time.abi_g16.2023060212.ieee_d
+
+    channels: &channels 7,8,9,10,11,12,13,14,15,16
+    regions: &regions 1
+    groups:
+      - name: GsiIeee
+        variables: &variables ['penalty', 'omgnbc', 'total', 'omgbc']
+
+transforms:
+  - transform: arithmetic
+    new name: time::GsiIeee::${variable}_avg
+    equals: time::GsiIeee::${variable}/time::GsiIeee::count
+    for:
+      variable: *variables
+
+graphics:
+
+    # Obs count plots
+    # ---------------
+    - batch figure:
+        channels: *channels
+        variables: ['count']
+        sensor: abi
+
+      figure:
+        layout: [1,1]
+        figure size: [20,18]
+        tight layout:
+        title: "${variable}, abi_g16 channel ${channel}  \n Valid: 2023070218"
+        output name: lineplots/abi_g16/time.abi_g16.${channel}.${variable}.png
+        plot logo:
+          which: 'noaa/nws'
+          loc: 'upper right'
+
+      plots:
+        - add_xlabel: 'Cycle'
+          add_ylabel: '${variable}'
+          layers:
+          - type: LinePlot
+            x:
+              variable: time::GsiIeee::cycle
+            y:
+              variable: time::GsiIeee::${variable}
+            color: 'blue'
+            channel: ${channel}
+
+
+    # All defined variables
+    # ---------------------
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      figure:
+        layout: [1,1]
+        figure size: [20,18]
+        tight layout:
+        title: "${variable}, abi_g16 channel ${channel}  \n Valid: 2023070218"
+        output name: lineplots/abi_g16/time.abi_g16.${channel}.${variable}.png
+        plot logo:
+          which: 'noaa/nws'
+          loc: 'upper right'
+
+      plots:
+        - add_xlabel: 'Cycle'
+          add_ylabel: "${variable}"
+          layers:
+          - type: LinePlot
+            x:
+              variable: time::GsiIeee::cycle
+            y:
+              variable: time::GsiIeee::${variable}_avg
+            color: 'blue'
+            channel: ${channel}

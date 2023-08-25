@@ -1,0 +1,367 @@
+# RadMon Angle plot performs the following:
+#   1.  Load binary monitor data for 120 cycles
+#   2.  Generate angle plots with 1 day, 1 week, and 30 day spans for:
+#         number of obs 
+#         penalty
+#         omgnbc
+#         total bias correction
+#         omgbc
+#         lapse
+#         lapse2
+#         const (mean correction)
+#         emiss
+#         ordang1
+#         ordang2
+#         ordang3
+#         ordang4
+#
+#   Note that fixang, scangl, clw, cos, and sin, which are available in the binary
+#   files are not included in this plot script.  Presently they are all zero values
+#   so there is no need to add the extra processing time.  This script is slow enough
+#   as is.
+#
+#   With this script in particular it's worth considering how much of what this plots 
+#   is really useful as a routinely available plot and how much belongs in a script 
+#   to be used for more in-depth investigations.
+#
+#   Also I'll need to consider a means to substitute the control file variable name 
+#   for the more descriptive term in plot labels (i.e. "const" = "Mean Correction").
+#
+#   Lastly this script does not include the sdv values for the variables.  I'm 
+#   convinced the sdv values in the existing RadMon angle plots are wrong.  That
+#   can be addressed/fixed when we replace the DA monitor data extraction mechanism.
+#  
+
+diagnostics:
+
+# Data read
+# ---------
+datasets:
+  - name: angle
+    satellite: j1
+    sensor: viirs-m
+    type: MonDataSpace
+    control_file:
+      - ../data/rad_data/angle.viirs-m_j1.ctl
+    filenames:
+      - ../data/rad_data/angle.viirs-m_j1.2023080718.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080712.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080706.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080700.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080618.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080612.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080606.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080600.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080518.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080512.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080506.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080500.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080418.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080412.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080406.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080400.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080318.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080312.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080306.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080300.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080218.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080212.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080206.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080200.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080118.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080112.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080106.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023080100.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023073118.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023073112.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023073106.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023073100.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023073018.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023073012.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023073006.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023073000.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072918.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072912.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072906.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072900.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072818.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072812.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072806.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072800.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072718.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072712.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072706.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072700.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072618.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072612.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072606.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072600.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072518.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072512.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072506.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072500.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072418.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072412.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072406.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072400.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072318.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072312.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072306.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072300.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072218.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072212.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072206.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072200.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072118.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072112.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072106.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072100.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072018.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072012.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072006.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023072000.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071918.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071912.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071906.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071900.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071818.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071812.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071806.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071800.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071718.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071712.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071706.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071700.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071618.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071612.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071606.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071600.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071518.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071512.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071506.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071500.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071418.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071412.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071406.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071400.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071318.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071312.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071306.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071300.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071218.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071212.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071206.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071200.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071118.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071112.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071106.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071100.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071018.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071012.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071006.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023071000.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023070918.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023070912.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023070906.ieee_d
+      - ../data/rad_data/angle.viirs-m_j1.2023070900.ieee_d
+
+    channels: &channels 12,13,14,15,16
+    regions: &regions 1
+    groups:
+      - name: GsiIeee
+        variables: &variables ['penalty', 'omgnbc', 'omgbc', 'total', 'lapse', 'lapse2', 'const', 'emiss', 'ordang1', 'ordang2', 'ordang3', 'ordang4']
+
+
+transforms:
+
+  - transform: accept where
+    new name: angle::GsiIeee::count_1
+    starting field: angle::GsiIeee::count
+    where:
+      - angle::GsiIeee::count > 0
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: angle::GsiIeee::count_1d
+    starting field: angle::GsiIeee::count_1
+    start cycle: 2023080718
+    end cycle: 2023080700
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: angle::GsiIeee::count_7d
+    starting field: angle::GsiIeee::count_1
+    start cycle: 2023080718
+    end cycle: 2023080100
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: angle::GsiIeee::count_30d
+    starting field: angle::GsiIeee::count_1
+    start cycle: 2023080718
+    end cycle: 2023070900
+    for:
+      variable: [none]
+
+  - transform: arithmetic
+    new name: angle::GsiIeee::${variable}_avg
+    equals: angle::GsiIeee::${variable}/angle::GsiIeee::count_1
+    for:
+      variable: *variables
+
+  - transform: select time
+    new name: angle::GsiIeee::${variable}_avg_1d
+    starting field: angle::GsiIeee::${variable}_avg
+    start cycle: 2023080718
+    end cycle: 2023080700
+    for:
+      variable: *variables
+
+  - transform: select time
+    new name: angle::GsiIeee::${variable}_avg_7d
+    starting field: angle::GsiIeee::${variable}_avg
+    start cycle: 2023080718
+    end cycle: 2023080100
+    for:
+      variable: *variables
+
+  - transform: select time
+    new name: angle::GsiIeee::${variable}_avg_30d
+    starting field: angle::GsiIeee::${variable}_avg
+    start cycle: 2023080718
+    end cycle: 2023070900
+    for:
+      variable: *variables
+
+
+graphics:
+
+  # Angle plots
+  # -----------
+    - batch figure:
+        channels: *channels
+        variables: ['count']
+
+      figure:
+        layout: [1,1]
+        figure size: [20,18]
+        title: "${variable}, viirs-m_j1 channel ${channel}  \n Valid: 2023080718"
+        output name: lineplots/viirs-m_j1/angle.viirs-m_j1.${channel}.${variable}.png
+        plot logo:
+          which: 'noaa/nws'
+          loc: 'upper left'
+
+      plots:
+
+        - add_xlabel: 'Scan Position'
+          add_ylabel: '${variable}'
+          add_legend:
+            loc: 'upper right'
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+
+          layers:
+          - type: LinePlot
+            x:
+              variable: angle::GsiIeee::scan
+            y:
+              variable: angle::GsiIeee::${variable}_1d
+            color: 'blue'
+            channel: ${channel}
+            label: '1 day'
+
+          - type: LinePlot
+            x:
+              variable: angle::GsiIeee::scan
+            y:
+              variable: angle::GsiIeee::${variable}_7d
+            color: 'green'
+            channel: ${channel}
+            label: '1 week'
+
+          - type: LinePlot
+            x:
+              variable: angle::GsiIeee::scan
+            y:
+              variable: angle::GsiIeee::${variable}_30d
+            color: 'red'
+            channel: ${channel}
+            label: '30 days'
+
+          - type: VerticalLine
+            x: 0
+            linewidth: 0.75
+            label: ''
+
+          - type: HorizontalLine
+            y: 0
+            linewidth: 0.75
+            label: ''
+
+    - batch figure:
+        variables: *variables
+        channels: *channels
+      figure:
+        layout: [1,1]
+        figure size: [20,18]
+        title: "${variable}, viirs-m_j1 channel ${channel}  \n Valid: 2023080718"
+        output name: lineplots/viirs-m_j1/angle.viirs-m_j1.${channel}.${variable}.png
+        plot logo:
+          which: 'noaa/nws'
+          loc: 'upper left'
+
+      plots:
+        - add_xlabel: 'Scan Position'
+          add_ylabel: "${variable}"
+          add_legend:
+            loc: 'upper right'
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+
+          layers:
+          - type: LinePlot
+            x:
+              variable: angle::GsiIeee::scan
+            y:
+              variable: angle::GsiIeee::${variable}_avg_1d
+            color: 'blue'
+            channel: ${channel}
+            label: '1 day'
+
+          - type: LinePlot
+            x:
+              variable: angle::GsiIeee::scan
+            y:
+              variable: angle::GsiIeee::${variable}_avg_7d
+            color: 'green'
+            channel: ${channel}
+            label: '7 days'
+
+          - type: LinePlot
+            x:
+              variable: angle::GsiIeee::scan
+            y:
+              variable: angle::GsiIeee::${variable}_avg_30d
+            color: 'red'
+            channel: ${channel}
+            label: '30 days'
+
+          - type: VerticalLine
+            x: 0
+            linewidth: 0.75
+            label: ''
+
+          - type: HorizontalLine
+            y: 0
+            linewidth: 0.75
+            label: ''
+

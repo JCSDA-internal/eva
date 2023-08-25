@@ -1,0 +1,399 @@
+# Test OznMon
+
+diagnostics:
+
+  # Data read
+  # ---------
+- data:
+    type: MonDataSpace
+    datasets:
+      - name: experiment1
+        satellite: npp
+        sensor: ompsnp
+        type: MonDataSpace
+        control_file:
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.ctl
+        filenames:
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040100.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040106.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040112.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040118.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040200.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040206.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040212.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040218.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040300.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040306.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040312.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040318.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040400.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040406.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040412.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040418.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040500.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040506.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040512.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040518.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040600.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040606.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040612.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040618.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040700.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040706.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040712.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040718.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040800.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040806.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040812.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040818.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040900.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040906.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040912.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022040918.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041000.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041006.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041012.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041018.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041100.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041106.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041112.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041118.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041200.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041206.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041212.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041218.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041300.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041306.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041312.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041318.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041400.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041406.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041412.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041418.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041500.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041506.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041512.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041518.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041600.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041606.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041612.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041618.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041700.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041706.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041712.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041718.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041800.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041806.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041812.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041818.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041900.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041906.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041912.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022041918.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042000.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042006.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042012.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042018.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042100.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042106.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042112.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042118.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042200.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042206.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042212.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042218.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042300.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042306.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042312.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042318.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042400.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042406.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042412.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042418.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042500.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042506.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042512.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042518.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042600.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042606.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042612.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042618.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042700.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042706.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042712.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042718.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042800.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042806.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042812.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042818.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042900.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042906.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042912.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022042918.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022043000.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022043006.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022043012.ieee_d
+          - ../data/ozn_data/gfs_22/ompsnp_npp.ges.2022043018.ieee_d
+
+        regions: &regions 1
+        groups:
+          - name: GsiIeee
+            variables: ['cnt', 'cycle']
+        levels: &levels 1
+
+      - name: experiment2
+        satellite: ompsnp
+        sensor: npp
+        type: MonDataSpace
+        control_file:
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.ctl
+        filenames:
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040100.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040106.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040112.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040118.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040200.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040206.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040212.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040218.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040300.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040306.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040312.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040318.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040400.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040406.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040412.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040418.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040500.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040506.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040512.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040518.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040600.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040606.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040612.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040618.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040700.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040706.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040712.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040718.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040800.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040806.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040812.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040818.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040900.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040906.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040912.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023040918.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041000.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041006.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041012.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041018.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041100.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041106.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041112.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041118.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041200.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041206.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041212.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041218.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041300.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041306.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041312.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041318.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041400.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041406.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041412.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041418.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041500.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041506.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041512.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041518.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041600.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041606.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041612.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041618.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041700.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041706.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041712.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041718.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041800.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041806.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041812.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041818.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041900.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041906.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041912.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023041918.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042000.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042006.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042012.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042018.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042100.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042106.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042112.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042118.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042200.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042206.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042212.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042218.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042300.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042306.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042312.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042318.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042400.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042406.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042412.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042418.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042500.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042506.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042512.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042518.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042600.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042606.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042612.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042618.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042700.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042706.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042712.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042718.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042800.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042806.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042812.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042818.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042900.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042906.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042912.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023042918.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023043000.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023043006.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023043012.ieee_d
+          - ../data/ozn_data/gfs_23/ompsnp_npp.ges.2023043018.ieee_d
+
+        regions:  1
+        groups:
+          - name: Fred
+            variables: ['cnt', 'cycle']
+        levels: *levels 
+
+#  transforms:
+#    - transform: select time
+#      new name: experiment::GsiIeee::count1
+#      starting field: experiment::GsiIeee::count
+#      cycle: 2015051418
+#      for:
+#        variable: [none]
+#
+#    - transform: select time
+#      new name: experiment::GsiIeee::count2
+#      starting field: experiment::GsiIeee::count
+##      cycles: 2015051500
+#      cycle: 2015051500
+#      for:
+#        variable: [none]
+#
+#    - transform: select time
+#      new name: experiment::GsiIeee::count3
+#      starting field: experiment::GsiIeee::count
+##      cycles: 2015051506
+#      cycle: 2015051506
+#      for:
+#        variable: [none]
+#
+#    - transform: select time
+#      new name: experiment::GsiIeee::count4
+#      starting field: experiment::GsiIeee::count
+##      cycles: 2015051512
+#      cycle: 2015051512
+#      for:
+#        variable: [none]
+#
+#    # Note that total is the total bias correction for a given
+#    # channel/region.  To find the average divide total by count.
+#    - transform: arithmetic
+#      new name: experiment::GsiIeee::total_avg
+#      equals: experiment::GsiIeee::total/experiment::GsiIeee::count
+#      for:
+#        variable: [none]
+#
+#    # Single cycle total bias correction 
+#    - transform: select time
+#      new name: experiment::GsiIeee::total_1cyc
+#      starting field: experiment::GsiIeee::total_avg
+#      cycle: 2015051512
+#      for:
+#        variable: [none]
+#
+#     # 4 cycle total bias correction using time slice    
+#    - transform: select time
+#      new name: experiment::GsiIeee::cnt_4cyc
+#      starting field: experiment::GsiIeee::cnt
+#      start cycle: 2023033012
+#      end cycle: 2023033106
+#      for:
+#        variable: [none]
+
+
+  graphics:
+    # Summary plots
+    # ---------------
+      - figure:
+          layout: [1,1]
+          figure size: [12,10]
+          title: 'ompsnp_npp | ges | April, Obs Count'
+          output name: lineplots/ompsnp_npp/time.ompsnp_npp.png
+
+        plots:
+          - add_xlabel: 'Cycle'
+            add_ylabel: 'Observation Count'
+            add_legend:
+              loc: 'upper right'
+            layers:
+            - type: LinePlot
+              x:
+                variable: experiment1::GsiIeee::cycle
+              y:
+                variable: experiment1::GsiIeee::cnt
+              color: 'red'
+              label: '2022'
+            - type: LinePlot
+              x:
+                variable: experiment1::GsiIeee::cycle
+              y:
+                variable: experiment2::Fred::cnt
+              color: 'blue'
+              label: '2023'
+#            - type: LinePlot
+#              x:
+#                variable: experiment::GsiIeee::channel
+#              y:
+#                variable: experiment::GsiIeee::count3
+#              color: 'yellow'
+#              label: '2015051506'
+#            - type: LinePlot
+#              x:
+#                variable: experiment::GsiIeee::channel
+#              y:
+#               variable: experiment::GsiIeee::count4
+#              color: 'red'
+#              label: '2015051512'
+#
+#          - add_xlabel: 'Channel'
+#            add_ylabel: 'Total Bias Correction (K)'
+#            add_legend:
+#              loc: 'upper right'
+#            layers:
+#            - type: LinePlot
+#              x:
+#                variable: experiment::GsiIeee::channel
+#              y:
+#                variable: experiment::GsiIeee::total_1cyc
+#              color: 'blue'
+#              label: '2015051512'
+#
+#            - type: LinePlot
+#              x:
+#                variable: experiment::GsiIeee::channel
+#              y:
+#                variable: experiment::GsiIeee::total_4cyc
+#              color: 'red'
+#              label: 'Avg last 4 cycles'
