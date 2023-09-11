@@ -22,7 +22,7 @@ import os
 # --------------------------------------------------------------------------------------------------
 
 
-def figure_driver(config, data_collections, timing, logger):
+def emcpy_figure_driver(config, data_collections, timing, logger):
     """
     Generates and saves multiple figures based on the provided configuration.
 
@@ -40,7 +40,8 @@ def figure_driver(config, data_collections, timing, logger):
 
     # Get list of graphics from configuration
     # -------------------
-    graphics = config.get("graphics")
+    graphics_section = config.get("graphics")
+    graphics = graphics_section.get("figure_list")
 
     # Loop through specified graphics
     # -------------------

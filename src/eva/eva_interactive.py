@@ -23,7 +23,7 @@ from eva.data.eva_dataset_base import EvaDatasetFactory
 from eva.transforms.arithmetic import arithmetic, generate_arithmetic_config
 from eva.transforms.accept_where import accept_where, generate_accept_where_config
 
-import eva.plotting.hvplot.interactive_plot_tools as plot
+import eva.plotting.interactive.interactive_plot_tools as plot
 
 
 # --------------------------------------------------------------------------------------------------
