@@ -12,8 +12,10 @@
 
 from eva.utilities.utils import replace_vars_dict, parse_channel_list
 from bokeh.plotting import figure, output_file, save
+from bokeh.embed import components
 import copy
 import os
+import pickle as pkl
 
 # --------------------------------------------------------------------------------------------------
 
@@ -127,11 +129,29 @@ def make_figure(figure_conf, plot, data_collections, logger):
     y_args = plot['y']['variable'].split('::')
     x = data_collections.get_variable_data(x_args[0], x_args[1], x_args[2])
     y = data_collections.get_variable_data(y_args[0], y_args[1], y_args[2])
+
+    # TODO handle this in a case/factory
     fig.scatter(x, y)
 
-    output_name = figure_conf['output name']
-    dir_path = os.path.dirname(output_name)
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-    output_file(output_name)
+    comp_name = figure_conf['components name']
+    html_name = figure_conf['html name']
+
+    # create directories if they don't exist
+    html_dir_path = os.path.dirname(html_name)
+    if not os.path.exists(html_dir_path):
+        os.makedirs(html_dir_path)
+
+    comp_dir_path = os.path.dirname(comp_name)
+    if not os.path.exists(comp_dir_path):
+        os.makedirs(comp_dir_path)
+
+    # save html, div, script to file
+    script, div = components(fig)
+    dictionary = {'script': script,
+              'div': div}
+
+    with open(comp_name, 'wb') as f:
+        pkl.dump(dictionary, f)
+
+    output_file(html_name)
     save(fig)
