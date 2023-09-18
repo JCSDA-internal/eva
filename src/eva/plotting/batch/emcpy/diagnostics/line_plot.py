@@ -9,22 +9,22 @@ import numpy as np
 # --------------------------------------------------------------------------------------------------
 
 
-class Scatter():
+class LinePlot():
 
-    """Base class for creating scatter plots."""
+    """Base class for creating line plots."""
 
     def __init__(self, config, logger, dataobj):
 
         """
-        Creates a scatter plot on a map based on the provided configuration.
+        Creates a line plot based on the provided configuration.
 
         Args:
-            config (dict): A dictionary containing the configuration for the scatter plot on a map.
+            config (dict): A dictionary containing the configuration for the line plot.
             logger (Logger): An instance of the logger for logging messages.
             dataobj: An instance of the data object containing input data.
 
-        This class initializes and configures a scatter plot on a map based on the provided
-        configuration. The scatter plot is created using a declarative plotting library from EMCPy
+        This class initializes and configures a line plot based on the provided configuration.
+        The line plot is created using a declarative plotting library from EMCPy
         (https://github.com/NOAA-EMC/emcpy).
 
         Example:
@@ -32,16 +32,15 @@ class Scatter():
             ::
 
                     config = {
-                        "longitude": {"variable": "collection::group::variable"},
-                        "latitude": {"variable": "collection::group::variable"},
-                        "data": {"variable": "collection::group::variable",
-                                 "channel": "channel_name"},
+                        "x": {"variable": "collection::group::variable"},
+                        "y": {"variable": "collection::group::variable"},
+                        "channel": "channel_name",
                         "plot_property": "property_value",
                         "plot_option": "option_value",
                         "schema": "path_to_schema_file.yaml"
                     }
                     logger = Logger()
-                    map_scatter_plot = MapScatter(config, logger, None)
+                    line_plot = LinePlot(config, logger, None)
         """
 
         # Get the data to plot from the data_collection
@@ -65,14 +64,13 @@ class Scatter():
             channel = config.get('channel')
 
         xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel)
-        xdata1 = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2])
         ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel)
 
         # see if we need to slice data
         xdata = slice_var_from_str(config['x'], xdata, logger)
         ydata = slice_var_from_str(config['y'], ydata, logger)
 
-        # scatter data should be flattened
+        # line plot data should be flattened
         xdata = xdata.flatten()
         ydata = ydata.flatten()
 
@@ -86,16 +84,16 @@ class Scatter():
         xdata = xdata[mask]
         ydata = ydata[mask]
 
-        # Create declarative plotting Scatter object
-        # ------------------------------------------
-        self.plotobj = emcpy.plots.plots.Scatter(xdata, ydata)
+        # Create declarative plotting LinePlot object
+        # -------------------------------------------
+        self.plotobj = emcpy.plots.plots.LinePlot(xdata, ydata)
 
         # Get defaults from schema
         # ------------------------
         layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'emcpy', 'defaults', 'scatter.yaml'))
+                                                         'emcpy', 'defaults', 'line_plot.yaml'))
         config = get_schema(layer_schema, config, logger)
-        delvars = ['x', 'y', 'type', 'schema']
+        delvars = ['x', 'y', 'type', 'schema', 'channel']
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, logger)

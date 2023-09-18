@@ -14,8 +14,7 @@ from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
 from eva.data.data_driver import data_driver
 from eva.transforms.transform_driver import transform_driver
-from eva.plotting.emcpy.plot_tools.figure_driver import emcpy_figure_driver
-from eva.plotting.bokeh.plot_tools.figure_driver import bokeh_figure_driver
+from eva.plotting.batch.base.plot_tools.figure_driver import figure_driver
 from eva.data.data_collections import DataCollections
 from eva.utilities.utils import load_yaml_file
 import argparse
@@ -85,12 +84,7 @@ def eva(eva_config, eva_logger=None):
     plotting_backend = eva_dict['graphics']['plotting_backend'] 
     logger.info(f'Running figure driver')
     timing.start('FigureDriverExecute')
-    if plotting_backend == 'emcpy':
-        emcpy_figure_driver(eva_dict, data_collections, timing, logger)
-    elif plotting_backend == 'bokeh':
-        bokeh_figure_driver(eva_dict, data_collections, timing, logger)
-    else:
-        print("throw error")
+    figure_driver(eva_dict, data_collections, timing, logger)
     timing.stop('FigureDriverExecute')
 
     timing.finalize()
