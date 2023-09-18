@@ -14,7 +14,8 @@ from eva.eva_path import return_eva_path
 from eva.utilities.stats import stats_helper
 from eva.utilities.utils import get_schema, camelcase_to_underscore, parse_channel_list
 from eva.utilities.utils import replace_vars_dict
-from emcpy.plots.create_plots import CreatePlot, CreateFigure
+#from emcpy.plots.create_plots import CreatePlot, CreateFigure
+from eva.plotting.batch.emcpy.plot_tools.emcpy_figure_handler import EmcpyFigureHandler
 import copy
 import importlib as im
 import os
@@ -57,8 +58,11 @@ def figure_driver(config, data_collections, timing, logger):
 
         # update figure conf based on schema
         # ----------------------------------
-        fig_schema = figure_conf.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                            'emcpy', 'defaults', 'figure.yaml'))
+        #fig_schema = figure_conf.get('schema', os.path.join(return_eva_path(), 'plotting',
+        #                                                    'emcpy', 'defaults', 'figure.yaml'))
+        
+        handler = EmcpyFigureHandler()
+        fig_schema = handler.find_schema(figure_conf)
         figure_conf = get_schema(fig_schema, figure_conf, logger)
 
         # pass configurations and make graphic(s)
@@ -99,18 +103,18 @@ def figure_driver(config, data_collections, timing, logger):
                                                                   **batch_conf_this)
 
                     # Make plot
-                    make_figure(figure_conf_fill, plots_conf_fill,
+                    make_figure(handler, figure_conf_fill, plots_conf_fill,
                                 dynamic_options_conf_fill, data_collections, logger)
         else:
             # make just one figure per configuration
-            make_figure(figure_conf, plots_conf, dynamic_options_conf, data_collections, logger)
+            make_figure(handler, figure_conf, plots_conf, dynamic_options_conf, data_collections, logger)
     timing.stop('Graphics Loop')
 
 
 # --------------------------------------------------------------------------------------------------
 
 
-def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
+def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, logger):
     """
     Generates a figure based on the provided configuration and plots.
 
@@ -130,7 +134,7 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
     # Adjust the plots configs if there are dynamic options
     # -----------------------------------------------------
     for dynamic_option in dynamic_options:
-        dynamic_option_module = im.import_module("eva.plotting.emcpy.plot_tools.dynamic_config")
+        dynamic_option_module = im.import_module("eva.plotting.batch.base.plot_tools.dynamic_config")
         dynamic_option_method = getattr(dynamic_option_module, dynamic_option['type'])
         plots = dynamic_option_method(logger, dynamic_option, plots, data_collections)
 
@@ -145,15 +149,13 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
     for plot in plots:
         layer_list = []
         for layer in plot.get("layers"):
-            eva_class_name = layer.get("type")
-            eva_class_name = 'Emcpy' +  eva_class_name
+            eva_class_name = handler.BACKEND_NAME + layer.get("type")
             eva_module_name = camelcase_to_underscore(eva_class_name)
-            full_module = "eva.plotting.batch.emcpy.diagnostics."+eva_module_name
+            full_module = handler.MODULE_NAME + eva_module_name
             layer_class = getattr(im.import_module(full_module), eva_class_name)
             layer = layer_class(layer, logger, data_collections)
             layer.data_prep()
             # use the translator class to go from eva to declarative plotting
-            #layer_list.append(layer_class(layer, logger, data_collections).plotobj)
             layer_list.append(layer.configure_plot())
         # get mapping dictionary
         proj = None
@@ -165,7 +167,8 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
             domain = mapoptions['domain']
 
         # create a subplot based on specified layers
-        plotobj = CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
+        #plotobj = CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
+        plotobj = handler.create_plot(layer_list, proj, domain)
         # make changes to subplot based on YAML configuration
         for key, value in plot.items():
             if key not in ['layers', 'mapping', 'statistics']:
@@ -181,9 +184,13 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
 
         plot_list.append(plotobj)
     # create figure
-    fig = CreateFigure(nrows=figure_conf['layout'][0],
-                       ncols=figure_conf['layout'][1],
-                       figsize=tuple(figure_conf['figure size']))
+    nrows = figure_conf['layout'][0]
+    ncols = figure_conf['layout'][1]
+    figsize = tuple(figure_conf['figure size'])
+    #fig = CreateFigure(nrows=figure_conf['layout'][0],
+    #                   ncols=figure_conf['layout'][1],
+    #                   figsize=tuple(figure_conf['figure size']))
+    fig = handler.create_figure(nrows, ncols, figsize)
     fig.plot_list = plot_list
     fig.create_figure()
 

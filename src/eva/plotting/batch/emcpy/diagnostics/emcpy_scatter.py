@@ -1,9 +1,8 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
-from eva.utilities.utils import get_schema, update_object, slice_var_from_str
+from eva.utilities.utils import get_schema, update_object
 import emcpy.plots.plots
 import os
-import numpy as np
 
 from eva.plotting.batch.base.diagnostics.scatter import Scatter
 
