@@ -14,8 +14,6 @@ from eva.eva_path import return_eva_path
 from eva.utilities.stats import stats_helper
 from eva.utilities.utils import get_schema, camelcase_to_underscore, parse_channel_list
 from eva.utilities.utils import replace_vars_dict
-#from emcpy.plots.create_plots import CreatePlot, CreateFigure
-from eva.plotting.batch.emcpy.plot_tools.emcpy_figure_handler import EmcpyFigureHandler
 import copy
 import importlib as im
 import os
@@ -41,8 +39,20 @@ def figure_driver(config, data_collections, timing, logger):
 
     # Get list of graphics from configuration
     # -------------------
-    graphics_section = config.get("graphics")
-    graphics = graphics_section.get("figure_list")
+    graphics_section = config.get('graphics')
+    graphics = graphics_section.get('figure_list')
+
+    # Get plotting backend
+    # --------------------
+    backend = graphics_section.get('plotting_backend')
+
+    # Create handler
+    # --------------
+    handler_class_name = backend + "FigureHandler"
+    handler_module_name = camelcase_to_underscore(handler_class_name)
+    handler_full_module = "eva.plotting.batch.base.handlers." + handler_module_name
+    handler_class = getattr(im.import_module(handler_full_module), handler_class_name)
+    handler = handler_class()
 
     # Loop through specified graphics
     # -------------------
@@ -58,10 +68,6 @@ def figure_driver(config, data_collections, timing, logger):
 
         # update figure conf based on schema
         # ----------------------------------
-        #fig_schema = figure_conf.get('schema', os.path.join(return_eva_path(), 'plotting',
-        #                                                    'emcpy', 'defaults', 'figure.yaml'))
-        
-        handler = EmcpyFigureHandler()
         fig_schema = handler.find_schema(figure_conf)
         figure_conf = get_schema(fig_schema, figure_conf, logger)
 
@@ -155,7 +161,6 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
             layer_class = getattr(im.import_module(full_module), eva_class_name)
             layer = layer_class(layer, logger, data_collections)
             layer.data_prep()
-            # use the translator class to go from eva to declarative plotting
             layer_list.append(layer.configure_plot())
         # get mapping dictionary
         proj = None

@@ -80,8 +80,6 @@ def eva(eva_config, eva_logger=None):
         timing.stop('TransformDriverExecute')
 
     # Generate figure(s)
-    # May want a separate function handling the "inner working" of figure driver selection
-    plotting_backend = eva_dict['graphics']['plotting_backend'] 
     logger.info(f'Running figure driver')
     timing.start('FigureDriverExecute')
     figure_driver(eva_dict, data_collections, timing, logger)
