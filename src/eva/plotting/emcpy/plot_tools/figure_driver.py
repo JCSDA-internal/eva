@@ -38,6 +38,7 @@ def figure_driver(config, data_collections, timing, logger):
     plots.
     """
 
+    logger.info(f"--> figure_driver")
     # Get list of graphics from configuration
     # -------------------
     graphics = config.get("graphics")
@@ -65,9 +66,19 @@ def figure_driver(config, data_collections, timing, logger):
         if batch_conf:
             # Get potential variables
             variables = batch_conf.get('variables', [])
+
             # Get list of channels
             channels_str_or_list = batch_conf.get('channels', [])
             channels = parse_channel_list(channels_str_or_list, logger)
+            step_vars = channels
+            step_var_name = 'channel'
+
+            # Get list of levels
+            levels_str_or_list = batch_conf.get('levels', [])
+            levels = parse_channel_list(levels_str_or_list, logger)
+            if levels != []:
+                step_vars = levels
+                step_var_name = 'level'
 
             # Set some fake values to ensure the loops are entered
             if variables == []:
@@ -77,15 +88,17 @@ def figure_driver(config, data_collections, timing, logger):
 
             # Loop over variables and channels
             for variable in variables:
-                for channel in channels:
+                for step_var in step_vars:
                     batch_conf_this = {}
                     batch_conf_this['variable'] = variable
+
                     # Version to be used in titles
                     batch_conf_this['variable_title'] = variable.replace('_', ' ').title()
-                    channel_str = str(channel)
-                    if channel_str != 'none':
-                        batch_conf_this['channel'] = channel_str
-                        var_title = batch_conf_this['variable_title'] + ' Ch. ' + channel_str
+
+                    step_var_str = str(step_var)
+                    if step_var_str != 'none':
+                        batch_conf_this[step_var_name] = step_var_str
+                        var_title = batch_conf_this['variable_title'] + ' Ch. ' + step_var_str
                         batch_conf_this['variable_title'] = var_title
 
                     # Replace templated variables in figure and plots config
@@ -100,6 +113,7 @@ def figure_driver(config, data_collections, timing, logger):
                     # Make plot
                     make_figure(figure_conf_fill, plots_conf_fill,
                                 dynamic_options_conf_fill, data_collections, logger)
+
         else:
             # make just one figure per configuration
             make_figure(figure_conf, plots_conf, dynamic_options_conf, data_collections, logger)
@@ -175,6 +189,7 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
                 stats_helper(logger, plotobj, data_collections, value)
 
         plot_list.append(plotobj)
+ 
     # create figure
     fig = CreateFigure(nrows=figure_conf['layout'][0],
                        ncols=figure_conf['layout'][1],
