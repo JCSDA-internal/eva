@@ -76,15 +76,15 @@ def figure_driver(config, data_collections, timing, logger):
             # Get list of levels
             levels_str_or_list = batch_conf.get('levels', [])
             levels = parse_channel_list(levels_str_or_list, logger)
-            if levels != []:
+            if levels:
                 step_vars = levels
                 step_var_name = 'level'
                 title_fill = ' Lv. '
 
             # Set some fake values to ensure the loops are entered
-            if variables == []:
+            if not variables:
                 logger.abort("Batch Figure must provide variables, even if with channels")
-            if channels == []:
+            if not channels:
                 channels = ['none']
 
             # Loop over variables and channels
