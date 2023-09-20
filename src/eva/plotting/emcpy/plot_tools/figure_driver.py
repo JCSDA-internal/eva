@@ -71,6 +71,7 @@ def figure_driver(config, data_collections, timing, logger):
             channels = parse_channel_list(channels_str_or_list, logger)
             step_vars = channels
             step_var_name = 'channel'
+            title_fill = ' Ch. '
 
             # Get list of levels
             levels_str_or_list = batch_conf.get('levels', [])
@@ -78,6 +79,7 @@ def figure_driver(config, data_collections, timing, logger):
             if levels != []:
                 step_vars = levels
                 step_var_name = 'level'
+                title_fill = ' Lv. '
 
             # Set some fake values to ensure the loops are entered
             if variables == []:
@@ -97,7 +99,7 @@ def figure_driver(config, data_collections, timing, logger):
                     step_var_str = str(step_var)
                     if step_var_str != 'none':
                         batch_conf_this[step_var_name] = step_var_str
-                        var_title = batch_conf_this['variable_title'] + ' Ch. ' + step_var_str
+                        var_title = batch_conf_this['variable_title'] + title_fill + step_var_str
                         batch_conf_this['variable_title'] = var_title
 
                     # Replace templated variables in figure and plots config
