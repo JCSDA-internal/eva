@@ -109,7 +109,6 @@ class DataCollections:
             channel_dimension_name (str): New name for the channel dimension.
         """
 
-        self.logger.info(f"IN adjust_channel_dimension_name: {channel_dimension_name}")
         for collection in self._collections.keys():
             if channel_dimension_name in list(self._collections[collection].dims):
                 self._collections[collection] = \
@@ -170,7 +169,8 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_variable_data_array(self, collection_name, group_name, variable_name, channels=None, levels=None):
+    def get_variable_data_array(self, collection_name, group_name, variable_name,
+                                channels=None, levels=None):
 
         """
         Retrieve a specific variable (as a DataArray) from a collection.
@@ -210,7 +210,7 @@ class DataCollections:
                 return data_array_channels
 
         elif levels is not None:
-            if isinstance(levels, int) or not any(not isinstance(c, int) for l in levels):
+            if isinstance(levels, int) or not any(not isinstance(lev, int) for lev in levels):
                 # Level must be a dimension if it will be used for selection
                 if 'Level' not in list(self._collections[collection_name].dims):
                     self.logger.abort(f'In get_variable_data_array levels is provided but ' +
@@ -229,7 +229,8 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_variable_data(self, collection_name, group_name, variable_name, channels=None, levels=None):
+    def get_variable_data(self, collection_name, group_name, variable_name,
+                          channels=None, levels=None):
 
         """
         Retrieve the data of a specific variable from a collection.

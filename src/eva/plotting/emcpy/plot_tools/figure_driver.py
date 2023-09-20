@@ -38,7 +38,6 @@ def figure_driver(config, data_collections, timing, logger):
     plots.
     """
 
-    logger.info(f"--> figure_driver")
     # Get list of graphics from configuration
     # -------------------
     graphics = config.get("graphics")
@@ -189,7 +188,7 @@ def make_figure(figure_conf, plots, dynamic_options, data_collections, logger):
                 stats_helper(logger, plotobj, data_collections, value)
 
         plot_list.append(plotobj)
- 
+
     # create figure
     fig = CreateFigure(nrows=figure_conf['layout'][0],
                        ncols=figure_conf['layout'][1],
