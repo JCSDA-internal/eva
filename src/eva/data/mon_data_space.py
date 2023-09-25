@@ -310,11 +310,15 @@ class MonDataSpace(EvaDatasetBase):
                 # specifies the number of scan steps, starting position, and step size.
                 # The last 2 are floats.  Add all to scan_info for later use.
                 if line.find('xdef') != -1:
+                    self.logger.info(f"xdef found in {line}") 
                     strs = line.split()
                     for st in strs:
+                        self.logger.info(f"checkint st: {st}") 
                         if st.isdigit():
                             dim_list.append(int(st))
+                            self.logger.info(f"    is digit") 
                         if is_number(st):
+                            self.logger.info(f"    is number") 
                             scan_info.append(st)
 
                 if line.find('ydef') != -1:
@@ -341,6 +345,9 @@ class MonDataSpace(EvaDatasetBase):
                         attribs['sensor'] = strs[1]
                         attribs['sat'] = strs[2]
 
+                if line.find('dtype station') != -1 or line.find('DTYPE station') != -1:
+                    self.logger.info(f"found dtype in line {line}")
+
                 # Note we need to extract the actual channel numbers.  We have the
                 # number of channels via the xdef line, but they are not necessarily
                 # ordered consecutively.
@@ -358,6 +365,8 @@ class MonDataSpace(EvaDatasetBase):
                         chan_nassim.append(int(strs[4]))
 
                 if line.find('level=') != -1:
+                    self.logger.info(f"found level= : {line}")
+
                     strs = line.split()
                     tlev = strs[2].replace(',', '')
                     if tlev.isdigit():
@@ -377,6 +386,7 @@ class MonDataSpace(EvaDatasetBase):
             # Ignore any coordinates in the control file that have a value of 1.
             used = 0
             mydef = ["xdef", "ydef", "zdef"]
+            self.logger.info(f"dim_list: {dim_list}")
             for x in range(3):
                 if dim_list[x] > 2:
                     coords[mydef[used]] = coord_list[x]
@@ -411,7 +421,7 @@ class MonDataSpace(EvaDatasetBase):
                 levs_dict = {'levels': levs,
                              'levels_assim': level_assim,
                              'levels_nassim': level_nassim}
-
+        self.logger.info(f"levs_dict: {levs_dict}")
         return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict
 
     def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars, file_path=None):
