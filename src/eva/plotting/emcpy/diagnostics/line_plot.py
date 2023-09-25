@@ -58,13 +58,16 @@ class LinePlot():
             logger.abort('In Scatter comparison the first variable \'var1\' does not appear to ' +
                          'be in the required format of collection::group::variable.')
 
-        # Optionally get the channel to plot
+        # Optionally get the channel|level to plot
         channel = None
         if 'channel' in config:
             channel = config.get('channel')
+        level = None
+        if 'level' in config:
+            level = config.get('level')
 
-        xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel)
-        ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel)
+        xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel, level)
+        ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel, level)
 
         # see if we need to slice data
         xdata = slice_var_from_str(config['x'], xdata, logger)
@@ -93,7 +96,7 @@ class LinePlot():
         layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
                                                          'emcpy', 'defaults', 'line_plot.yaml'))
         config = get_schema(layer_schema, config, logger)
-        delvars = ['x', 'y', 'type', 'schema', 'channel']
+        delvars = ['x', 'y', 'type', 'schema', 'channel', 'level']
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, logger)
