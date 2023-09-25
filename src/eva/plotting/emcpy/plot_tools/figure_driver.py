@@ -80,7 +80,7 @@ def figure_driver(config, data_collections, timing, logger):
             if levels:
                 step_vars = levels
                 step_var_name = 'level'
-                title_fill = ' Lv. '
+                title_fill = ' Lev. '
 
             # Set some fake values to ensure the loops are entered
             if not variables:

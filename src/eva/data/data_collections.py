@@ -208,6 +208,9 @@ class DataCollections:
                 # Create a new DataArray with the requested channels
                 data_array_channels = data_array.sel(Channel=channels_sel)
                 return data_array_channels
+            else:
+                self.logger.abort('In get_variable_data_array channels is neither none ' +
+                                  'nor a list of integers')
 
         elif levels is not None:
             if isinstance(levels, int) or not any(not isinstance(lev, int) for lev in levels):
@@ -222,10 +225,9 @@ class DataCollections:
                 # Create a new DataArray with the requested channels
                 data_array_levels = data_array.sel(Level=levels_sel)
                 return data_array_levels
-
-        else:
-            self.logger.abort('In get_variable_data_array channels is neither none or list of ' +
-                              'integers')
+            else:
+                self.logger.abort('In get_variable_data_array levels is neither none ' +
+                                  'nor a list of integers')
 
     # ----------------------------------------------------------------------------------------------
 
