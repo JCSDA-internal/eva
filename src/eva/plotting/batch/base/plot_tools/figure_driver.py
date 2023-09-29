@@ -44,13 +44,17 @@ def figure_driver(config, data_collections, timing, logger):
 
     # Get plotting backend
     # --------------------
-    backend = graphics_section.get('plotting_backend')
+    if 'plotting_backend' in graphics_section:
+        backend = graphics_section.get('plotting_backend')
+    else:
+        # use emcpy as default
+        backend = 'Emcpy'
 
     # Create handler
     # --------------
-    handler_class_name = backend + "FigureHandler"
+    handler_class_name = backend + 'FigureHandler'
     handler_module_name = camelcase_to_underscore(handler_class_name)
-    handler_full_module = "eva.plotting.batch.base.handlers." + handler_module_name
+    handler_full_module = 'eva.plotting.batch.' + backend.lower() + '.plot_tools.' + handler_module_name
     handler_class = getattr(im.import_module(handler_full_module), handler_class_name)
     handler = handler_class()
 
@@ -68,7 +72,8 @@ def figure_driver(config, data_collections, timing, logger):
 
         # update figure conf based on schema
         # ----------------------------------
-        fig_schema = handler.find_schema(figure_conf)
+        fig_schema = figure_conf.get('schema', os.path.join(return_eva_path(), 'plotting', 'batch',
+                                                      backend.lower(), 'defaults', 'figure.yaml'))
         figure_conf = get_schema(fig_schema, figure_conf, logger)
 
         # pass configurations and make graphic(s)
@@ -76,27 +81,40 @@ def figure_driver(config, data_collections, timing, logger):
         if batch_conf:
             # Get potential variables
             variables = batch_conf.get('variables', [])
-            # Get list of channels
+
+            # Get list of channels and load step variables
             channels_str_or_list = batch_conf.get('channels', [])
             channels = parse_channel_list(channels_str_or_list, logger)
 
+            step_vars = channels if channels else ['none']
+            step_var_name = 'channel'
+            title_fill = ' Ch. '
+
+            # Get list of levels, conditionally override step variables
+            levels_str_or_list = batch_conf.get('levels', [])
+            levels = parse_channel_list(levels_str_or_list, logger)
+            if levels:
+                step_vars = levels
+                step_var_name = 'level'
+                title_fill = ' Lev. '
+
             # Set some fake values to ensure the loops are entered
-            if variables == []:
+            if not variables:
                 logger.abort("Batch Figure must provide variables, even if with channels")
-            if channels == []:
-                channels = ['none']
 
             # Loop over variables and channels
             for variable in variables:
-                for channel in channels:
+                for step_var in step_vars:
                     batch_conf_this = {}
                     batch_conf_this['variable'] = variable
+
                     # Version to be used in titles
                     batch_conf_this['variable_title'] = variable.replace('_', ' ').title()
-                    channel_str = str(channel)
-                    if channel_str != 'none':
-                        batch_conf_this['channel'] = channel_str
-                        var_title = batch_conf_this['variable_title'] + ' Ch. ' + channel_str
+
+                    step_var_str = str(step_var)
+                    if step_var_str != 'none':
+                        batch_conf_this[step_var_name] = step_var_str
+                        var_title = batch_conf_this['variable_title'] + title_fill + step_var_str
                         batch_conf_this['variable_title'] = var_title
 
                     # Replace templated variables in figure and plots config
@@ -111,6 +129,7 @@ def figure_driver(config, data_collections, timing, logger):
                     # Make plot
                     make_figure(handler, figure_conf_fill, plots_conf_fill,
                                 dynamic_options_conf_fill, data_collections, logger)
+
         else:
             # make just one figure per configuration
             make_figure(handler, figure_conf, plots_conf, dynamic_options_conf, data_collections, logger)
@@ -155,13 +174,23 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
     for plot in plots:
         layer_list = []
         for layer in plot.get("layers"):
-            eva_class_name = handler.BACKEND_NAME + layer.get("type")
-            eva_module_name = camelcase_to_underscore(eva_class_name)
-            full_module = handler.MODULE_NAME + eva_module_name
-            layer_class = getattr(im.import_module(full_module), eva_class_name)
-            layer = layer_class(layer, logger, data_collections)
-            layer.data_prep()
-            layer_list.append(layer.configure_plot())
+
+            #Temporary case to handle different diagnostics
+            if handler.BACKEND_NAME == 'Emcpy':
+                eva_class_name = layer.get("type")
+                eva_module_name = camelcase_to_underscore(eva_class_name)
+                full_module = "eva.plotting.emcpy.diagnostics."+eva_module_name
+                layer_class = getattr(im.import_module(full_module), eva_class_name)
+                layer_list.append(layer_class(layer, logger, data_collections).plotobj)
+            else:
+                eva_class_name = handler.BACKEND_NAME + layer.get("type")
+                eva_module_name = camelcase_to_underscore(eva_class_name)
+                full_module = handler.MODULE_NAME + eva_module_name
+                layer_class = getattr(im.import_module(full_module), eva_class_name)
+                layer = layer_class(layer, logger, data_collections)
+                layer.data_prep()
+                layer_list.append(layer.configure_plot())
+
         # get mapping dictionary
         proj = None
         domain = None

@@ -1,4 +1,4 @@
-from bokeh.plotting import save
+from bokeh.plotting import save, output_file
 import hvplot as hv
 import os
 
@@ -11,27 +11,18 @@ class CreatePlot:
         if domain:
             self.domain = domain
 
-    def add_grid(self):
-        pass
+    def add_grid(self, **kwargs):
+        self.grid = {
+            **kwargs
+        }
 
     def add_legend(self, **kwargs):
         self.legend = {
             **kwargs
         }
 
-    def add_title(self, label, loc='center',
-                  pad=None, **kwargs):
-
-        self.title = {
-            'label': label,
-            'loc': loc,
-            'pad': pad,
-            **kwargs
-        }
-
     def add_xlabel(self, xlabel, labelpad=None,
                    loc='center', **kwargs):
-
         self.xlabel = {
             'xlabel': xlabel,
             'labelpad': labelpad,
@@ -41,7 +32,6 @@ class CreatePlot:
 
     def add_ylabel(self, ylabel, labelpad=None,
                    loc='center', **kwargs):
-
         self.ylabel = {
             'ylabel': ylabel,
             'labelpad': labelpad,
@@ -49,54 +39,6 @@ class CreatePlot:
             **kwargs
         }
 
-    def add_colorbar(self, label=None, fontsize=12, single_cbar=False,
-                     cbar_location=None, **kwargs):
-
-        kwargs.setdefault('orientation', 'horizontal')
-
-        pad = 0.15 if kwargs['orientation'] == 'horizontal' else 0.1
-        fraction = 0.065 if kwargs['orientation'] == 'horizontal' else 0.085
-
-        kwargs.setdefault('pad', pad)
-        kwargs.setdefault('fraction', fraction)
-
-        if not cbar_location:
-            h_loc = [0.14, -0.1, 0.8, 0.04]
-            v_loc = [1.02, 0.12, 0.04, 0.8]
-            cbar_location = h_loc if kwargs['orientation'] == 'horizontal' else v_loc
-
-        self.colorbar = {
-            'label': label,
-            'fontsize': fontsize,
-            'single_cbar': single_cbar,
-            'cbar_loc': cbar_location,
-            'kwargs': kwargs
-        }
-
-    def add_stats_dict(self, stats_dict={}, xloc=0.5,
-                       yloc=-0.1, ha='center', **kwargs):
-
-        self.stats = {
-            'stats': stats_dict,
-            'xloc': xloc,
-            'yloc': yloc,
-            'ha': ha,
-            'kwargs': kwargs
-        }
-
-    def add_text(self, xloc, yloc, text, transform='datacoords',
-                 **kwargs):
-
-        if not hasattr(self, 'text'):
-            self.text = []
-
-        self.text.append({
-            'xloc': xloc,
-            'yloc': yloc,
-            'text': text,
-            'transform': transform,
-            'kwargs': kwargs
-        })
 
 class CreateFigure:
 
@@ -108,19 +50,50 @@ class CreateFigure:
         self.fig = None
 
     def create_figure(self):
+        # Needs work, need to combine all the layers
+        # and figure out how subplots will work
         self.fig = self.plot_list[0].plot_layers[0]  
-        print(type(self.fig))
+        plot_obj = self.plot_list[0]
 
+        # Add all features to the figure
+        for feat in vars(plot_obj).keys():
+            self._plot_features(plot_obj, feat)
 
     def add_suptitle(self, text, **kwargs):
-        pass
+        self.fig.opts(title=text)
 
     def save_figure(self, pathfile, **kwargs):
         pathfile_dir = os.path.dirname(pathfile)
         if not os.path.exists(pathfile_dir):
             os.makedirs(pathfile_dir)
         bokeh_fig = hv.render(self.fig, backend='bokeh')
-        save(bokeh_fig, pathfile)
+        #save(bokeh_fig, pathfile)
+        output_file(pathfile)
+        save(bokeh_fig)
 
     def close_figure(self):
         pass 
+
+    def _plot_features(self, plot_obj, feature):
+
+        feature_dict = {
+            'xlabel': self._plot_xlabel,
+            'ylabel': self._plot_ylabel,
+            'legend': self._plot_legend,
+            'grid': self._plot_grid,
+        }
+
+        if feature in feature_dict:
+            feature_dict[feature](vars(plot_obj)[feature])
+
+    def _plot_grid(self, grid):
+        self.fig.opts(show_grid=True)
+
+    def _plot_xlabel(self, xlabel):
+        self.fig.opts(xlabel=xlabel['xlabel'])
+
+    def _plot_ylabel(self, ylabel):
+        self.fig.opts(ylabel=ylabel['ylabel'])
+
+    def _plot_legend(self, legend):
+        self.fig.opts(legend_position='top_left', show_legend=True)

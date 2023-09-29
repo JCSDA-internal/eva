@@ -9,10 +9,6 @@ class HvplotFigureHandler():
         self.BACKEND_NAME = "Hvplot"
         self.MODULE_NAME = "eva.plotting.batch.hvplot.diagnostics."
 
-    def find_schema(self, figure_conf):
-        return figure_conf.get('schema', os.path.join(return_eva_path(), 'plotting', 'batch',
-                                                      'hvplot', 'defaults', 'figure.yaml'))
-
     def create_plot(self, layer_list, proj, domain):
         return CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
 

@@ -9,10 +9,6 @@ class EmcpyFigureHandler():
         self.BACKEND_NAME = "Emcpy"
         self.MODULE_NAME = "eva.plotting.batch.emcpy.diagnostics."
 
-    def find_schema(self, figure_conf):
-        return figure_conf.get('schema', os.path.join(return_eva_path(), 'plotting', 'batch',
-                                                      'emcpy', 'defaults', 'figure.yaml'))
-
     def create_plot(self, layer_list, proj, domain):
         return CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
     
