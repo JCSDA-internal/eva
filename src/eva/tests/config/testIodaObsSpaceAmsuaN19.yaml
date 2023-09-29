@@ -75,6 +75,7 @@ transforms:
       variable: *variables
 
 graphics:
+  figure_list:
 
   # Correlation scatter plots
   # -------------------------

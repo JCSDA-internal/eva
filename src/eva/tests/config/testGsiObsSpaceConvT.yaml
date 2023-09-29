@@ -12,6 +12,8 @@ datasets:
                                Longitude]
 
 graphics:
+  figure_list:
+
   # Map plots
   # ---------
 

@@ -23,6 +23,8 @@ transforms:
       variable: *variables
 
 graphics:
+  figure_list:
+
   # Histogram plots
   # ---------------
 

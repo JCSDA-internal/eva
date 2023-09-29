@@ -19,6 +19,8 @@ datasets:
         variables: &variables [count, cycle]
 
 graphics:
+  figure_list:
+
   # Time series plots
   # ---------------
     - figure:

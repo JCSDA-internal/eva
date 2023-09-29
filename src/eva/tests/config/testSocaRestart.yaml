@@ -10,6 +10,8 @@ datasets:
     coordinate variables: [lon, lat]
 
 graphics:
+  figure_list:
+
 # Map plots
 # ---------
 

@@ -72,6 +72,7 @@ transforms:
       variable: *variables
 
 graphics:
+  figure_list:
 
   # Observation correlation scatter plots
   # -------------------------------------

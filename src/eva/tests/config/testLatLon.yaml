@@ -6,6 +6,8 @@ datasets:
     variables: [T_inc, lat, lon]
 
 graphics:
+  figure_list:
+
   # Map plots
   # ---------
 

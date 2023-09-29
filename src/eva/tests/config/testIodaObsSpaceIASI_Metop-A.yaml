@@ -51,6 +51,7 @@ transforms:
       variable: *variables
 
 graphics:
+  figure_list:
 
   # ---------- Statistical Plot ----------
   # JEDI h(x) vs GSI h(x)

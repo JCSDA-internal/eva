@@ -19,6 +19,7 @@ datasets:
     orography variables: [geolon, geolat]
 
 graphics:
+  figure_list:
   # Map plots
   # ---------
 

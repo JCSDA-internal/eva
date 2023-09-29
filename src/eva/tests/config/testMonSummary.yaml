@@ -81,6 +81,8 @@ transforms:
 
 
 graphics:
+  figure_list:
+
   # Summary plots
   # ---------------
     - figure:
