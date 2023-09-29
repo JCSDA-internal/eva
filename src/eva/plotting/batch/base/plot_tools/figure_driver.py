@@ -219,6 +219,7 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
                 stats_helper(logger, plotobj, data_collections, value)
 
         plot_list.append(plotobj)
+
     # create figure
     nrows = figure_conf['layout'][0]
     ncols = figure_conf['layout'][1]
