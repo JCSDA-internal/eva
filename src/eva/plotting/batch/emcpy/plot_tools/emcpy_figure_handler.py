@@ -2,6 +2,7 @@ from emcpy.plots.create_plots import CreatePlot, CreateFigure
 from eva.eva_path import return_eva_path
 import os
 
+
 class EmcpyFigureHandler():
 
     def __init__(self):
@@ -11,6 +12,6 @@ class EmcpyFigureHandler():
 
     def create_plot(self, layer_list, proj, domain):
         return CreatePlot(plot_layers=layer_list, projection=proj, domain=domain)
-    
+
     def create_figure(self, nrows, ncols, figsize):
         return CreateFigure(nrows=nrows, ncols=ncols, figsize=figsize)

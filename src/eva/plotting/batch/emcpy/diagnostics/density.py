@@ -79,7 +79,8 @@ class Density():
         # Get defaults from schema
         # ------------------------
         layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'emcpy', 'defaults', 'density.yaml'))
+                                                         'batch', 'emcpy', 'defaults',
+                                                         'density.yaml'))
         config = get_schema(layer_schema, config, logger)
         delvars = ['type', 'schema', 'data']
         for d in delvars:

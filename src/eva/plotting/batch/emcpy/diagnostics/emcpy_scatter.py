@@ -20,7 +20,7 @@ class EmcpyScatter(Scatter):
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'emcpy', 'defaults', 'scatter.yaml'))
+                                       'emcpy', 'defaults', 'scatter.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['x', 'y', 'type', 'schema']
         for d in delvars:

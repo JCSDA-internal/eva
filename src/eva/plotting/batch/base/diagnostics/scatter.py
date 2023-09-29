@@ -1,7 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-#import emcpy.plots.plots
 import os
 import numpy as np
 
@@ -53,7 +52,7 @@ class Scatter(ABC):
 
 # --------------------------------------------------------------------------------------------------
 
-    def data_prep(self): 
+    def data_prep(self):
 
         # Get the data to plot from the data_collection
         # ---------------------------------------------
@@ -64,11 +63,11 @@ class Scatter(ABC):
         var1_cgv = var1.split('::')
 
         if len(var0_cgv) != 3:
-            self.logger.abort('In Scatter comparison the first variable \'var0\' does not appear to ' +
-                         'be in the required format of collection::group::variable.')
+            self.logger.abort('Scatter: comparison first var \'var0\' does not appear to ' +
+                              'be in the required format of collection::group::variable.')
         if len(var1_cgv) != 3:
-            self.logger.abort('In Scatter comparison the first variable \'var1\' does not appear to ' +
-                         'be in the required format of collection::group::variable.')
+            self.logger.abort('Scatter: comparison first var \'var1\' does not appear to ' +
+                              'be in the required format of collection::group::variable.')
 
         # Optionally get the channel to plot
         channel = None
@@ -96,7 +95,6 @@ class Scatter(ABC):
         mask = ~np.isnan(ydata)
         self.xdata = xdata[mask]
         self.ydata = ydata[mask]
-
 
     @abstractmethod
     def configure_plot(self):

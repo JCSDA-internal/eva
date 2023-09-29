@@ -2,6 +2,7 @@ from bokeh.plotting import save, output_file
 import hvplot as hv
 import os
 
+
 class CreatePlot:
 
     def __init__(self, plot_layers=[], projection=None, domain=None):
@@ -52,7 +53,7 @@ class CreateFigure:
     def create_figure(self):
         # Needs work, need to combine all the layers
         # and figure out how subplots will work
-        self.fig = self.plot_list[0].plot_layers[0]  
+        self.fig = self.plot_list[0].plot_layers[0]
         plot_obj = self.plot_list[0]
 
         # Add all features to the figure
@@ -67,12 +68,11 @@ class CreateFigure:
         if not os.path.exists(pathfile_dir):
             os.makedirs(pathfile_dir)
         bokeh_fig = hv.render(self.fig, backend='bokeh')
-        #save(bokeh_fig, pathfile)
         output_file(pathfile)
         save(bokeh_fig)
 
     def close_figure(self):
-        pass 
+        pass
 
     def _plot_features(self, plot_obj, feature):
 

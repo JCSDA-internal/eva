@@ -2,6 +2,7 @@ from eva.eva_path import return_eva_path
 from eva.plotting.batch.hvplot.plot_tools.create_plots import CreatePlot, CreateFigure
 import os
 
+
 class HvplotFigureHandler():
 
     def __init__(self):
