@@ -12,6 +12,8 @@ datasets:
                                Longitude]
 
 graphics:
+
+  plotting_backend: Emcpy
   figure_list:
 
   # Map plots

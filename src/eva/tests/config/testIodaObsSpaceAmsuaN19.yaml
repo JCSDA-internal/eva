@@ -75,6 +75,8 @@ transforms:
       variable: *variables
 
 graphics:
+
+  plotting_backend: Emcpy
   figure_list:
 
   # Correlation scatter plots

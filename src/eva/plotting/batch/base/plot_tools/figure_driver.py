@@ -44,11 +44,7 @@ def figure_driver(config, data_collections, timing, logger):
 
     # Get plotting backend
     # --------------------
-    if 'plotting_backend' in graphics_section:
-        backend = graphics_section.get('plotting_backend')
-    else:
-        # use emcpy as default
-        backend = 'Emcpy'
+    backend = graphics_section.get('plotting_backend')
 
     # Create handler
     # --------------
