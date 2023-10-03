@@ -46,6 +46,13 @@ def figure_driver(config, data_collections, timing, logger):
     # --------------------
     backend = graphics_section.get('plotting_backend')
 
+    if backend == 'Hvplot':
+        try:
+            import hvplot
+        except ImportError:
+            logger.abort("The hvplot backend is not available since hvplot is not in the environment.")
+            backend = 'Emcpy'
+
     # Create handler
     # --------------
     handler_class_name = backend + 'FigureHandler'
