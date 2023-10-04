@@ -464,6 +464,7 @@ class MonDataSpace(EvaDatasetBase):
         scan_info = []
         levs_dict = None
         levs = []
+        lev_vals = []
         level_assim = []
         level_nassim = []
 
@@ -477,9 +478,14 @@ class MonDataSpace(EvaDatasetBase):
 
 # Ozn
 # *XDEF is pressure level number
+# *  x=    1, level=      0.101 , iuse=  1 , error=    0.020
+# *  x=    2, level=      0.160 , iuse=  1 , error=    0.020
+# *  x=    3, level=      0.254 , iuse=  1 , error=    0.025
 
 # Con
 # * ZDEF mandatary level 1000,925,850,700,500,400,300,250,200,150,100,70,50
+
+        attribs['dtype'] = 'station'
 
         with open(control_file, 'r') as fp:
             lines = fp.readlines()
@@ -491,32 +497,46 @@ class MonDataSpace(EvaDatasetBase):
                     if 'DEF' in line and item in line:
                         coord_list.append(coord_dict[item])
 
+                # Find level information
+                if line.find('level=') != -1:
+                    strs = line.split()
+                    
+                    lev_vals.append({'lev_val': strs[4], 'iuse': strs[7], 'err_val': strs[10]})
+                    lev_str = strs[2].split(',')
+                    levs.append(int(lev_str[0]))
+
+                    self.logger.info(f" iuse flag: {strs[7]}")
+                    if strs[7] == '1':
+                        level_assim.append(int(lev_str[0]))
+                    else:
+                        level_nassim.append(int(lev_str[0]))
+
                 # In most cases xdef, ydef, and zdef specify the size of
                 # the coresponding coordinate.
                 #
                 # Scan is different. If xdef coresponds to Scan then the xdef line
                 # specifies the number of scan steps, starting position, and step size.
                 # The last 2 are floats.  Add all to scan_info for later use.
-                if line.find('xdef') != -1:
-                    strs = line.split()
-                    for st in strs:
-                        if st.isdigit():
-                            dim_list.append(int(st))
-                        if is_number(st):
-                            scan_info.append(st)
-
-                if line.find('ydef') != -1:
-                    strs = line.split()
-                    for st in strs:
-                        if st.isdigit():
-                            dim_list.append(int(st))
-
-                if line.find('zdef') != -1:
-                    strs = line.split()
-                    for st in strs:
-                        if st.isdigit():
-                            dim_list.append(int(st))
-
+#                if line.find('xdef') != -1:
+#                    strs = line.split()
+#                    for st in strs:
+#                        if st.isdigit():
+#                            dim_list.append(int(st))
+#                        if is_number(st):
+#                            scan_info.append(st)
+#
+#                if line.find('ydef') != -1:
+#                    strs = line.split()
+#                    for st in strs:
+#                        if st.isdigit():
+#                            dim_list.append(int(st))
+#
+#                if line.find('zdef') != -1:
+#                    strs = line.split()
+#                    for st in strs:
+#                        if st.isdigit():
+#                            dim_list.append(int(st))
+#
                 if line.find('vars') != -1:
                     strs = line.split()
                     for st in strs:
@@ -529,72 +549,39 @@ class MonDataSpace(EvaDatasetBase):
                         attribs['sensor'] = strs[1]
                         attribs['sat'] = strs[2]
 
-                if line.find('dtype station') != -1 or line.find('DTYPE station') != -1:
-                    self.logger.info(f"STATION DATA {line}")
-                    attribs['dtype'] = 'station'
-
-                # Note we need to extract the actual channel numbers.  We have the
-                # number of channels via the xdef line, but they are not necessarily
-                # ordered consecutively.
-                #
-                # If channel is used then assign channel numbers to the chan_assim and
-                # chan_nassim arrays based on the channel's iuse setting in the control
-                # file.  In the file 1 = assimilated, -1 = not assimilated.
-                if line.find('channel=') != -1:
-                    strs = line.split()
-                    if strs[4].isdigit():
-                        channo.append(int(strs[4]))
-                    if strs[7] == '1':
-                        chan_assim.append(int(strs[4]))
-                    if strs[7] == '-1':
-                        chan_nassim.append(int(strs[4]))
-
-                if line.find('level=') != -1:
-
-                    strs = line.split()
-                    tlev = strs[2].replace(',', '')
-                    if tlev.isdigit():
-                        levs.append(int(tlev))
-                    if strs[7] == '1':
-                        level_assim.append(int(tlev))
-                    if strs[7] == '-1':
-                        level_nassim.append(int(tlev))
+#                # Set level nume
+#                # number of channels via the xdef line, but they are not necessarily
+#                # ordered consecutively.
+#                if line.find('level=') != -1:
+#
+#                    strs = line.split()
+#                    tlev = strs[2].replace(',', '')
+#                    if tlev.isdigit():
+#                        levs.append(int(tlev))
+#                    if strs[7] == '1':
+#                        level_assim.append(int(tlev))
+#                    if strs[7] == '-1':
+#                        level_nassim.append(int(tlev))
 
             # The list of variables is at the end of the file between the lines
             # "vars" and "end vars".
-            start = len(lines) - (nvars + 1)
-            for x in range(start, start + nvars):
-                strs = lines[x].split()
-                vars.append(strs[-1])
+#            start = len(lines) - (nvars + 1)
+#            for x in range(start, start + nvars):
+#                strs = lines[x].split()
+#                vars.append(strs[-1])
+
+            # set levels
+            dim_list.append(len(lev_vals))
 
             # Ignore any coordinates in the control file that have a value of 1.
             used = 0
             mydef = ["xdef", "ydef", "zdef"]
+            self.logger.info(f"len(dim_list): {len(dim_list)}")
             for x in range(len(dim_list)):
                 if dim_list[x] > 2:
                     coords[mydef[used]] = coord_list[x]
                     dims[mydef[used]] = dim_list[x]
                     used += 1
-
-            # If Scan is in the coords calculate the scan positions.
-            # scan_info[0] = num steps, [1] = start position, [2] = step size
-            if 'Scan' in coords.values():
-                scanpo = [(float(scan_info[1]))]
-                for x in range(1, int(scan_info[0])):
-                    scanpo.append(float(scan_info[1])+(float(scan_info[2])*x))
-
-            # If Channel is in the coords then pad out the chan_assim adn chan_nassim
-            # arrays with zeros.  They need to be the correct length to use 'Channel' as
-            # the dimension.  Also the yaml file can use the 'select where' transform
-            # to drop all values < 1 and plot only the assim/nassim channel markers.
-            if 'Channel' in coords.values():
-                for x in range(len(chan_assim), len(channo)):
-                    chan_assim.append(0)
-                for x in range(len(chan_nassim), len(channo)):
-                    chan_nassim.append(0)
-                chans_dict = {'chan_nums': channo,
-                              'chans_assim': chan_assim,
-                              'chans_nassim': chan_nassim}
 
             if 'Level' in coords.values():
                 for x in range(len(level_assim), len(levs)):
@@ -604,6 +591,16 @@ class MonDataSpace(EvaDatasetBase):
                 levs_dict = {'levels': levs,
                              'levels_assim': level_assim,
                              'levels_nassim': level_nassim}
+
+            self.logger.info(f"coords: {coords}")
+            self.logger.info(f"dims: {dims}")
+            self.logger.info(f"attribs: {attribs}")
+            self.logger.info(f"nvars: {vars}")
+            self.logger.info(f"levs_dict: {levs_dict}")
+            self.logger.info(f"chans_dict: {chans_dict}")
+
+            self.logger.info(f"lev_vals: {lev_vals}")
+
         return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict
 
     # ----------------------------------------------------------------------------------------------
