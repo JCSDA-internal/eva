@@ -14,7 +14,7 @@ from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
 from eva.data.data_driver import data_driver
 from eva.transforms.transform_driver import transform_driver
-from eva.plotting.emcpy.plot_tools.figure_driver import figure_driver
+from eva.plotting.batch.base.plot_tools.figure_driver import figure_driver
 from eva.data.data_collections import DataCollections
 from eva.utilities.utils import load_yaml_file
 import argparse

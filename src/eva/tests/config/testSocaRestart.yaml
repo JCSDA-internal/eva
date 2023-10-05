@@ -10,6 +10,10 @@ datasets:
     coordinate variables: [lon, lat]
 
 graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
 # Map plots
 # ---------
 
