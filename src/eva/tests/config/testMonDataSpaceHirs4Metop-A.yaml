@@ -19,6 +19,10 @@ datasets:
         variables: &variables [count, cycle]
 
 graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
   # Time series plots
   # ---------------
     - figure:

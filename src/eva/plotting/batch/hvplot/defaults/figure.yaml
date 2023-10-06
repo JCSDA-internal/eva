@@ -1,0 +1,6 @@
+# figure default schema
+layout: [1,1]
+figure file type: html
+output path: ./
+output name: 'myfig'
+figure size: [8,8]

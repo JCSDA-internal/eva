@@ -11,9 +11,3 @@ numpy>=1.22.3
 
 # Additional packages
 git+https://github.com/NOAA-EMC/emcpy.git@9b6756341e9ae963baa7d3a256b8ada3da688d04#egg=emcpy
-scikit-learn
-seaborn
-hvplot
-nbconvert
-bokeh
-geopandas

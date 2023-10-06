@@ -19,6 +19,10 @@ datasets:
     orography variables: [geolon, geolat]
 
 graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
   # Map plots
   # ---------
 

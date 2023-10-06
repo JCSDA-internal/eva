@@ -13,6 +13,10 @@ datasets:
 
 # Make plots
 graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
   - figure:
       layout: [3,1]
       figure size: [12,10]
