@@ -13,7 +13,7 @@
 import os
 import numpy as np
 
-from xarray import Dataset, concat
+from xarray import Dataset, concat, merge
 from scipy.io import FortranFile
 from datetime import datetime
 
@@ -47,15 +47,19 @@ class MonDataSpace(EvaDatasetBase):
         # -----------------------
         collection_name = get(dataset_config, self.logger, 'name')
 
+        # Filenames to be read into this collection
+        # -----------------------------------------
+        filenames = get(dataset_config, self.logger, 'filenames')
+
         # Get control file and parse
         # --------------------------
         control_file = get(dataset_config, self.logger, 'control_file')
 
         dims_arr = []
         if self.is_stn_data(control_file[0]):
-            coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict = (
+            coords, dims, attribs, nvars, stn_vars, scanpo, levs_dict, chans_dict = (
                                                      self.get_stn_ctl_dict(control_file[0]))
-            ndims_used = 2 
+            ndims_used = 2
             dims_arr = ['xdef', 'ydef', 'zdef']
             stn_data = True
         else:
@@ -73,7 +77,6 @@ class MonDataSpace(EvaDatasetBase):
             0: ['channels', 'Channel'],
             1: ['regions', 'Region'],
             2: ['levels', 'Level']
-# 3: ['nobs', 'Nobs']
         }
         drop_coord = [False, False, False]
         requested_coord = [None, None, None]
@@ -89,57 +92,70 @@ class MonDataSpace(EvaDatasetBase):
         channo = chans_dict["chan_nums"] if chans_dict is not None else None
         x_range, y_range, z_range = self.get_dim_ranges(coords, dims, channo)
 
-        # Filenames to be read into this collection
-        # -----------------------------------------
-        filenames = get(dataset_config, self.logger, 'filenames')
-        ds_list = []
-
         # Get missing value threshold
         # ---------------------------
         threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
+        ds_list = []
+        file_ctr = 1
         for filename in filenames:
 
             lat = []
             lon = []
-            if attribs['dtype']:
-                # read station data file
-                darr, cycle_tm, dims, lat, lon = self.read_stn_ieee(filename, coords, dims, ndims_used,
-                                                dims_arr, nvars, vars)
+            if stn_data:
+
+                # Read station data file.  Note that there is no guarantee the number
+                # of variables is the same for different station data files.  The file_ctr
+                # is used to tack on a number to distinguish the coordinates/dimensions
+                # and corresponding variables for file1, file2, etc.
+                darr, cycle_tm, dims, lat, lon = self.read_stn_ieee(filename, coords, dims,
+                                                                    ndims_used, dims_arr, nvars,
+                                                                    stn_vars)
                 y_range = np.arange(1, dims['ydef']+1)
+                coords['ydef'] = "Nobs" + str(file_ctr)
+                vars = []
+                for var in stn_vars:
+                    stnvar = var + str(file_ctr)
+                    vars.append(stnvar)
             else:
                 # read data file
                 darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used,
                                                 dims_arr, nvars, vars)
 
             # add cycle as a variable to data array
-            cyc_darr = self.var_to_np_array(dims, ndims_used, dims_arr, cycle_tm)
+            cyc_darr = None if stn_data else self.var_to_np_array(dims, ndims_used,
+                                                                  dims_arr, cycle_tm)
 
             # create dataset from file contents
             timestep_ds = None
-
             timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
-                                         dims_arr, x_range, y_range, z_range, cyc_darr, channo)
+                                         dims_arr, x_range, y_range, z_range, channo, cyc_darr)
 
             if attribs['sat']:
                 timestep_ds.attrs['satellite'] = attribs['sat']
             if attribs['sensor']:
                 timestep_ds.attrs['sensor'] = attribs['sensor']
-         
+
             if len(lat):
-                timestep_ds['lat'] = (['Nobs'], (lat))
+                lat_str = 'lat' + str(file_ctr) if stn_data else 'lat'
+                timestep_ds[lat_str] = (['Nobs'+str(file_ctr)], (lat))
             if len(lon):
-                timestep_ds['lon'] = (['Nobs'], (lon))
+                lon_str = 'lon' + str(file_ctr) if stn_data else 'lon'
+                timestep_ds[lon_str] = (['Nobs'+str(file_ctr)], (lon))
 
             # add cycle_tm dim for concat
-            timestep_ds['Time'] = cycle_tm.strftime("%Y%m%d%H")
+            if not stn_data:
+                timestep_ds['Time'] = cycle_tm.strftime("%Y%m%d%H")
 
             # Add this dataset to the list of ds_list
             ds_list.append(timestep_ds)
+            file_ctr += 1
 
         # Concatenate datasets from ds_list into a single dataset
-        ds = concat(ds_list, dim='Time')
-
+        if not stn_data:
+            ds = concat(ds_list, dim='Time')
+        else:
+            ds = merge(ds_list)
 
         # Group name and variables
         # ------------------------
@@ -169,8 +185,6 @@ class MonDataSpace(EvaDatasetBase):
                 self.logger.abort('Collection \'' + dataset_config['name'] + '\', group \'' +
                                   group_name + '\' in file ' + filename +
                                   ' does not have any variables.')
-
-        self.logger.info(f"ds:  {ds}") 
 
         # Add the dataset to the collections
         data_collections.create_or_add_to_collection(collection_name, ds, 'cycle')
@@ -369,7 +383,6 @@ class MonDataSpace(EvaDatasetBase):
                         attribs['sat'] = strs[2]
 
                 if line.find('dtype station') != -1 or line.find('DTYPE station') != -1:
-                    self.logger.info(f"STATION DATA {line}")
                     attribs['dtype'] = 'station'
 
                 # Note we need to extract the actual channel numbers.  We have the
@@ -468,18 +481,13 @@ class MonDataSpace(EvaDatasetBase):
         """
 
         coords = {'xdef': 'Level', 'ydef': 'Nobs', 'zdef': None}
-#        coord_list = []
         dims = {'xdef': 0, 'ydef': 0, 'zdef': 0}
         dim_list = []
-        attribs = {'sensor': None, 'sat': None, 'dtype': None}
+        attribs = {'sensor': None, 'sat': None, 'dtype': 'station'}
         vars = []
         nvars = 0
         chans_dict = None
-        channo = []
-        chan_assim = []
-        chan_nassim = []
         scanpo = None
-        scan_info = []
         levs_dict = None
         levs = []
         lev_vals = []
@@ -494,31 +502,14 @@ class MonDataSpace(EvaDatasetBase):
                      'iter': 'Iteration'
         }
 
-# Ozn
-# *XDEF is pressure level number
-# *  x=    1, level=      0.101 , iuse=  1 , error=    0.020
-# *  x=    2, level=      0.160 , iuse=  1 , error=    0.020
-# *  x=    3, level=      0.254 , iuse=  1 , error=    0.025
-
-# Con
-# * ZDEF mandatary level 1000,925,850,700,500,400,300,250,200,150,100,70,50
-
-        attribs['dtype'] = 'station'
-
         with open(control_file, 'r') as fp:
             lines = fp.readlines()
             for line in lines:
 
-                #  Use this as a check that the ctl file has a level indication
-                #  or raise an error
-#                for item in list(coord_dict.keys()):
-#                    if 'DEF' in line and item in line:
-#                        coord_list.append(coord_dict[item])
-
                 # Find level information
                 if line.find('level=') != -1:
                     strs = line.split()
-                    
+
                     lev_vals.append({'lev_val': strs[4], 'iuse': strs[7], 'err_val': strs[10]})
                     lev_str = strs[2].split(',')
                     levs.append(int(lev_str[0]))
@@ -544,14 +535,14 @@ class MonDataSpace(EvaDatasetBase):
             # "vars" and "end vars".  Note that for ozn station control files the
             # var is repeated for every level (e.g. obs1, obs2, obs3, etc).  These
             # need to be combined into single entries in the vars list and nvars
-            # set to the final size of the vars list. 
+            # then set to the final size of the vars list.
             start = len(lines) - (nvars + 1)
             for x in range(start, start + nvars):
                 strs = lines[x].split()
                 if strs[-1] not in vars:
                     vars.append(strs[-1])
             nvars = len(vars)
-   
+
             # set levels
             dim_list.append(len(lev_vals))
             dim_list.append(0)
@@ -559,12 +550,6 @@ class MonDataSpace(EvaDatasetBase):
             # Ignore any coordinates in the control file that have a value of 1.
             used = 0
             mydef = ["xdef", "ydef", "zdef"]
-            self.logger.info(f"len(dim_list): {len(dim_list)}")
-#            for x in range(len(dim_list)):
-#                if dim_list[x] > 2:
-#                    coords[mydef[used]] = coord_list[x]
-#                dims[mydef[used]] = dim_list[x]
-#                    used += 1
 
             if 'Level' in coords.values():
                 for x in range(len(level_assim), len(levs)):
@@ -576,16 +561,7 @@ class MonDataSpace(EvaDatasetBase):
                              'levels_nassim': level_nassim}
                 dims['xdef'] = len(levs)
 
-            self.logger.info(f"coords: {coords}")
-            self.logger.info(f"dims: {dims}")
-            self.logger.info(f"attribs: {attribs}")
-            self.logger.info(f"vars: {vars}")
-            self.logger.info(f"nvars: {nvars}")
-            self.logger.info(f"levs_dict: {levs_dict}")
-            self.logger.info(f"chans_dict: {chans_dict}")
-
-            self.logger.info(f"lev_vals: {lev_vals}")
-
+        fp.close()
         return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict
 
     # ----------------------------------------------------------------------------------------------
@@ -677,9 +653,7 @@ class MonDataSpace(EvaDatasetBase):
                         arr = np.transpose(f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions))
                 else:
                     arr = zarray
-                self.logger.info(f"arr: {arr}")
-                self.logger.info(f"rtn_array: {rtn_array}")
-                  
+
                 rtn_array = np.append(rtn_array, [arr], axis=0)
 
         if load_data:
@@ -688,24 +662,35 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def read_stn_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars, file_path=None):
-    
-        """
-        """
+    def read_stn_ieee(self, file_name, coords, dims, ndims_used, dims_arr,
+                      nvars, vars, file_path=None):
 
-        self.logger.info(f"--> read_stn_ieee")
-        self.logger.info(f"dims: {dims}")
-        self.logger.info(f"ndims_used: {ndims_used}")
-        self.logger.info(f"dims_arr: {dims_arr}")
-        self.logger.info(f"nvars: {nvars}")
-        self.logger.info(f"vars: {vars}")
+        """
+        Read station data from an IEEE file and arrange it into a numpy array.
+
+        Args:
+            file_name (str): Name of the IEEE station file to read.
+            coords (dict): Dictionary of coordinates.
+            dims (dict): Dictionary of dimension sizes.
+            ndims_used (int): Number of dimensions used.
+            dims_arr (list): List of dimension names used.
+            nvars (int): Number of variables.
+            vars (list): List of variable names.
+            file_path (str, optional): Path to the directory containing the file. Defaults to None.
+
+        Returns:
+            numpy.ndarray: Numpy array containing the read data.
+            datetime.datetime: Cycle time extracted from the filename.
+            list: Updated list of dimensions
+            list: Lat location of obs
+            list: Lon location of obs
+        """
 
         rtn_array = None
 
         # find cycle time in filename and create cycle_tm as datetime object
         cycle_tm = None
         cycstrs = file_name.replace('/', '.').split('.')
-        self.logger.info(f"cycstrs: {cycstrs}")
 
         for cycstr in cycstrs:
             if ((cycstr.isnumeric()) and (len(cycstr) == 10)):
@@ -725,36 +710,30 @@ class MonDataSpace(EvaDatasetBase):
         lat = []
         lon = []
         numobs = 0
+
         if load_data:
-            # The 5th record in the header (nlev) is 0 at EOF
             nlev = 1
-            while (nlev): 
-                # Header components are stn id, lat, lon, time, nlev, flag
-                # Data follows header if not at EOF
+            while (nlev):
+
+                # Header components are stn id, lat, lon, time, nlev, flag.
+                # Data follows header if nlev == 1, else it's EOF.
                 record = f.read_record('>i8', '>f4', '>f4', '>f4', '>i4', '>i4')
                 nlev = record[4]
                 if nlev:
                     lat.append(record[1])
-                    lon.append(record[1])
-                    data = f.read_record('>f4').reshape([nvars,dims[dims_arr[0]]])
+                    lon.append(record[2])
+                    data = f.read_record('>f4').reshape([nvars, dims[dims_arr[0]]])
                     numobs += 1
                     mylist.append(data)
 
-            # dimensions are nvar, nlev, numobs 
+            # dimensions are nvar, nlev, numobs
             rtn_array = np.dstack(mylist)
             dims['ydef'] = numobs
-                                       
+
+        f.close()
         rtn_lat = np.asarray(lat).reshape(-1)
         rtn_lon = np.asarray(lon).reshape(-1)
 
-#        self.logger.info(f"rtn_array: {rtn_array}")
-#        self.logger.info(f"rtn_array.shape: {rtn_array.shape}")
-#        self.logger.info(f"len(lat): {len(lat)}")
-#        self.logger.info(f"len(lon): {len(lon)}")
-#        self.logger.info(f"cycle_tm: {cycle_tm}")
-         
-#        self.logger.info(f"<-- read_stn_ieee, numobs {numobs}")
-       
         return rtn_array, cycle_tm, dims, rtn_lat, rtn_lon
 
     # ----------------------------------------------------------------------------------------------
@@ -859,8 +838,6 @@ class MonDataSpace(EvaDatasetBase):
             else:
                 dims_arr.append(list(dims)[x])
 
-        # Not sure I understand what this is intended to do. 
-        # Investigate before release.
         for x in range(ndims, 3):
             dims_arr.append(list(dims)[2])
 
@@ -869,7 +846,7 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def load_dset(self, vars, nvars, coords, darr, dims, ndims_used,
-                  dims_arr, x_range, y_range, z_range, cyc_darr, channo):
+                  dims_arr, x_range, y_range, z_range, channo, cyc_darr=None):
 
         """
         Create a dataset from various components.
@@ -895,18 +872,15 @@ class MonDataSpace(EvaDatasetBase):
         # create dataset from file components
         rtn_ds = None
 
-        self.logger.info(f"nvars: {nvars}, ndims_used: {ndims_used}")
-        self.logger.info(f"coords: {coords}, dims_arr[0]: {dims_arr[0]}")
         for x in range(0, nvars):
             if ndims_used == 1:
-                self.logger.info(f"ndims_used = 1")
                 d = {
                     vars[x]: {"dims": (coords[dims_arr[0]]), "data": darr[x, :]}
                 }
             if ndims_used == 2:
                 d = {
                     vars[x]: {"dims": (coords[dims_arr[0]], coords[dims_arr[1]]),
-                              "data": darr[x, :, :]}
+                              "data": darr[x, :, :]},
                 }
             if ndims_used == 3:
                 d = {
@@ -918,45 +892,49 @@ class MonDataSpace(EvaDatasetBase):
             if 'Channel' in coords.values():
                 d.update({"Channel": {"dims": ("Channel"), "data": channo}})
 
-            self.logger.info(f"d: {d}")
             new_ds = Dataset.from_dict(d)
             rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
 
+        # Define new coordinates
+        new_coords = {
+            coords[dims_arr[0]]: x_range,
+            coords[dims_arr[1]]: y_range
+        }
+
+        # Add the new coordinates to the dataset
+        rtn_ds = rtn_ds.assign_coords(new_coords)
+
         # tack on 'cycle' as a variable
         # -----------------------------
-        if ndims_used == 1:
-            new_cyc = Dataset(
-                {
-                    'cycle': ((coords[dims_arr[0]]), cyc_darr),
-                },
-                coords={coords[dims_arr[0]]: x_range},
-            )
-        if ndims_used == 2:
-            self.logger.info(f"coords[dims_arr[0]]: {coords[dims_arr[0]]}")
-            self.logger.info(f"coords[dims_arr[1]]: {coords[dims_arr[1]]}")
-            self.logger.info(f"cyc_darr: {cyc_darr}")
-            self.logger.info(f"x_range: {x_range}")
-            self.logger.info(f"y_range: {y_range}")
-             
-            new_cyc = Dataset(
-                {
-                    'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]]), cyc_darr),
-                },
-                coords={coords[dims_arr[0]]: x_range,
-                        coords[dims_arr[1]]: y_range},
-            )
-        if ndims_used == 3:
-            new_cyc = Dataset(
-                {
-                    'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]],
-                               coords[dims_arr[2]]), cyc_darr),
-                },
-                coords={coords[dims_arr[0]]: x_range,
-                        coords[dims_arr[1]]: y_range,
-                        coords[dims_arr[2]]: z_range},
-            )
+        if cyc_darr is not None:
+            if ndims_used == 1:
+                new_cyc = Dataset(
+                    {
+                        'cycle': ((coords[dims_arr[0]]), cyc_darr),
+                    },
+                    coords={coords[dims_arr[0]]: x_range},
+                )
+            if ndims_used == 2:
+                new_cyc = Dataset(
+                    {
+                        'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]]), cyc_darr),
+                    },
+                    coords={coords[dims_arr[0]]: x_range,
+                            coords[dims_arr[1]]: y_range},
+                )
+            if ndims_used == 3:
+                new_cyc = Dataset(
+                    {
+                        'cycle': ((coords[dims_arr[0]], coords[dims_arr[1]],
+                                   coords[dims_arr[2]]), cyc_darr),
+                    },
+                    coords={coords[dims_arr[0]]: x_range,
+                            coords[dims_arr[1]]: y_range,
+                            coords[dims_arr[2]]: z_range},
+                )
 
-        rtn_ds = rtn_ds.merge(new_cyc)
+            rtn_ds = rtn_ds.merge(new_cyc)
+
         return rtn_ds
 
     # ----------------------------------------------------------------------------------------------
@@ -1019,9 +997,8 @@ class MonDataSpace(EvaDatasetBase):
             is_stn(boolean): True if this is a control file.
         """
 
-        self.logger.info(f"control_file: {control_file}")
         with open(control_file, 'r') as fp:
-            content = fp.read() 
+            content = fp.read()
             is_stn = True if 'DTYPE station' in content or 'dtype station' in content else False
             fp.close()
 
