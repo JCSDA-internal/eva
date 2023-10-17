@@ -13,7 +13,7 @@
 import os
 import numpy as np
 
-from xarray import Dataset, concat, merge
+from xarray import Dataset, concat, merge, align
 from scipy.io import FortranFile
 from datetime import datetime
 
@@ -57,7 +57,7 @@ class MonDataSpace(EvaDatasetBase):
 
         dims_arr = []
         if self.is_stn_data(control_file[0]):
-            coords, dims, attribs, nvars, stn_vars, scanpo, levs_dict, chans_dict = (
+            coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict = (
                                                      self.get_stn_ctl_dict(control_file[0]))
             ndims_used = 2
             dims_arr = ['xdef', 'ydef', 'zdef']
@@ -97,34 +97,26 @@ class MonDataSpace(EvaDatasetBase):
         threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
         ds_list = []
-        file_ctr = 1
         for filename in filenames:
 
             lat = []
             lon = []
             if stn_data:
 
-                # Read station data file.  Note that there is no guarantee the number
-                # of variables is the same for different station data files.  The file_ctr
-                # is used to tack on a number to distinguish the coordinates/dimensions
-                # and corresponding variables for file1, file2, etc.
+                # Read station data file.  Note that the variable dimensions
+                # will NOT be the same for different station data files.
                 darr, cycle_tm, dims, lat, lon = self.read_stn_ieee(filename, coords, dims,
                                                                     ndims_used, dims_arr, nvars,
-                                                                    stn_vars)
+                                                                    vars)
                 y_range = np.arange(1, dims['ydef']+1)
-                coords['ydef'] = "Nobs" + str(file_ctr)
-                vars = []
-                for var in stn_vars:
-                    stnvar = var + str(file_ctr)
-                    vars.append(stnvar)
+
             else:
                 # read data file
                 darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used,
                                                 dims_arr, nvars, vars)
 
             # add cycle as a variable to data array
-            cyc_darr = None if stn_data else self.var_to_np_array(dims, ndims_used,
-                                                                  dims_arr, cycle_tm)
+            cyc_darr = self.var_to_np_array(dims, ndims_used, dims_arr, cycle_tm)
 
             # create dataset from file contents
             timestep_ds = None
@@ -136,26 +128,26 @@ class MonDataSpace(EvaDatasetBase):
             if attribs['sensor']:
                 timestep_ds.attrs['sensor'] = attribs['sensor']
 
-            if len(lat):
-                lat_str = 'lat' + str(file_ctr) if stn_data else 'lat'
-                timestep_ds[lat_str] = (['Nobs'+str(file_ctr)], (lat))
-            if len(lon):
-                lon_str = 'lon' + str(file_ctr) if stn_data else 'lon'
-                timestep_ds[lon_str] = (['Nobs'+str(file_ctr)], (lon))
+            # Add lat and lon variables.  This is done separately because they are
+            # only single dimension arrays unlike the obs which are 2d (level, nobs).
+            if stn_data and len(lat):
+                timestep_ds['lat'] = (['Nobs'], (lat))
+            if stn_data and len(lon):
+                timestep_ds['lon'] = (['Nobs'], (lon))
 
             # add cycle_tm dim for concat
-            if not stn_data:
-                timestep_ds['Time'] = cycle_tm.strftime("%Y%m%d%H")
+            timestep_ds['Time'] = cycle_tm.strftime("%Y%m%d%H")
 
             # Add this dataset to the list of ds_list
             ds_list.append(timestep_ds)
-            file_ctr += 1
+
+        # Align all datasets.  This syncs the dimensions and variables
+        # of all datasets in ds_list using NaN for all missing data.
+        if stn_data:
+            ds_list = align(*ds_list, join='outer', exclude=[])
 
         # Concatenate datasets from ds_list into a single dataset
-        if not stn_data:
-            ds = concat(ds_list, dim='Time')
-        else:
-            ds = merge(ds_list)
+        ds = concat(ds_list, dim='Time')
 
         # Group name and variables
         # ------------------------
@@ -716,7 +708,7 @@ class MonDataSpace(EvaDatasetBase):
             while (nlev):
 
                 # Header components are stn id, lat, lon, time, nlev, flag.
-                # Data follows header if nlev == 1, else it's EOF.
+                # Data follows header if nlev > 0, else it's EOF.
                 record = f.read_record('>i8', '>f4', '>f4', '>f4', '>i4', '>i4')
                 nlev = record[4]
                 if nlev:
@@ -880,7 +872,7 @@ class MonDataSpace(EvaDatasetBase):
             if ndims_used == 2:
                 d = {
                     vars[x]: {"dims": (coords[dims_arr[0]], coords[dims_arr[1]]),
-                              "data": darr[x, :, :]},
+                              "data": darr[x, :, :]}
                 }
             if ndims_used == 3:
                 d = {
