@@ -62,14 +62,15 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
     # is kept
     percentage_capture = option_dict.get('percentage capture', 100)
 
-    # Optionally the data might have a channel.
+    # Optionally the data might have a channel or level.
     channel = option_dict.get('channel', None)
+    level = option_dict.get('level', None)
 
     # Get the data variable to use for determining cbar limits
     varname = option_dict.get('data variable')
     varname_cgv = varname.split('::')
     datavar = data_collections.get_variable_data(varname_cgv[0], varname_cgv[1],
-                                                 varname_cgv[2], channel)
+                                                 varname_cgv[2], channel, level)
 
     # Reorder the data array
     datavar = np.sort(datavar)
