@@ -9,7 +9,6 @@
 
 # --------------------------------------------------------------------------------------------------
 
-import struct
 import os
 import numpy as np
 import array
@@ -450,9 +449,7 @@ class MonDataSpace(EvaDatasetBase):
                 levs_dict = {'levels': levs,
                              'levels_assim': level_assim,
                              'levels_nassim': level_nassim}
-
             fp.close()
-
         return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict
 
     # ----------------------------------------------------------------------------------------------
