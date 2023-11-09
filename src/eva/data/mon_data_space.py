@@ -9,9 +9,10 @@
 
 # --------------------------------------------------------------------------------------------------
 
-
+import struct
 import os
 import numpy as np
+import array
 
 from xarray import Dataset, concat, merge, align
 from scipy.io import FortranFile
@@ -162,9 +163,10 @@ class MonDataSpace(EvaDatasetBase):
                     ds, chans_dict = \
                        self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], chans_dict)
 
-            # Conditionally add channel, level, and scan related variables
-            # ------------------------------------------------------------
-            ds = self.loadConditionalItems(ds, chans_dict, levs_dict, scanpo)
+            # Conditionally add channel, level, scan, and iteration related variables
+            # -----------------------------------------------------------------------
+            iterations = x_range if 'Iteration' in coords.values() else None
+            ds = self.loadConditionalItems(ds, chans_dict, levs_dict, scanpo, iterations)
 
             # Rename variables with group
             rename_dict = {}
@@ -448,7 +450,9 @@ class MonDataSpace(EvaDatasetBase):
                 levs_dict = {'levels': levs,
                              'levels_assim': level_assim,
                              'levels_nassim': level_nassim}
+
             fp.close()
+
         return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict
 
     # ----------------------------------------------------------------------------------------------
@@ -640,14 +644,17 @@ class MonDataSpace(EvaDatasetBase):
             for x in range(nvars):
                 if load_data:
                     if ndims_used == 1:
-                        arr = f.read_reals(dtype=np.dtype('>f4'))
+                        with open(filename, 'rb') as infile:
+                            binary_data = infile.read()
+
+                        arr = array.array('f')
+                        arr.frombytes(binary_data)
                     else:
                         arr = np.transpose(f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions))
                 else:
                     arr = zarray
 
                 rtn_array = np.append(rtn_array, [arr], axis=0)
-
         if load_data:
             f.close()
         return rtn_array, cycle_tm
@@ -864,15 +871,29 @@ class MonDataSpace(EvaDatasetBase):
         # create dataset from file components
         rtn_ds = None
 
+        new_coords = {}
         for x in range(0, nvars):
             if ndims_used == 1:
                 d = {
                     vars[x]: {"dims": (coords[dims_arr[0]]), "data": darr[x, :]}
                 }
+
+                # MinMon plots require both the 'allgnorm' data and log('allgnorm').
+                if vars[x] == 'allgnorm':
+                    d.update({
+                        "log_gnorm": {"dims": (coords[dims_arr[0]]), "data": np.log(darr[x, :])}
+                    })
+                new_coords = {
+                    coords[dims_arr[0]]: x_range
+                }
             if ndims_used == 2:
                 d = {
                     vars[x]: {"dims": (coords[dims_arr[0]], coords[dims_arr[1]]),
                               "data": darr[x, :, :]}
+                }
+                new_coords = {
+                    coords[dims_arr[0]]: x_range,
+                    coords[dims_arr[1]]: y_range
                 }
             if ndims_used == 3:
                 d = {
@@ -880,18 +901,17 @@ class MonDataSpace(EvaDatasetBase):
                                        coords[dims_arr[2]]),
                               "data": darr[x, :, :]}
                 }
+                new_coords = {
+                    coords[dims_arr[0]]: x_range,
+                    coords[dims_arr[1]]: y_range,
+                    coords[dims_arr[2]]: z_range
+                }
 
             if 'Channel' in coords.values():
                 d.update({"Channel": {"dims": ("Channel"), "data": channo}})
 
             new_ds = Dataset.from_dict(d)
             rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
-
-        # Define new coordinates
-        new_coords = {
-            coords[dims_arr[0]]: x_range,
-            coords[dims_arr[1]]: y_range
-        }
 
         # Add the new coordinates to the dataset
         rtn_ds = rtn_ds.assign_coords(new_coords)
@@ -931,7 +951,7 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def loadConditionalItems(self, dataset, chans_dict, levs_dict, scanpo):
+    def loadConditionalItems(self, dataset, chans_dict, levs_dict, scanpo, iterations=None):
 
         """
         Add channel, level, and scan related variables to the dataset.
@@ -941,7 +961,7 @@ class MonDataSpace(EvaDatasetBase):
             chans_dict (dict): Dictionary of channel components.
             levs_dict (dict): Dictionary of level components.
             scanpo (list): List of scan positions.
-
+            iterations (list): List of iterations.
         Returns:
             xarray.Dataset: Dataset with added scan-related variables.
         """
@@ -972,6 +992,9 @@ class MonDataSpace(EvaDatasetBase):
             for x in range(nchan):
                 scan_array[:, x] = np.array([scanpo])
                 dataset['scan'] = (['Scan', 'Channel'], scan_array)
+
+        if iterations is not None:
+            dataset['iteration'] = (['Iteration'], iterations)
 
         return dataset
 
