@@ -1,0 +1,110 @@
+#
+# MinMon summary plots for gfs
+#
+# Generate three, 120 cycle (30 day) time series plots:
+#   - initial gradients
+#   - final gnorm values
+#   - min/max gnorm values for final 10 iterations
+
+
+# Data read
+# ---------
+datasets:
+  - name: gnorm
+    type: CsvSpace
+    filenames:
+      - ${data_input_path}/csv_space.txt
+    groups:
+      - name: GsiIeee
+        variables:
+          igrad: 4
+          final_gnorm: 5
+          min_gnorm: 6
+          max_gnorm: 7
+        date: 
+          year: 0
+          month: 1
+          day: 2
+          hour: 3
+
+graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
+    # Gnorm single cycle & 7 day hourly mean
+    # --------------------------------------
+    - figure:
+        layout: [3,1]
+        figure size: [20,18]
+        tight layout:
+        title: "Valid: 2023062006"
+        output name: line_plots/minimization/gfs_gdas.summary.gnorms.png
+        plot logo:
+          which: 'noaa/nws'
+          loc: 'upper left'
+          subplot_orientation: 'first'
+
+      plots:
+        - add_xlabel: 'Cycle Time'
+          add_ylabel: 'Initial Gradient'
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+          add_legend:
+            loc: 'upper right'
+          layers:
+          - type: LinePlot
+            x:
+              variable: gnorm::GsiIeee::datetime
+            y:
+              variable: gnorm::GsiIeee::igrad
+            color: 'blue'
+            label: 'Initial Gradient'
+
+        - add_xlabel: 'Cycle Time'
+          add_ylabel: 'Final Gnorm'
+          set_yscale: 'log'
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+          add_legend:
+            loc: 'upper right'
+          layers:
+          - type: LinePlot
+            x:
+              variable: gnorm::GsiIeee::datetime
+            y:
+              variable: gnorm::GsiIeee::final_gnorm
+            color: 'blue'
+            label: 'Final Gnorm'
+
+        - add_xlabel: 'Cycle Time'
+          add_ylabel: 'Min/Max Gnorm, final 10 iterations'
+          set_yscale: 'log'
+          add_grid:
+            axis: 'both'
+            linestyle: 'dotted'
+            linewidth: 0.5
+            color: 'black'
+          add_legend:
+            loc: 'upper right'
+          layers:
+          - type: LinePlot
+            x:
+              variable: gnorm::GsiIeee::datetime
+            y:
+              variable: gnorm::GsiIeee::min_gnorm
+            color: 'blue'
+            label: 'Minimum Gnorm'
+          - type: LinePlot
+            x:
+              variable: gnorm::GsiIeee::datetime
+            y:
+              variable: gnorm::GsiIeee::max_gnorm
+            color: 'red'
+            label: 'Maximum Gnorm'
