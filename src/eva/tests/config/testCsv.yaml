@@ -21,7 +21,7 @@ datasets:
           final_gnorm: 5
           min_gnorm: 6
           max_gnorm: 7
-        date: 
+        date:
           year: 0
           month: 1
           day: 2

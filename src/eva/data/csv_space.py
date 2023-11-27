@@ -48,11 +48,19 @@ class CsvSpace(EvaDatasetBase):
 
             for group in groups:
                 group_name = get(group, self.logger, 'name')
+                header_info = get(group, self.logger, 'header', None, False)
                 group_vars = get(group, self.logger, 'variables', None, False)
 
                 selected_fields = get(group, self.logger, 'selected_fields', 'all')
                 date_config = get(group, self.logger, 'date', None, False)
-                coord = None
+
+                coord_config = get(group, self.logger, 'coordinate', None, False)
+                coord = None if not coord_config else coord_config.get('name')
+
+                # skip header if present
+                if header_info is not None:
+                    nrows = int(header_info.get('rows'))
+                    file_data.pop(nrows-1)
 
                 # load datetime if available
                 if date_config is not None:
@@ -60,20 +68,21 @@ class CsvSpace(EvaDatasetBase):
                     var_name = group_name + "::datetime"
                     dt_arr = self.get_datetime_array(file_data, date_config)
                     ds = xr.Dataset({var_name: (coord, dt_arr),
-                         coord: range(0, len(dt_arr))})
-                    
+                                     coord: range(0, len(dt_arr))})
+
                     ds_list.append(ds)
 
-                # load requested data 
+                # load requested data
                 if group_vars is not None:
                     for key, var in group_vars.items():
-                        if coord is None: coord = 'Unit'
+                        if coord is None:
+                            coord = 'Unit'
                         var_name = group_name + "::" + key
                         st_var_arr = [row[var] for row in file_data]
                         var_arr = np.array(st_var_arr, dtype=np.float32)
 
                         ds = xr.Dataset({var_name: (coord, var_arr),
-                             coord: range(0, len(var_arr))})
+                                         coord: range(0, len(var_arr))})
                         ds_list.append(ds)
 
         # Concatenate datasets from ds_list into a single dataset
@@ -127,7 +136,7 @@ class CsvSpace(EvaDatasetBase):
             date_config (dict): date configuration information
 
         Returns:
-            np.array: datetime array 
+            np.array: datetime array
         """
 
         datetime_key = 'datetime'
@@ -141,13 +150,13 @@ class CsvSpace(EvaDatasetBase):
             mon = [row[date_config.get('month')] for row in file_data]
             day = [row[date_config.get('day')] for row in file_data]
             hr = [row[date_config.get('hour')] for row in file_data]
-            date_str_list = [y + m + d + h for y,m,d,h in zip(yr,mon,day,hr)]
-            
+            date_str_list = [y + m + d + h for y, m, d, h in zip(yr, mon, day, hr)]
+
         else:
-            self.logger.abort("The date configuration in yaml file does not contain required date " +
-                              "information. A \'date\': entry must specify either " +
+            self.logger.abort("The date configuration in yaml file does not contain required " +
+                              "date information. A \'date\': entry must specify either " +
                               "\'datetime\': (int) file field position or entries specifying " +
-                              " \'year\': int, \'month\': int, \'day\': int, and \'hour\': int. " +  
-                              f" Date information found was {date_config}") 
+                              " \'year\': int, \'month\': int, \'day\': int, and \'hour\': int. " +
+                              f" Date information found was {date_config}")
 
         return np.array([np.datetime64(datetime.strptime(ds, '%Y%m%d%H')) for ds in date_str_list])
