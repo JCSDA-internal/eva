@@ -131,3 +131,4 @@ dmypy.json
 # Swap files
 *.swp
 *.swo
+._*
