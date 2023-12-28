@@ -643,7 +643,6 @@ class MonDataSpace(EvaDatasetBase):
             self.logger.info(f"WARNING:  file {filename} is missing")
             load_data = False
 
-        self.logger.info(f"ndims_used: {ndims_used}")
         if ndims_used == 1:		# MinMon
             rtn_array = np.empty((0, dims[dims_arr[0]]), datatype=float)
             if not load_data:
