@@ -1023,7 +1023,16 @@ class MonDataSpace(EvaDatasetBase):
                 dataset['chan_nassim'] = (['Channel'], chans_dict["chans_nassim"])
 
         if levs_dict is not None:
-            dataset['level'] = (['Level'], levs_dict["levels"])
+
+            # If datatype_dict is available then level needs to include that dimension
+            # for potential batch processing by DataType (conmon vert plots).
+            if datatype_dict is not None:
+                combined_list = []
+                for x in datatype_dict['datatype']:
+                    combined_list.append(levs_dict['levels'])
+                dataset['level'] = (['DataType', 'Level'], combined_list)
+            else:
+                dataset['level'] = (['Level'], levs_dict["levels"])
             dataset['level_yaxis_z'] = (['Level'], [0.0]*len(levs_dict["levels"]))
 
             if 'levels_assim' in levs_dict:
