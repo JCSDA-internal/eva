@@ -98,7 +98,7 @@ def figure_driver(config, data_collections, timing, logger):
             step_var_name = 'channel'
             title_fill = ' Ch. '
 
-            # Get list of levels load step variables
+            # Get list of levels, load step variables
             levels_str_or_list = batch_conf.get('levels', [])
             levels = parse_channel_list(levels_str_or_list, logger)
             if levels:
