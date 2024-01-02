@@ -58,16 +58,21 @@ class LinePlot():
             logger.abort('In Scatter comparison the first variable \'var1\' does not appear to ' +
                          'be in the required format of collection::group::variable.')
 
-        # Optionally get the channel|level to plot
+        # Optionally get the channel|level|datatype to plot
         channel = None
         if 'channel' in config:
             channel = config.get('channel')
         level = None
         if 'level' in config:
             level = config.get('level')
+        datatype = None
+        if 'datatype' in config:
+            datatype = config.get('datatype')
 
-        xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel, level)
-        ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel, level)
+        xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1],
+                                          var0_cgv[2], channel, level, datatype)
+        ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1],
+                                          var1_cgv[2], channel, level, datatype)
 
         # see if we need to slice data
         xdata = slice_var_from_str(config['x'], xdata, logger)

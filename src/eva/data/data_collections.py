@@ -170,7 +170,7 @@ class DataCollections:
     # ----------------------------------------------------------------------------------------------
 
     def get_variable_data_array(self, collection_name, group_name, variable_name,
-                                channels=None, levels=None):
+                                channels=None, levels=None, datatypes=None):
 
         """
         Retrieve a specific variable (as a DataArray) from a collection.
@@ -181,18 +181,21 @@ class DataCollections:
             variable_name (str): Name of the variable.
             channels (int or list[int]): Indices of channels to select (optional).
             levels (int or list[int]): Indices of levels to select (optional).
+            datatypes (str or list[str]): Indices of data types to select (optional).
 
         Returns:
             DataArray: The selected variable as an xarray DataArray.
 
         Raises:
-            ValueError: If channels are provided but the 'Channel' dimension is missing.
+            ValueError: If channels, levels, or datatypes are provided but the
+                        corresponding 'Channel', 'Level', or 'DataType' dimension
+                        is missing.
         """
 
         group_variable_name = group_name + '::' + variable_name
         data_array = self._collections[collection_name][group_variable_name]
 
-        if channels is None and levels is None:
+        if channels is None and levels is None and datatypes is None:
             return data_array
 
         if channels is not None:
@@ -201,6 +204,7 @@ class DataCollections:
                 if 'Channel' not in list(self._collections[collection_name].dims):
                     self.logger.abort(f'In get_variable_data_array channels is provided but ' +
                                       f'Channel is not a dimension in Dataset')
+
                 # Make sure it is a list
                 channels_sel = []
                 channels_sel.append(channels)
@@ -229,10 +233,26 @@ class DataCollections:
                 self.logger.abort('In get_variable_data_array levels is neither none ' +
                                   'nor a list of integers')
 
+        elif datatypes is not None:
+            if isinstance(datatypes, str) or not any(not isinstance(dt, str) for dt in datatypes):
+                # DataType must be a dimension if it will be used for selection
+                if 'DataType' not in list(self._collections[collection_name].dims):
+                    self.logger.abort(f'In get_variable_data_array levels is provided but ' +
+                                      f'DataType is not a dimension in Dataset')
+                datatypes_sel = []
+                datatypes_sel.append(datatypes)
+
+                # Create a new DataArray with the requested datatypes
+                data_array_dtypes = data_array.sel(DataType=datatypes_sel)
+                return data_array_dtypes
+            else:
+                self.logger.abort('In get_variable_data_array datatype is neither none ' +
+                                  'nor a list of strings')
+
     # ----------------------------------------------------------------------------------------------
 
     def get_variable_data(self, collection_name, group_name, variable_name,
-                          channels=None, levels=None):
+                          channels=None, levels=None, datatypes=None):
 
         """
         Retrieve the data of a specific variable from a collection.
@@ -243,13 +263,14 @@ class DataCollections:
             variable_name (str): Name of the variable.
             channels (int or list[int]): Indices of channels to select (optional).
             levels (int or list[int]): Indices of levels to select (optional).
+            datatypes (str or list[str]): Indices of data types to select (optional).
 
         Returns:
             ndarray: The selected variable data as a NumPy array.
         """
 
         variable_array = self.get_variable_data_array(collection_name, group_name, variable_name,
-                                                      channels, levels)
+                                                      channels, levels, datatypes)
 
         # Extract the actual data array
         variable_data = variable_array.data

@@ -30,6 +30,15 @@ class MonDataSpace(EvaDatasetBase):
     A class for handling MonDataSpace dataset configuration and processing.
     """
 
+    # index values for specific control files
+    level_iuse_ozn = 7
+    channel_iuse_rad = 7
+    channel_num_rad = 4
+    type_con = 1
+    datatype_con = 5
+    subtype_con = 7
+    regions_rad_ang = 5
+
     def execute(self, dataset_config, data_collections, timing):
 
         """
@@ -57,13 +66,13 @@ class MonDataSpace(EvaDatasetBase):
 
         dims_arr = []
         if self.is_stn_data(control_file[0]):
-            coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict = (
-                                                     self.get_stn_ctl_dict(control_file[0]))
+            coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict, datatype_dict = (
+                                                        self.get_stn_ctl_dict(control_file[0]))
             ndims_used = 2
             dims_arr = ['xdef', 'ydef', 'zdef']
             stn_data = True
         else:
-            coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict = (
+            coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict, datatype_dict = (
                                                           self.get_ctl_dict(control_file[0]))
             ndims_used, dims_arr = self.get_ndims_used(dims)
 
@@ -90,7 +99,8 @@ class MonDataSpace(EvaDatasetBase):
         # Set coordinate ranges
         # ---------------------
         channo = chans_dict["chan_nums"] if chans_dict is not None else None
-        x_range, y_range, z_range = self.get_dim_ranges(coords, dims, channo)
+        datatypes = datatype_dict["datatype"] if datatype_dict is not None else None
+        x_range, y_range, z_range = self.get_dim_ranges(coords, dims, channo, datatypes)
 
         # Get missing value threshold
         # ---------------------------
@@ -121,7 +131,7 @@ class MonDataSpace(EvaDatasetBase):
             # create dataset from file contents
             timestep_ds = None
             timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
-                                         dims_arr, x_range, y_range, z_range, channo, cyc_darr)
+                                         dims_arr, x_range, y_range, z_range, cyc_darr)
 
             if attribs['sat']:
                 timestep_ds.attrs['satellite'] = attribs['sat']
@@ -165,7 +175,8 @@ class MonDataSpace(EvaDatasetBase):
             # Conditionally add channel, level, scan, and iteration related variables
             # -----------------------------------------------------------------------
             iterations = x_range if 'Iteration' in coords.values() else None
-            ds = self.loadConditionalItems(ds, chans_dict, levs_dict, scanpo, iterations)
+            ds = self.loadConditionalItems(ds, chans_dict, levs_dict,
+                                           datatype_dict, scanpo, iterations)
 
             # Rename variables with group
             rename_dict = {}
@@ -299,13 +310,14 @@ class MonDataSpace(EvaDatasetBase):
             list: List of scan positions.
             dict: Dictionary containing channel information.
             dict: Dictionary containing level information.
+            dict: Dictionary containing datatype information.
         """
 
         coords = {'xdef': None, 'ydef': None, 'zdef': None}
         coord_list = []
         dims = {'xdef': 0, 'ydef': 0, 'zdef': 0}
         dim_list = []
-        attribs = {'sensor': None, 'sat': None, 'dtype': None}
+        attribs = {'sensor': None, 'sat': None, 'datatype': None}
         vars = []
         nvars = 0
         chans_dict = None
@@ -318,13 +330,18 @@ class MonDataSpace(EvaDatasetBase):
         levs = []
         level_assim = []
         level_nassim = []
+        datatype_dict = None
+        datatype = []
+        datatype_assim = []
 
         coord_dict = {
                      'channel': 'Channel',
                      'scan': 'Scan',
                      'pressure': 'Level',
+                     'vertical': 'Level',
                      'region': 'Region',
-                     'iter': 'Iteration'
+                     'iter': 'Iteration',
+                     'data type': 'DataType'
         }
 
         with open(control_file, 'r') as fp:
@@ -334,6 +351,7 @@ class MonDataSpace(EvaDatasetBase):
                 # Locate the coordinates using coord_dict.  There will be 1-3
                 # coordinates specified as XDEF, YDEF, and ZDEF.
                 for item in list(coord_dict.keys()):
+
                     if 'DEF' in line and item in line:
                         coord_list.append(coord_dict[item])
 
@@ -375,8 +393,14 @@ class MonDataSpace(EvaDatasetBase):
                         attribs['sensor'] = strs[1]
                         attribs['sat'] = strs[2]
 
-                if line.find('dtype station') != -1 or line.find('DTYPE station') != -1:
-                    attribs['dtype'] = 'station'
+                if line.find('datatype station') != -1 or line.find('DTYPE station') != -1:
+                    attribs['datatype'] = 'station'
+
+                if line.find('subtype') != -1:
+                    strs = line.split()
+                    datatype.append(strs[self.type_con] + strs[self.datatype_con] + '_' +
+                                    strs[self.subtype_con])
+                    datatype_assim.append(strs[9])
 
                 # Note we need to extract the actual channel numbers.  We have the
                 # number of channels via the xdef line, but they are not necessarily
@@ -388,11 +412,11 @@ class MonDataSpace(EvaDatasetBase):
                 if line.find('channel=') != -1:
                     strs = line.split()
                     if strs[4].isdigit():
-                        channo.append(int(strs[4]))
-                    if strs[7] == '1':
-                        chan_assim.append(int(strs[4]))
-                    if strs[7] == '-1':
-                        chan_nassim.append(int(strs[4]))
+                        channo.append(int(strs[self.channel_num_rad]))
+                    if strs[self.channel_iuse_rad] == '1':
+                        chan_assim.append(int(strs[self.channel_num_rad]))
+                    if strs[self.channel_iuse_rad] == '-1':
+                        chan_nassim.append(int(strs[self.channel_num_rad]))
 
                 if line.find('level=') != -1:
 
@@ -400,17 +424,23 @@ class MonDataSpace(EvaDatasetBase):
                     tlev = strs[2].replace(',', '')
                     if tlev.isdigit():
                         levs.append(int(tlev))
-                    if strs[7] == '1':
-                        level_assim.append(int(tlev))
-                    if strs[7] == '-1':
-                        level_nassim.append(int(tlev))
+
+                    # Ozn data control files include the assim flag on the Level definition
+                    # lines.  Con data control files use level but assim is included on the
+                    # datatype line, not Level
+                    #
+                    if len(strs) >= self.level_iuse_ozn:
+                        if strs[self.level_iuse_ozn] == '1':
+                            level_assim.append(int(tlev))
+                        if strs[self.level_iuse_ozn] == '-1':
+                            level_nassim.append(int(tlev))
 
             # The list of variables is at the end of the file between the lines
             # "vars" and "end vars".
             start = len(lines) - (nvars + 1)
             for x in range(start, start + nvars):
                 strs = lines[x].split()
-                vars.append(strs[-1])
+                vars.append(strs[0])
 
             # Ignore any coordinates in the control file that have a value of 1.
             used = 0
@@ -442,15 +472,22 @@ class MonDataSpace(EvaDatasetBase):
                               'chans_nassim': chan_nassim}
 
             if 'Level' in coords.values():
-                for x in range(len(level_assim), len(levs)):
-                    level_assim.append(0)
-                for x in range(len(level_nassim), len(levs)):
-                    level_nassim.append(0)
-                levs_dict = {'levels': levs,
-                             'levels_assim': level_assim,
-                             'levels_nassim': level_nassim}
+                levs_dict = {'levels': levs}
+
+                if len(level_assim) > 0 or len(level_nassim) > 0:
+                    for x in range(len(level_assim), len(levs)):
+                        level_assim.append(0)
+                    for x in range(len(level_nassim), len(levs)):
+                        level_nassim.append(0)
+                    levs_dict['levels_assim'] = level_assim
+                    levs_dict['levels_nassim'] = level_nassim
+
+            if 'DataType' in coords.values():
+                datatype_dict = {'datatype': datatype,
+                                 'assim': datatype_assim}
+
             fp.close()
-        return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict
+        return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict, datatype_dict
 
     # ----------------------------------------------------------------------------------------------
 
@@ -471,12 +508,13 @@ class MonDataSpace(EvaDatasetBase):
             list: List of scan positions.
             dict: Dictionary containing channel information.
             dict: Dictionary containing level information.
+            dict: Dictionary containing datatype information.
         """
 
         coords = {'xdef': 'Level', 'ydef': 'Nobs', 'zdef': None}
         dims = {'xdef': 0, 'ydef': 0, 'zdef': 0}
         dim_list = []
-        attribs = {'sensor': None, 'sat': None, 'dtype': 'station'}
+        attribs = {'sensor': None, 'sat': None, 'datatype': 'station'}
         vars = []
         nvars = 0
         chans_dict = None
@@ -486,13 +524,17 @@ class MonDataSpace(EvaDatasetBase):
         lev_vals = []
         level_assim = []
         level_nassim = []
+        datatype_dict = None
+        datatype = []
+        datatype_assim = []
 
         coord_dict = {
                      'channel': 'Channel',
                      'scan': 'Scan',
                      'pressure': 'Level',
                      'region': 'Region',
-                     'iter': 'Iteration'
+                     'iter': 'Iteration',
+                     'data type': 'DataType'
         }
 
         with open(control_file, 'r') as fp:
@@ -554,8 +596,12 @@ class MonDataSpace(EvaDatasetBase):
                              'levels_nassim': level_nassim}
                 dims['xdef'] = len(levs)
 
+            if 'DataType' in coords.values():
+                datatype_dict = {'datatype': datatype,
+                                 'assim': datatype_assim}
+
         fp.close()
-        return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict
+        return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict, datatype_dict
 
     # ----------------------------------------------------------------------------------------------
 
@@ -598,7 +644,7 @@ class MonDataSpace(EvaDatasetBase):
             load_data = False
 
         if ndims_used == 1:		# MinMon
-            rtn_array = np.empty((0, dims[dims_arr[0]]), dtype=float)
+            rtn_array = np.empty((0, dims[dims_arr[0]]), datatype=float)
             if not load_data:
                 zarray = np.zeros((dims[dims_arr[0]]), float)
             dimensions = [dims[dims_arr[0]]]
@@ -609,7 +655,7 @@ class MonDataSpace(EvaDatasetBase):
                 zarray = np.zeros((dims[dims_arr[0]], dims[dims_arr[1]]), float)
             dimensions = [dims[dims_arr[1]], dims[dims_arr[0]]]
 
-        if ndims_used == 3:		# RadMon angle
+        if ndims_used == 3:		# RadMon angle, ConMon time/vert
             rtn_array = np.empty((0, dims[dims_arr[0]], dims[dims_arr[1]],
                                   dims[dims_arr[2]]), float)
             zarray = np.zeros((dims[dims_arr[0]], dims[dims_arr[1]],
@@ -627,7 +673,7 @@ class MonDataSpace(EvaDatasetBase):
                         tarr = zarray
                     else:
                         mylist = []
-                        for z in range(5):
+                        for z in range(dims['zdef']):
                             arr = f.read_reals(dtype=np.dtype('>f4')).reshape(dims['ydef'],
                                                                               dims['xdef'])
                             mylist.append(np.transpose(arr))
@@ -635,6 +681,7 @@ class MonDataSpace(EvaDatasetBase):
 
                 else:
                     tarr = zarray
+
                 rtn_array = np.append(rtn_array, [tarr], axis=0)
 
         else:		# ndims_used == 1|2
@@ -768,7 +815,7 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def get_dim_ranges(self, coords, dims, channo):
+    def get_dim_ranges(self, coords, dims, channo, datatypes):
 
         """
         Get the valid ranges for each dimension based on the specified coordinates and channel
@@ -778,6 +825,7 @@ class MonDataSpace(EvaDatasetBase):
             coords (dict): Dictionary of coordinates.
             dims (dict): Dictionary of dimension sizes.
             channo (list): List of channel numbers.
+            datatypes (list): List of data types.
 
         Returns:
             numpy.ndarray or None: Valid x coordinate range or None.
@@ -795,7 +843,12 @@ class MonDataSpace(EvaDatasetBase):
         # - The z coordinate is never used for channel.
 
         if dims['xdef'] > 1:
-            x_range = channo if coords['xdef'] == 'Channel' else np.arange(1, dims['xdef']+1)
+            if coords['xdef'] == 'Channel':
+                x_range = channo
+            elif coords['xdef'] == 'DataType':
+                x_range = datatypes
+            else:
+                x_range = np.arange(1, dims['xdef']+1)
 
         if dims['ydef'] > 1:
             y_range = channo if coords['ydef'] == 'Channel' else np.arange(1, dims['ydef']+1)
@@ -842,7 +895,7 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def load_dset(self, vars, nvars, coords, darr, dims, ndims_used,
-                  dims_arr, x_range, y_range, z_range, channo, cyc_darr=None):
+                  dims_arr, x_range, y_range, z_range, cyc_darr=None):
 
         """
         Create a dataset from various components.
@@ -859,7 +912,6 @@ class MonDataSpace(EvaDatasetBase):
             y_range (numpy.ndarray or None): Valid y coordinate range.
             z_range (numpy.ndarray or None): Valid z coordinate range.
             cyc_darr (numpy.ndarray): Numpy array of cycle data.
-            channo (list): List of channel numbers.
 
         Returns:
             xarray.Dataset: Created dataset.
@@ -904,9 +956,6 @@ class MonDataSpace(EvaDatasetBase):
                     coords[dims_arr[2]]: z_range
                 }
 
-            if 'Channel' in coords.values():
-                d.update({"Channel": {"dims": ("Channel"), "data": channo}})
-
             new_ds = Dataset.from_dict(d)
             rtn_ds = new_ds if rtn_ds is None else rtn_ds.merge(new_ds)
 
@@ -948,7 +997,8 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def loadConditionalItems(self, dataset, chans_dict, levs_dict, scanpo, iterations=None):
+    def loadConditionalItems(self, dataset, chans_dict, levs_dict, datatype_dict,
+                             scanpo, iterations=None):
 
         """
         Add channel, level, and scan related variables to the dataset.
@@ -973,13 +1023,28 @@ class MonDataSpace(EvaDatasetBase):
                 dataset['chan_nassim'] = (['Channel'], chans_dict["chans_nassim"])
 
         if levs_dict is not None:
-            dataset['level'] = (['Level'], levs_dict["levels"])
+
+            # If datatype_dict is available then level needs to include that dimension
+            # for potential batch processing by DataType (conmon vert plots).
+            if datatype_dict is not None:
+                combined_list = []
+                for x in datatype_dict['datatype']:
+                    combined_list.append(levs_dict['levels'])
+                dataset['level'] = (['DataType', 'Level'], combined_list)
+            else:
+                dataset['level'] = (['Level'], levs_dict["levels"])
             dataset['level_yaxis_z'] = (['Level'], [0.0]*len(levs_dict["levels"]))
 
-            if len(levs_dict["levels_assim"]) > 0:
+            if 'levels_assim' in levs_dict:
                 dataset['level_assim'] = (['Level'], levs_dict["levels_assim"])
-            if len(levs_dict["levels_nassim"]) > 0:
+            if 'levels_nassim' in levs_dict:
                 dataset['level_nassim'] = (['Level'], levs_dict["levels_nassim"])
+            if 'levels_value' in levs_dict:
+                dataset['level_value'] = (['Level'], levs_dict["levels_value"])
+
+        if datatype_dict is not None:
+            dataset['datatype'] = (['DataType'], datatype_dict['datatype'])
+            dataset['datatype_assim'] = (['DataType'], datatype_dict['assim'])
 
         if scanpo is not None:
             nscan = dataset.dims.get('Scan')

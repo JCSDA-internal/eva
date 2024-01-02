@@ -98,13 +98,20 @@ def figure_driver(config, data_collections, timing, logger):
             step_var_name = 'channel'
             title_fill = ' Ch. '
 
-            # Get list of levels, conditionally override step variables
+            # Get list of levels, load step variables
             levels_str_or_list = batch_conf.get('levels', [])
             levels = parse_channel_list(levels_str_or_list, logger)
             if levels:
                 step_vars = levels
                 step_var_name = 'level'
                 title_fill = ' Lev. '
+
+            # Get list of datatypes and load step variables
+            datatypes = batch_conf.get('datatypes', [])
+            if datatypes:
+                step_vars = datatypes
+                step_var_name = 'datatype'
+                title_fill = ' Dtype. '
 
             # Set some fake values to ensure the loops are entered
             if not variables:
