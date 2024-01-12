@@ -123,7 +123,7 @@ class MonDataSpace(EvaDatasetBase):
             else:
                 # read data file
                 darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used,
-                                                dims_arr, nvars, vars)
+                                                dims_arr, nvars, vars, gsistat=attribs['gsistat'])
 
             # add cycle as a variable to data array
             cyc_darr = self.var_to_np_array(dims, ndims_used, dims_arr, cycle_tm)
@@ -317,7 +317,7 @@ class MonDataSpace(EvaDatasetBase):
         coord_list = []
         dims = {'xdef': 0, 'ydef': 0, 'zdef': 0}
         dim_list = []
-        attribs = {'sensor': None, 'sat': None, 'datatype': None}
+        attribs = {'sensor': None, 'sat': None, 'datatype': None, 'gsistat': False}
         vars = []
         nvars = 0
         chans_dict = None
@@ -395,6 +395,9 @@ class MonDataSpace(EvaDatasetBase):
 
                 if line.find('datatype station') != -1 or line.find('DTYPE station') != -1:
                     attribs['datatype'] = 'station'
+
+                if line.find('gsistat') != -1:
+                    attribs['gsistat'] = True
 
                 if line.find('subtype') != -1:
                     strs = line.split()
@@ -514,7 +517,7 @@ class MonDataSpace(EvaDatasetBase):
         coords = {'xdef': 'Level', 'ydef': 'Nobs', 'zdef': None}
         dims = {'xdef': 0, 'ydef': 0, 'zdef': 0}
         dim_list = []
-        attribs = {'sensor': None, 'sat': None, 'datatype': 'station'}
+        attribs = {'sensor': None, 'sat': None, 'datatype': 'station', 'gsistat': False}
         vars = []
         nvars = 0
         chans_dict = None
@@ -605,7 +608,8 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars, file_path=None):
+    def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars,
+                  file_path=None, gsistat=False):
 
         """
         Read data from an IEEE file and arrange it into a numpy array.
@@ -643,8 +647,8 @@ class MonDataSpace(EvaDatasetBase):
             self.logger.info(f"WARNING:  file {filename} is missing")
             load_data = False
 
-        if ndims_used == 1:		# MinMon
-            rtn_array = np.empty((0, dims[dims_arr[0]]), datatype=float)
+        if ndims_used == 1:		# MinMon, regional RadMon time,bcoef,bcor
+            rtn_array = np.empty((0, dims[dims_arr[0]]), dtype=float)
             if not load_data:
                 zarray = np.zeros((dims[dims_arr[0]]), float)
             dimensions = [dims[dims_arr[0]]]
@@ -688,11 +692,14 @@ class MonDataSpace(EvaDatasetBase):
             for x in range(nvars):
                 if load_data:
                     if ndims_used == 1:
-                        with open(filename, 'rb') as infile:
-                            binary_data = infile.read()
+                        if gsistat:
+                            with open(filename, 'rb') as infile:
+                                binary_data = infile.read()
+                            arr = array.array('f')
+                            arr.frombytes(binary_data)
+                        else:
+                            arr = f.read_reals(dtype=np.dtype('>f4'))
 
-                        arr = array.array('f')
-                        arr.frombytes(binary_data)
                     else:
                         arr = np.transpose(f.read_reals(dtype=np.dtype('>f4')).reshape(dimensions))
                 else:
