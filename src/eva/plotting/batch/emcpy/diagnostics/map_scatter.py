@@ -45,8 +45,9 @@ class MapScatter():
         # prepare data based on config
         # Optionally get the channel or level to plot
         channel = None
-        if 'channel' in config['data']:
-            channel = config['data'].get('channel')
+        if 'data' in config:
+            if 'channel' in config['data']:
+                channel = config['data'].get('channel')
         level = None
         if 'level' in config:
             level = config.get('level')
@@ -58,19 +59,23 @@ class MapScatter():
         latvar = dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], None)
         latvar = slice_var_from_str(config['latitude'], latvar, logger)
 
-        datavar_cgv = config['data']['variable'].split('::')
-        datavar = dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1],
-                                            datavar_cgv[2], channel, level)
-        datavar = slice_var_from_str(config['data'], datavar, logger)
-
         # scatter data should be flattened
         lonvar = lonvar.flatten()
         latvar = latvar.flatten()
-        datavar = datavar.flatten()
 
-        # If everything is nan plotting will fail so just plot some large values
-        if np.isnan(datavar).all():
-            datavar[np.isnan(datavar)] = 1.0e38
+        if 'data' in config:
+            datavar_cgv = config['data']['variable'].split('::')
+            datavar = dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1],
+                                                datavar_cgv[2], channel, level)
+            datavar = slice_var_from_str(config['data'], datavar, logger)
+
+            datavar = datavar.flatten()
+
+            # If everything is nan plotting will fail so just plot some large values
+            if np.isnan(datavar).all():
+                datavar[np.isnan(datavar)] = 1.0e38
+        else:
+            datavar = None
 
         # create declarative plotting MapScatter object
         self.plotobj = emcpy.plots.map_plots.MapScatter(latvar, lonvar, datavar)
@@ -83,6 +88,8 @@ class MapScatter():
                                                'map_scatter.yaml'))
         config = get_schema(layer_schema, config, logger)
         delvars = ['longitude', 'latitude', 'data', 'type', 'schema', 'level']
+        if datavar is None:
+            delvars.append('cmap')
         for d in delvars:
             config.pop(d, None)
         self.plotobj = update_object(self.plotobj, config, logger)
