@@ -66,13 +66,13 @@ class MonDataSpace(EvaDatasetBase):
 
         dims_arr = []
         if self.is_stn_data(control_file[0]):
-            coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict, datatype_dict = (
+            coords, dims, attribs, vars, scanpo, levs_dict, chans_dict, datatype_dict = (
                                                         self.get_stn_ctl_dict(control_file[0]))
             ndims_used = 2
             dims_arr = ['xdef', 'ydef', 'zdef']
             stn_data = True
         else:
-            coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict, datatype_dict = (
+            coords, dims, attribs, vars, scanpo, levs_dict, chans_dict, datatype_dict = (
                                                           self.get_ctl_dict(control_file[0]))
             ndims_used, dims_arr = self.get_ndims_used(dims)
 
@@ -116,21 +116,20 @@ class MonDataSpace(EvaDatasetBase):
                 # Read station data file.  Note that the variable dimensions
                 # will NOT be the same for different station data files.
                 darr, cycle_tm, dims, lat, lon = self.read_stn_ieee(filename, coords, dims,
-                                                                    ndims_used, dims_arr, nvars,
-                                                                    vars)
+                                                                    ndims_used, dims_arr, vars)
                 y_range = np.arange(1, dims['ydef']+1)
 
             else:
                 # read data file
                 darr, cycle_tm = self.read_ieee(filename, coords, dims, ndims_used,
-                                                dims_arr, nvars, vars, gsistat=attribs['gsistat'])
+                                                dims_arr, vars, gsistat=attribs['gsistat'])
 
             # add cycle as a variable to data array
             cyc_darr = self.var_to_np_array(dims, ndims_used, dims_arr, cycle_tm)
 
             # create dataset from file contents
             timestep_ds = None
-            timestep_ds = self.load_dset(vars, nvars, coords, darr, dims, ndims_used,
+            timestep_ds = self.load_dset(vars, coords, darr, dims, ndims_used,
                                          dims_arr, x_range, y_range, z_range, cyc_darr)
 
             if attribs['sat']:
@@ -168,7 +167,7 @@ class MonDataSpace(EvaDatasetBase):
             # Drop coordinates not in requested list
             # --------------------------------------
             for x in range(len(coord_dict)):
-                if drop_coord[x]:
+                if drop_coord[x] and coord_dict[x][1] in list(ds.coords):
                     ds, chans_dict = \
                        self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], chans_dict)
 
@@ -305,7 +304,6 @@ class MonDataSpace(EvaDatasetBase):
             dict: Dictionary containing various coordinates and information.
             dict: Dictionary containing dimension sizes.
             dict: Dictionary containing sensor and satellite attributes.
-            int: Number of variables.
             list: List of variable names.
             list: List of scan positions.
             dict: Dictionary containing channel information.
@@ -490,7 +488,7 @@ class MonDataSpace(EvaDatasetBase):
                                  'assim': datatype_assim}
 
             fp.close()
-        return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict, datatype_dict
+        return coords, dims, attribs, vars, scanpo, levs_dict, chans_dict, datatype_dict
 
     # ----------------------------------------------------------------------------------------------
 
@@ -506,7 +504,6 @@ class MonDataSpace(EvaDatasetBase):
             dict: Dictionary containing various coordinates and information.
             dict: Dictionary containing dimension sizes.
             dict: Dictionary containing sensor and satellite attributes.
-            int: Number of variables.
             list: List of variable names.
             list: List of scan positions.
             dict: Dictionary containing channel information.
@@ -579,7 +576,6 @@ class MonDataSpace(EvaDatasetBase):
                 strs = lines[x].split()
                 if strs[-1] not in vars:
                     vars.append(strs[-1])
-            nvars = len(vars)
 
             # set levels
             dim_list.append(len(lev_vals))
@@ -604,11 +600,11 @@ class MonDataSpace(EvaDatasetBase):
                                  'assim': datatype_assim}
 
         fp.close()
-        return coords, dims, attribs, nvars, vars, scanpo, levs_dict, chans_dict, datatype_dict
+        return coords, dims, attribs, vars, scanpo, levs_dict, chans_dict, datatype_dict
 
     # ----------------------------------------------------------------------------------------------
 
-    def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, nvars, vars,
+    def read_ieee(self, file_name, coords, dims, ndims_used, dims_arr, vars,
                   file_path=None, gsistat=False):
 
         """
@@ -620,7 +616,6 @@ class MonDataSpace(EvaDatasetBase):
             dims (dict): Dictionary of dimension sizes.
             ndims_used (int): Number of dimensions used.
             dims_arr (list): List of dimension names used.
-            nvars (int): Number of variables.
             vars (list): List of variable names.
             file_path (str, optional): Path to the directory containing the file. Defaults to None.
 
@@ -667,7 +662,7 @@ class MonDataSpace(EvaDatasetBase):
 
             dimensions = [dims[dims_arr[0]], dims[dims_arr[1]]]
 
-            for x in range(nvars):
+            for x in range(len(vars)):
 
                 if load_data:
                     # satang variable is not used and a non-standard size
@@ -689,7 +684,7 @@ class MonDataSpace(EvaDatasetBase):
                 rtn_array = np.append(rtn_array, [tarr], axis=0)
 
         else:		# ndims_used == 1|2
-            for x in range(nvars):
+            for x in range(len(vars)):
                 if load_data:
                     if ndims_used == 1:
                         if gsistat:
@@ -713,7 +708,7 @@ class MonDataSpace(EvaDatasetBase):
     # ----------------------------------------------------------------------------------------------
 
     def read_stn_ieee(self, file_name, coords, dims, ndims_used, dims_arr,
-                      nvars, vars, file_path=None):
+                      vars, file_path=None):
 
         """
         Read station data from an IEEE file and arrange it into a numpy array.
@@ -724,7 +719,6 @@ class MonDataSpace(EvaDatasetBase):
             dims (dict): Dictionary of dimension sizes.
             ndims_used (int): Number of dimensions used.
             dims_arr (list): List of dimension names used.
-            nvars (int): Number of variables.
             vars (list): List of variable names.
             file_path (str, optional): Path to the directory containing the file. Defaults to None.
 
@@ -772,7 +766,7 @@ class MonDataSpace(EvaDatasetBase):
                 if nlev:
                     lat.append(record[1])
                     lon.append(record[2])
-                    data = f.read_record('>f4').reshape([nvars, dims[dims_arr[0]]])
+                    data = f.read_record('>f4').reshape([len(vars), dims[dims_arr[0]]])
                     numobs += 1
                     mylist.append(data)
 
@@ -901,7 +895,7 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def load_dset(self, vars, nvars, coords, darr, dims, ndims_used,
+    def load_dset(self, vars, coords, darr, dims, ndims_used,
                   dims_arr, x_range, y_range, z_range, cyc_darr=None):
 
         """
@@ -909,7 +903,6 @@ class MonDataSpace(EvaDatasetBase):
 
         Args:
             vars (list): List of variable names.
-            nvars (int): Number of variables.
             coords (dict): Dictionary of coordinates.
             darr (numpy.ndarray): Numpy array of data.
             dims (dict): Dictionary of dimension sizes.
@@ -928,7 +921,7 @@ class MonDataSpace(EvaDatasetBase):
         rtn_ds = None
 
         new_coords = {}
-        for x in range(0, nvars):
+        for x in range(0, len(vars)):
             if ndims_used == 1:
                 d = {
                     vars[x]: {"dims": (coords[dims_arr[0]]), "data": darr[x, :]}
