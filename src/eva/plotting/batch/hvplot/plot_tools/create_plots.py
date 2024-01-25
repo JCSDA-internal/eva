@@ -1,4 +1,7 @@
 from bokeh.plotting import save, output_file
+from bokeh.layouts import gridplot
+import panel as pn
+import holoviews
 import hvplot as hv
 import os
 
@@ -42,23 +45,38 @@ class CreatePlot:
 
 
 class CreateFigure:
-
+  
     def __init__(self, nrows=1, ncols=1, figsize=(8, 6)):
         self.nrows = nrows
         self.ncols = ncols
         self.figsize = figsize
         self.plot_list = []
         self.fig = None
+        self.subplot_row = None
 
     def create_figure(self):
-        # Needs work, need to combine all the layers
-        # and figure out how subplots will work
-        self.fig = self.plot_list[0].plot_layers[0]
-        plot_obj = self.plot_list[0]
 
-        # Add all features to the figure
-        for feat in vars(plot_obj).keys():
-            self._plot_features(plot_obj, feat)
+        new_plot_list = []
+        for plot_obj in self.plot_list:
+
+            base_hvplot = holoviews.Scatter([], [])
+            for layer in plot_obj.plot_layers:
+                # combine layers if necessary
+                base_hvplot = base_hvplot * layer
+
+            self.fig = base_hvplot
+            for feat in vars(plot_obj).keys():
+                self._plot_features(plot_obj, feat)
+
+            new_plot_list.append(self.fig)
+
+        # Construct subplots if necessary
+        if len(new_plot_list) == 1:
+            self.fig = new_plot_list[0]
+        else:
+            # use layout to construct subplot
+            self.fig = holoviews.Layout(new_plot_list).cols(self.ncols)
+            self.fig.opts(shared_axes=False)            
 
     def add_suptitle(self, text, **kwargs):
         self.fig.opts(title=text)
@@ -67,9 +85,7 @@ class CreateFigure:
         pathfile_dir = os.path.dirname(pathfile)
         if not os.path.exists(pathfile_dir):
             os.makedirs(pathfile_dir)
-        bokeh_fig = hv.render(self.fig, backend='bokeh')
-        output_file(pathfile)
-        save(bokeh_fig)
+        holoviews.save(self.fig, pathfile, backend="bokeh")
 
     def close_figure(self):
         pass
