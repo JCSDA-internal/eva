@@ -1,0 +1,88 @@
+datasets:
+
+  - name: experiment_geovals_with_lvls
+    type: DataFile
+    data_file: /discover/nobackup/asewnath/JediWednesday/eva/src/eva/tests/data/swell-hofx.amsua_n19-geovals.20211211T210000Z.nc4
+    levels: &levels 33,60
+    instrument_name: amsua_n19
+    variables: &variables_with_lvls ['mole_fraction_of_carbon_dioxide_in_air']
+
+  - name: experiment_geovals
+    type: DataFile
+    data_file: /discover/nobackup/asewnath/JediWednesday/eva/src/eva/tests/data/swell-hofx.amsua_n19-geovals.20211211T210000Z.nc4
+    instrument_name: amsua_n19
+    variables: &variables ['vegetation_area_fraction', 'leaf_area_index']
+
+  - name: experiment_latlon
+    type: IodaObsSpace
+    filenames:
+      - /discover/nobackup/asewnath/JediWednesday/eva/src/eva/tests/data/swell-hofx.amsua_n19.20211211T210000Z.nc4
+    groups:
+      - name: MetaData
+
+graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+  - batch figure:
+      variables: *variables_with_lvls
+      levels: *levels
+    dynamic options:
+      - type: vminvmaxcmap
+        level: ${level}
+        data variable: experiment_geovals_with_lvls::amsua_n19::${variable}
+    figure:
+      figure size: [20,10]
+      layout: [1,1]
+      title: 'Observations | AMSU-A NOAA-19 | Geovals | {level}'
+      output name: map_plots/amsua_n19/${variable}/${level}/observations_amsua_n19_${variable}_${level}.png
+    plots:
+      - mapping:
+          projection: plcarr
+          domain: global
+        add_map_features: ['coastline']
+        add_colorbar:
+          label: '${variable}'
+        layers:
+        - type: MapScatter
+          longitude:
+            variable: experiment_latlon::MetaData::longitude
+          latitude:
+            variable: experiment_latlon::MetaData::latitude
+          data:
+            variable: experiment_geovals_with_lvls::amsua_n19::${variable}
+          level: ${level}
+          markersize: 2
+          cmap: ${dynamic_cmap}
+          vmin: ${dynamic_vmin}
+          vmax: ${dynamic_vmax}
+
+  - batch figure:
+      variables: *variables
+    dynamic options:
+      - type: vminvmaxcmap
+        data variable: experiment_geovals::amsua_n19::${variable}
+    figure:
+      figure size: [20,10]
+      layout: [1,1]
+      title: 'Observations | AMSU-A NOAA-19 | Geovals'
+      output name: map_plots/amsua_n19/${variable}/observations_amsua_n19_${variable}.png
+    plots:
+      - mapping:
+          projection: plcarr
+          domain: global
+        add_map_features: ['coastline']
+        add_colorbar:
+          label: '${variable}'
+        layers:
+        - type: MapScatter
+          longitude:
+            variable: experiment_latlon::MetaData::longitude
+          latitude:
+            variable: experiment_latlon::MetaData::latitude
+          data:
+            variable: experiment_geovals::amsua_n19::${variable}
+          markersize: 2
+          cmap: ${dynamic_cmap}
+          vmin: ${dynamic_vmin}
+          vmax: ${dynamic_vmax}
