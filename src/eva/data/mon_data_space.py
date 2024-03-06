@@ -117,6 +117,7 @@ class MonDataSpace(EvaDatasetBase):
                 # will NOT be the same for different station data files.
                 darr, cycle_tm, dims, lat, lon = self.read_stn_ieee(filename, coords, dims,
                                                                     ndims_used, dims_arr, vars)
+                x_range = np.arange(1, dims['xdef']+1)
                 y_range = np.arange(1, dims['ydef']+1)
 
             else:
@@ -168,8 +169,9 @@ class MonDataSpace(EvaDatasetBase):
             # --------------------------------------
             for x in range(len(coord_dict)):
                 if drop_coord[x] and coord_dict[x][1] in list(ds.coords):
-                    ds, chans_dict = \
-                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], chans_dict)
+                    ds, chans_dict, levs_dict = \
+                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x],
+                                              chans_dict, levs_dict)
 
             # Conditionally add channel, level, scan, and iteration related variables
             # -----------------------------------------------------------------------
@@ -227,7 +229,7 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def subset_coordinate(self, ds, coordinate, requested_subset, chans_dict):
+    def subset_coordinate(self, ds, coordinate, requested_subset, chans_dict, levs_dict=None):
 
         """
         Subset the input dataset along the specified coordinate dimension and update channel
@@ -284,11 +286,32 @@ class MonDataSpace(EvaDatasetBase):
                 chans_dict['chans_assim'] = new_chan_assim
                 chans_dict['chans_nassim'] = new_chan_nassim
 
+            # If Level coordinate has been reduced from "all" (by the yaml
+            # file) then reset level, level_yaxis_z, level_assim and level_nassim accordingly
+            if coordinate == 'Level':
+                new_levels_assim = []
+                new_levels_nassim = []
+
+                for x in requested_subset:
+                    if x in levs_dict['levels_assim']:
+                        new_levels_assim.append(x)
+                    if x in levs_dict['levels_nassim']:
+                        new_levels_nassim.append(x)
+
+                for x in range(len(new_levels_assim), len(requested_subset)):
+                    new_levels_assim.append(0)
+                for x in range(len(new_levels_nassim), len(requested_subset)):
+                    new_levels_nassim.append(0)
+
+                levs_dict['levels'] = requested_subset
+                levs_dict['levels_assim'] = new_levels_assim
+                levs_dict['levels_nassim'] = new_levels_nassim
+
         else:
             self.logger.info('Warning:  requested coordinate, ' + str(coordinate) + ' is not in ' +
                              ' dataset dimensions valid dimensions include ' + str(ds.dims))
 
-        return ds, chans_dict
+        return ds, chans_dict, levs_dict
 
     # ----------------------------------------------------------------------------------------------
 
@@ -773,8 +796,8 @@ class MonDataSpace(EvaDatasetBase):
             # dimensions are nvar, nlev, numobs
             rtn_array = np.dstack(mylist)
             dims['ydef'] = numobs
+            f.close()
 
-        f.close()
         rtn_lat = np.asarray(lat).reshape(-1)
         rtn_lon = np.asarray(lon).reshape(-1)
 
