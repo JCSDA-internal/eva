@@ -115,9 +115,10 @@ class MonDataSpace(EvaDatasetBase):
 
                 # Read station data file.  Note that the variable dimensions
                 # will NOT be the same for different station data files.
+                # y_range is set here because it's the number of obs which is not in the control
+                # file and is only known once the ieee file is read.
                 darr, cycle_tm, dims, lat, lon = self.read_stn_ieee(filename, coords, dims,
                                                                     ndims_used, dims_arr, vars)
-                x_range = np.arange(1, dims['xdef']+1)
                 y_range = np.arange(1, dims['ydef']+1)
 
             else:
@@ -469,11 +470,10 @@ class MonDataSpace(EvaDatasetBase):
             # Ignore any coordinates in the control file that have a value of 1.
             used = 0
             mydef = ["xdef", "ydef", "zdef"]
-            for x in range(len(dim_list)):
-                if dim_list[x] > 2:
-                    coords[mydef[used]] = coord_list[x]
-                    dims[mydef[used]] = dim_list[x]
-                    used += 1
+            for x in range(len(coord_list)):
+                coords[mydef[used]] = coord_list[x]
+                dims[mydef[used]] = dim_list[x]
+                used += 1
 
             # If Scan is in the coords calculate the scan positions.
             # scan_info[0] = num steps, [1] = start position, [2] = step size
@@ -861,12 +861,18 @@ class MonDataSpace(EvaDatasetBase):
         y_range = None
         z_range = None
 
-        # - Return None for a coordinate that has value 0 or 1.
-        # - "Channel" can be either the x or y coordinate and can be
+        # - Return None for a dims['xdef'] or dims['ydef'] coordinate that has value 0.
+        # - Return None for a dims['zdef'] coordinate that has a value < 2.  Some
+        #     control files specify a non-existant zdef dimension which is interpreted
+        #     by the control file parser as having a value of 1.  That's the reasoning
+        #     behind setting dims['zdef'] only if it's > 1.
+        #
+        #   Additional special cases:
+        #   - "Channel" can be either the x or y coordinate and can be
         #      numbered non-consecutively, which has been captured in channo.
-        # - The z coordinate is never used for channel.
+        #   - DataType number has been captured in datatypes.
 
-        if dims['xdef'] > 1:
+        if dims['xdef'] > 0:
             if coords['xdef'] == 'Channel':
                 x_range = channo
             elif coords['xdef'] == 'DataType':
@@ -874,7 +880,7 @@ class MonDataSpace(EvaDatasetBase):
             else:
                 x_range = np.arange(1, dims['xdef']+1)
 
-        if dims['ydef'] > 1:
+        if dims['ydef'] > 0:
             y_range = channo if coords['ydef'] == 'Channel' else np.arange(1, dims['ydef']+1)
 
         if dims['zdef'] > 1:
@@ -899,14 +905,10 @@ class MonDataSpace(EvaDatasetBase):
 
         # Some ieee files (ozn) can be 1 or 2 dimensions depending on the
         # number of levels used.  Levels is the xdef, Regions is the ydef.
-        # All Ozn files use ydef, but many have xdef = 1.  The dims_arr[]
-        # will return the name(s) of the dimensions actually used.
-
-        # Ignore dims with values of 0 or 1
         ndims = len(dims)
         dims_arr = []
         for x in range(ndims):
-            if list(dims.values())[x] <= 1:
+            if list(dims.values())[x] <= 0:
                 ndims -= 1
             else:
                 dims_arr.append(list(dims)[x])
