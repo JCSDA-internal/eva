@@ -43,6 +43,19 @@ class CreatePlot:
             **kwargs
         }
 
+    def add_text(self, xloc, yloc, text, transform='datacoords', **kwargs):
+
+        if not hasattr(self, 'text'):
+            self.text = []
+
+        self.text.append({
+            'xloc': xloc,
+            'yloc': yloc,
+            'text': text,
+            'transform': transform,
+            'kwargs': kwargs
+        })
+
 
 class CreateFigure:
   
@@ -57,11 +70,12 @@ class CreateFigure:
     def create_figure(self):
 
         new_plot_list = []
+        item_list = []
         for plot_obj in self.plot_list:
 
             base_hvplot = holoviews.Scatter([], [])
             for layer in plot_obj.plot_layers:
-                # combine layers if necessary
+                # Combine layers if necessary
                 base_hvplot = base_hvplot * layer
 
             self.fig = base_hvplot
@@ -70,13 +84,31 @@ class CreateFigure:
 
             new_plot_list.append(self.fig)
 
+            # Keep track of text found in plot object
+            if hasattr(plot_obj, 'text'):
+                colors_list = [text_dict['kwargs']['color'] for text_dict in plot_obj.text]
+                stats_list = [text_dict['text'] for text_dict in plot_obj.text]
+                hv_text = holoviews.Table({'Color': colors_list, 'Statistics': stats_list},
+                                          ['Color', 'Statistics'])
+                hv_text.opts(width=1000)
+                item_list.append(hv_text)
+
         # Construct subplots if necessary
         if len(new_plot_list) == 1:
             self.fig = new_plot_list[0]
         else:
             # use layout to construct subplot
             self.fig = holoviews.Layout(new_plot_list).cols(self.ncols)
-            self.fig.opts(shared_axes=False)            
+            self.fig.opts(shared_axes=False)
+
+        # Add any text that was found in the plot_list
+        # combine self.fig and text list into one list
+        final_list = [self.fig] + item_list
+        self.fig = holoviews.Layout(final_list).cols(1)
+
+    #Create a running list of text objects if they exist
+    #list items will be seen as some sort of holoview text layout
+    #which can then be appended to the bottom of the image at the end
 
     def add_suptitle(self, text, **kwargs):
         self.fig.opts(title=text)
@@ -91,14 +123,12 @@ class CreateFigure:
         pass
 
     def _plot_features(self, plot_obj, feature):
-
         feature_dict = {
             'xlabel': self._plot_xlabel,
             'ylabel': self._plot_ylabel,
             'legend': self._plot_legend,
             'grid': self._plot_grid,
         }
-
         if feature in feature_dict:
             feature_dict[feature](vars(plot_obj)[feature])
 
@@ -113,3 +143,4 @@ class CreateFigure:
 
     def _plot_legend(self, legend):
         self.fig.opts(legend_position='top_left', show_legend=True)
+
