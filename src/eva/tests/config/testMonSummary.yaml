@@ -1,0 +1,152 @@
+# Test Monitor Summary plot performs the following:
+#   1.  Load binary monitor data for 5 cycles
+#   2.  Select obs counts from last 4 cycles
+#   3.  Select total bias correction for 1 cycle and average of last 4
+#   4.  Plot obs counts for the 4 cycles (panel 1).
+#   5.  Plot bias correction for 1 cycle and average of 4 (panel 2).
+
+datasets:
+  - name: experiment
+    type: MonDataSpace
+    satellite: metop-a
+    sensor: hirs4
+    control_file:
+      - ${data_input_path}/time.hirs4_metop-a.ctl
+    filenames:
+      - ${data_input_path}/time.hirs4_metop-a.2015051418.ieee_d
+      - ${data_input_path}/time.hirs4_metop-a.2015051500.ieee_d
+      - ${data_input_path}/time.hirs4_metop-a.2015051506.ieee_d
+      - ${data_input_path}/time.hirs4_metop-a.2015051512.ieee_d
+      - ${data_input_path}/time.hirs4_metop-a.2015051518.ieee_d
+
+    channels: &channels 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+    regions: &regions 1
+    groups:
+      - name: GsiIeee
+        variables: ['count', 'cycle', 'total', 'channel']
+
+transforms:
+  - transform: select time
+    new name: experiment::GsiIeee::count1
+    starting field: experiment::GsiIeee::count
+    cycle: 2015051418
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: experiment::GsiIeee::count2
+    starting field: experiment::GsiIeee::count
+    cycle: 2015051500
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: experiment::GsiIeee::count3
+    starting field: experiment::GsiIeee::count
+    cycle: 2015051506
+    for:
+      variable: [none]
+
+  - transform: select time
+    new name: experiment::GsiIeee::count4
+    starting field: experiment::GsiIeee::count
+    cycle: 2015051512
+    for:
+      variable: [none]
+
+  # Note that total is the total bias correction for a given
+  # channel/region.  To find the average divide total by count.
+  - transform: arithmetic
+    new name: experiment::GsiIeee::total_avg
+    equals: experiment::GsiIeee::total/experiment::GsiIeee::count
+    for:
+      variable: [none]
+
+  # Single cycle total bias correction
+  - transform: select time
+    new name: experiment::GsiIeee::total_1cyc
+    starting field: experiment::GsiIeee::total_avg
+    cycle: 2015051512
+    for:
+      variable: [none]
+
+   # 4 cycle total bias correction using time slice
+  - transform: select time
+    new name: experiment::GsiIeee::total_4cyc
+    starting field: experiment::GsiIeee::total_avg
+    start cycle: 2015051418
+    end cycle: 2015051512
+    for:
+      variable: [none]
+
+
+graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
+  # Summary plots
+  # ---------------
+    - figure:
+        layout: [2,1]
+        figure size: [12,10]
+        tight layout:
+          pad: 5
+        title: 'hirs4_metop-a | Number of Obs Count'
+        output name: lineplots/hirs4_metop-a/summary.hirs4_metop-a.png
+
+      plots:
+        - add_xlabel: 'Channel'
+          add_ylabel: 'Observation Count'
+          add_legend:
+            loc: 'upper right'
+          layers:
+          - type: LinePlot
+            x:
+              variable: experiment::GsiIeee::channel
+            y:
+              variable: experiment::GsiIeee::count1
+            color: 'blue'
+            label: '2015051418'
+          - type: LinePlot
+            x:
+              variable: experiment::GsiIeee::channel
+            y:
+              variable: experiment::GsiIeee::count2
+            color: 'green'
+            label: '2015051500'
+          - type: LinePlot
+            x:
+              variable: experiment::GsiIeee::channel
+            y:
+              variable: experiment::GsiIeee::count3
+            color: 'yellow'
+            label: '2015051506'
+          - type: LinePlot
+            x:
+              variable: experiment::GsiIeee::channel
+            y:
+              variable: experiment::GsiIeee::count4
+            color: 'red'
+            label: '2015051512'
+
+        - add_xlabel: 'Channel'
+          add_ylabel: 'Total Bias Correction (K)'
+          add_legend:
+            loc: 'upper right'
+          layers:
+          - type: LinePlot
+            x:
+              variable: experiment::GsiIeee::channel
+            y:
+              variable: experiment::GsiIeee::total_1cyc
+            color: 'blue'
+            label: '2015051512'
+
+          - type: LinePlot
+            x:
+              variable: experiment::GsiIeee::channel
+            y:
+              variable: experiment::GsiIeee::total_4cyc
+            color: 'red'
+            label: 'Avg last 4 cycles'
