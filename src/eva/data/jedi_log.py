@@ -237,6 +237,13 @@ class JediLog(EvaDatasetBase):
             var_position.append(1)
             var_dtype.append('float32')
 
+            # Residual norm
+            var_names.append('residual_norm')
+            var_search_criteria.append('Residual norm (')
+            var_split.append('=')
+            var_position.append(1)
+            var_dtype.append('float32')
+
             # Norm reduction
             var_names.append('norm_reduction')
             var_search_criteria.append('Norm reduction (')
@@ -278,6 +285,7 @@ class JediLog(EvaDatasetBase):
         # Concatenate chunks to simplify search algorithm
         min_and_j_chunks = minimizer_chunks + j_chunks
 
+        ds_vars = []
         for var_ind, var in enumerate(var_names):
             var_array = []
             for min_and_j_chunk in min_and_j_chunks:
@@ -291,7 +299,12 @@ class JediLog(EvaDatasetBase):
             if var_array:
                 gn = f'convergence::{var_names[var_ind]}'  # group::variable name
                 convergence_ds[gn] = xr.DataArray(np.zeros(total_iter, dtype=var_dtype[var_ind]))
+
+                # If var is greater than total_iter, clip var array
+                if len(var_array) > total_iter:
+                    var_array = var_array[0:total_iter]
                 convergence_ds[gn].data[:] = var_array
+                ds_vars.append(var)
 
         # Create special case variables
 
@@ -316,10 +329,12 @@ class JediLog(EvaDatasetBase):
 
         # Normalized versions of data
         # ---------------------------
-        normalize_var_names = ['gradient_reduction', 'norm_reduction', 'j', 'jb', 'jojc']
+        normalize_var_names = ['gradient_reduction', 'residual_norm',
+                               'norm_reduction', 'j', 'jb', 'jojc']
 
         for normalize_var_name in normalize_var_names:
-            if normalize_var_name in var_names:
+            if (normalize_var_name in var_names) and (normalize_var_name in ds_vars):
+
                 # Index in lists for the variable being normalized
                 var_ind = var_names.index(normalize_var_name)
 
