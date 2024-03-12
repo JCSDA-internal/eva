@@ -10,6 +10,7 @@
 
 import os
 import netCDF4 as nc
+import numpy as np
 from xarray import Dataset, open_dataset
 from eva.utilities.config import get
 from eva.data.eva_dataset_base import EvaDatasetBase
@@ -57,7 +58,8 @@ class DataFile(EvaDatasetBase):
         for v in variables:
             # Retrieve dimension names
             dims = instr_ds[v].dims
-            rename_dims_dict[dims[1]] = f'Level'
+            if np.size(dims) > 1:
+                rename_dims_dict[dims[1]] = f'Level'
             rename_dict[v] = f'{instr_name}::{v}'
         instr_ds = instr_ds.rename(rename_dict)
         instr_ds = instr_ds.rename_dims(rename_dims_dict)
