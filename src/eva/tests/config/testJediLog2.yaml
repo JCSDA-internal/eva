@@ -2,7 +2,7 @@ datasets:
 
 - type: JediLog
   collection_name: jedi_log_test
-  jedi_log_to_parse: ${data_input_path}/jedi_variational_log.log
+  jedi_log_to_parse: ${data_input_path}/jedi_variational_log.txt
   data_to_parse:
     convergence: true
 
@@ -15,7 +15,7 @@ graphics:
       layout: [3,1]
       figure size: [12,10]
       title: 'Residual norm and Norm Reduction Plots'
-      output name: 'jedi_log/convergence/norm_gradient_reduction.png'
+      output name: jedi_log/convergence/norm_gradient_reduction.png
     plots:
       - add_xlabel: 'Total inner iteration number'
         add_ylabel: 'Residual norm'
