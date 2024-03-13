@@ -6,6 +6,7 @@
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
+from xarray import Dataset, DataArray
 from eva.utilities.config import get
 from eva.utilities.logger import Logger
 from eva.transforms.transform_utils import parse_for_dict, split_collectiongroupvariable
@@ -38,15 +39,21 @@ def latlon_match(config, data_collections):
         matching_index.append((abs(match_to_lat - starting_lat[i]) + abs(match_to_lon - starting_lon[i])).argmin())
 
     # Loop through starting_dataset and update all variable arrays
+    update_ds_list = []
     for variable in variables:
         var_array = data_collections.get_variable_data_array(cgv[0], cgv[1], variable)
+        #dims = list(var_array.dims)
 
         # Index var_array based on matching_index into new numpy array
         var_values = var_array.values
         var_values = var_values[matching_index]
-        print(var_values)
-        # Create new dataset with new data array
+
+        # Create new ds in the way that data readers do
+
+        # Add new array to update_ds
         
+    # merge all the datasets    
     # Save new array in place using new data set
+    # Or instead of saving in place, just add to new collection with new collection name
     # may need to create a method in data_collections to do an inplace update
 
