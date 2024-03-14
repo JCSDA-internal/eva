@@ -33,27 +33,31 @@ def latlon_match(config, data_collections):
     match_to_lat = data_collections.get_variable_data_array(match_to_latlon_name, 'MetaData', 'latitude').to_numpy()
     match_to_lon = data_collections.get_variable_data_array(match_to_latlon_name, 'MetaData', 'longitude').to_numpy()
 
-    # Find matching index (use optimized way with dask if possible
+    # Find matching index (this can be updated using dask)
     matching_index = []
     for i in range(len(starting_lat)):
         matching_index.append((abs(match_to_lat - starting_lat[i]) + abs(match_to_lon - starting_lon[i])).argmin())
+
+    # Retrieve data collection from data collections
+    match_ds = data_collections.get_data_collection(cgv[0])
 
     # Loop through starting_dataset and update all variable arrays
     update_ds_list = []
     for variable in variables:
         var_array = data_collections.get_variable_data_array(cgv[0], cgv[1], variable)
-        #dims = list(var_array.dims)
 
         # Index var_array based on matching_index into new numpy array
         var_values = var_array.values
         var_values = var_values[matching_index]
+        var_array.values = var_values
 
-        # Create new ds in the way that data readers do
+        # Get corresponding dims and whatever else is needed from var in curr_ds
+        match_ds[f'{cgv[1]}::{variable}'] = var_array
 
-        # Add new array to update_ds
-        
-    # merge all the datasets    
-    # Save new array in place using new data set
-    # Or instead of saving in place, just add to new collection with new collection name
-    # may need to create a method in data_collections to do an inplace update
+    # create new collection name
+    new_collection_name = cgv[0] + '_matched_index' 
+
+    # add new collection to data collections
+    data_collections.create_or_add_to_collection(new_collection_name, match_ds)
+    match_ds.close()
 
