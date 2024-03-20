@@ -16,9 +16,23 @@ from eva.utilities.config import get
 from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.utils import parse_channel_list
 
+
 class DataFile(EvaDatasetBase):
 
+    """
+    A class for handling data files (such as geovals)
+    """
+
     def execute(self, dataset_config, data_collections, timing):
+
+        """
+        Executes the processing of data file dataset.
+
+        Args:
+            dataset_config (dict): Configuration dictionary for the dataset.
+            data_collections (DataCollections): Object for managing data collections.
+            timing (Timing): Timing object for tracking execution time.
+        """
 
         # Set the collection name
         # -----------------------
@@ -47,8 +61,10 @@ class DataFile(EvaDatasetBase):
         # Open instrument files xarray dataset
         instr_ds = open_dataset(data_filename)
 
-        # FIX: enforce that a variable exists, but have no defaults
+        # Enforce that a variable exists, do not default to all variables
         variables = get(dataset_config, self.logger, 'variables')
+        if not variables:
+            self.logger.abort('A variables list needs to be defined in the config file.')
         vars_to_remove = list(set(list(instr_ds.keys())) - set(variables))
         instr_ds = instr_ds.drop_vars(vars_to_remove)
 
@@ -73,7 +89,6 @@ class DataFile(EvaDatasetBase):
         # Display the contents of the collections for helping the user with making plots
         data_collections.display_collections()
 
-
     def generate_default_config(self, filenames, collection_name):
 
         """
@@ -92,4 +107,3 @@ class DataFile(EvaDatasetBase):
         """
 
         pass
-
