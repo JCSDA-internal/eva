@@ -17,10 +17,10 @@ from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.utils import parse_channel_list
 
 
-class DataFile(EvaDatasetBase):
+class GeovalSpace(EvaDatasetBase):
 
     """
-    A class for handling data files (such as geovals)
+    A class for handling geoval files
     """
 
     def execute(self, dataset_config, data_collections, timing):

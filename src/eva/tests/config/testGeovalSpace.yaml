@@ -1,14 +1,14 @@
 datasets:
 
   - name: exp_geovals_with_lvls
-    type: DataFile
+    type: GeovalSpace
     data_file: ${data_input_path}/swell-hofx.amsua_n19-geovals.20211211T210000Z.nc4
     levels: &exp_levels 33,60
     instrument_name: amsua_n19
     variables: &exp_vars_with_lvls ['mole_fraction_of_carbon_dioxide_in_air']
 
   - name: exp_geovals
-    type: DataFile
+    type: GeovalSpace
     data_file: ${data_input_path}/swell-hofx.amsua_n19-geovals.20211211T210000Z.nc4
     instrument_name: amsua_n19
     variables: &exp_vars ['vegetation_area_fraction', 'leaf_area_index']
@@ -21,14 +21,14 @@ datasets:
       - name: MetaData
 
   - name: ctrl_geovals_with_lvls
-    type: DataFile
+    type: GeovalSpace
     data_file: ${data_input_path}/ncdiag.x0048v2-geovals.ob.PT6H.amsua_n19.2021-12-11T21:00:00Z.nc4
     levels: &ctrl_levels 33,60
     instrument_name: amsua_n19
     variables: &ctrl_vars_with_lvls ['mole_fraction_of_carbon_dioxide_in_air']
 
   - name: ctrl_geovals
-    type: DataFile
+    type: GeovalSpace
     data_file: ${data_input_path}/ncdiag.x0048v2-geovals.ob.PT6H.amsua_n19.2021-12-11T21:00:00Z.nc4
     instrument_name: amsua_n19
     variables: &ctrl_vars ['vegetation_area_fraction', 'leaf_area_index']
