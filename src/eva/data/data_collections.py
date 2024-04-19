@@ -169,6 +169,11 @@ class DataCollections:
 
     # ----------------------------------------------------------------------------------------------
 
+    def get_data_collection(self, collection_name):
+        return self._collections[collection_name]
+
+    # ----------------------------------------------------------------------------------------------
+
     def get_variable_data_array(self, collection_name, group_name, variable_name,
                                 channels=None, levels=None, datatypes=None):
 
