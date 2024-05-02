@@ -1,15 +1,15 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-import emcpy.plots.plots
 import os
 import numpy as np
 
+from abc import ABC, abstractmethod
 
 # --------------------------------------------------------------------------------------------------
 
 
-class LinePlot():
+class LinePlot(ABC):
 
     """Base class for creating line plots."""
 
@@ -43,40 +43,59 @@ class LinePlot():
                     line_plot = LinePlot(config, logger, None)
         """
 
+        self.dataobj = dataobj
+        self.config = config
+        self.logger = logger
+        self.xdata = None
+        self.ydata = None
+        self.plotobj = None
+
+        self.color = None
+        self.label = None
+
+# --------------------------------------------------------------------------------------------------
+
+    def data_prep(self):
+
         # Get the data to plot from the data_collection
         # ---------------------------------------------
-        var0 = config['x']['variable']
-        var1 = config['y']['variable']
+        var0 = self.config['x']['variable']
+        var1 = self.config['y']['variable']
 
         var0_cgv = var0.split('::')
         var1_cgv = var1.split('::')
 
         if len(var0_cgv) != 3:
-            logger.abort('In Scatter comparison the first variable \'var0\' does not appear to ' +
+            self.logger.abort('In Scatter comparison the first variable \'var0\' does not appear to ' +
                          'be in the required format of collection::group::variable.')
         if len(var1_cgv) != 3:
-            logger.abort('In Scatter comparison the first variable \'var1\' does not appear to ' +
+            self.logger.abort('In Scatter comparison the first variable \'var1\' does not appear to ' +
                          'be in the required format of collection::group::variable.')
 
         # Optionally get the channel|level|datatype to plot
         channel = None
-        if 'channel' in config:
-            channel = config.get('channel')
+        if 'channel' in self.config:
+            channel = self.config.get('channel')
         level = None
-        if 'level' in config:
-            level = config.get('level')
+        if 'level' in self.config:
+            level = self.config.get('level')
         datatype = None
-        if 'datatype' in config:
-            datatype = config.get('datatype')
+        if 'datatype' in self.config:
+            datatype = self.config.get('datatype')
+        if 'color' in self.config:
+            self.color = self.config.get('color')
+        if 'label' in self.config:
+            self.label = self.config.get('label')
 
-        xdata = dataobj.get_variable_data(var0_cgv[0], var0_cgv[1],
-                                          var0_cgv[2], channel, level, datatype)
-        ydata = dataobj.get_variable_data(var1_cgv[0], var1_cgv[1],
-                                          var1_cgv[2], channel, level, datatype)
+
+        xdata = self.dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2],
+                                          channel, level, datatype)
+        ydata = self.dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2],
+                                          channel, level, datatype)
 
         # see if we need to slice data
-        xdata = slice_var_from_str(config['x'], xdata, logger)
-        ydata = slice_var_from_str(config['y'], ydata, logger)
+        xdata = slice_var_from_str(self.config['x'], xdata, self.logger)
+        ydata = slice_var_from_str(self.config['y'], ydata, self.logger)
 
         # line plot data should be flattened
         xdata = xdata.flatten()
@@ -89,22 +108,12 @@ class LinePlot():
         ydata = ydata[mask]
 
         mask = ~np.isnan(ydata)
-        xdata = xdata[mask]
-        ydata = ydata[mask]
-
-        # Create declarative plotting LinePlot object
-        # -------------------------------------------
-        self.plotobj = emcpy.plots.plots.LinePlot(xdata, ydata)
-
-        # Get defaults from schema
-        # ------------------------
-        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'emcpy', 'defaults', 'line_plot.yaml'))
-        config = get_schema(layer_schema, config, logger)
-        delvars = ['x', 'y', 'type', 'schema', 'channel', 'level']
-        for d in delvars:
-            config.pop(d, None)
-        self.plotobj = update_object(self.plotobj, config, logger)
-
+        self.xdata = xdata[mask]
+        self.ydata = ydata[mask]
 
 # --------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def configure_plot(self):
+        pass
+     

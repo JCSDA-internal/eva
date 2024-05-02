@@ -56,6 +56,34 @@ class CreatePlot:
             'kwargs': kwargs
         })
 
+    def add_colorbar(self, label=None, fontsize=12, single_cbar=False,
+                     cbar_location=None, **kwargs):
+
+        kwargs.setdefault('orientation', 'horizontal')
+
+        pad = 0.15 if kwargs['orientation'] == 'horizontal' else 0.1
+        fraction = 0.065 if kwargs['orientation'] == 'horizontal' else 0.085
+
+        kwargs.setdefault('pad', pad)
+        kwargs.setdefault('fraction', fraction)
+
+        if not cbar_location:
+            h_loc = [0.14, -0.1, 0.8, 0.04]
+            v_loc = [1.02, 0.12, 0.04, 0.8]
+            cbar_location = h_loc if kwargs['orientation'] == 'horizontal' else v_loc
+
+        self.colorbar = {
+            'label': label,
+            'fontsize': fontsize,
+            'single_cbar': single_cbar,
+            'cbar_loc': cbar_location,
+            'kwargs': kwargs
+        }
+
+    def add_map_features(self, feature_list=['coastline']):
+
+        self.map_features = feature_list
+
 
 class CreateFigure:
   

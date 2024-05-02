@@ -26,12 +26,12 @@ class HvplotScatter(Scatter):
         # add line statistics to legend label
         try:
             plot_for_slope = df.hvplot.scatter('xdata', 'ydata')
-            slope = hv.Slope.from_scatter(plot_for_slope)
+            slope = hv.Slope.from_scatter(plot_for_slope).opts(color=color, line_width=1.5)
             slope_attrs = linregress(self.xdata, self.ydata)
             slope_expression = 'y='+f'{slope.slope:.3f}'+"x+"+f'{slope.y_intercept:.3f}'
             r_sq = ', r^2: ' + f'{slope_attrs.rvalue**2:.3f}'
             slope_label = "y="+f'{slope.slope:.3f}'+"x+"+f'{slope.y_intercept:.3f}'+r_sq
-            plot = df.hvplot.scatter('xdata', 'ydata',
+            plot = df.hvplot.scatter('xdata', 'ydata', width=600, height=600,
                                      s=size, c=color, label=label+", "+slope_label)
             new_plot = hv.Overlay([plot, plot])
             plotobj = new_plot * slope

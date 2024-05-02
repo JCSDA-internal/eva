@@ -3,6 +3,7 @@ import pandas as pd
 import hvplot.pandas
 import holoviews as hv
 from scipy.stats import linregress
+from bokeh.models import HoverTool
 
 from eva.plotting.batch.base.diagnostics.density import Density
 
@@ -16,11 +17,10 @@ class HvplotDensity(Density):
         df['data'] = self.data
         color = self.config['color']
         label = self.config['label']
-        alpha = self.config['alpha']
-        bw_adjust = self.config['bw_adjust']
 
-        plotobj = df.hvplot.kde(filled=True, legend='top_left', alpha=alpha,
-                                c=color, bandwidth=bw_adjust, label=label, height=400)
+        hover=HoverTool(tooltips=[('data', '$data')])
+        plotobj = df.hvplot.kde(filled=True, legend='top_left', color=color, 
+                                tools=[hover], label=label, height=600, width=600)
 
         return plotobj
 

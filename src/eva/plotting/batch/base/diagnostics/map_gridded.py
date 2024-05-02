@@ -1,13 +1,14 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-import emcpy.plots.map_plots
 import os
 
+import numpy as np
+from abc import ABC, abstractmethod
 
 # --------------------------------------------------------------------------------------------------
 
 
-class MapGridded():
+class MapGridded(ABC):
 
     """Base class for creating map gridded plots."""
 
@@ -40,31 +41,40 @@ class MapGridded():
                     logger = Logger()
                     map_plot = MapGridded(config, logger, None)
         """
+        self.collection = None
+        self.datavar_name = None
+        self.slice = None
 
-        # prepare data based on config
-        lonvar_cgv = config['longitude']['variable'].split('::')
-        lonvar = dataobj.get_variable_data(lonvar_cgv[0], lonvar_cgv[1], lonvar_cgv[2], None)
-        lonvar = slice_var_from_str(config['longitude'], lonvar, logger)
-        latvar_cgv = config['latitude']['variable'].split('::')
-        latvar = dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], None)
-        latvar = slice_var_from_str(config['latitude'], latvar, logger)
-        datavar_cgv = config['data']['variable'].split('::')
-        datavar = dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1], datavar_cgv[2], None)
-        datavar = slice_var_from_str(config['data'], datavar, logger)
-
-        # create declarative plotting MapGridded object
-        self.plotobj = emcpy.plots.map_plots.MapGridded(latvar, lonvar, datavar)
-        # get defaults from schema
-        layer_schema = config.get("schema",
-                                  os.path.join(return_eva_path(),
-                                               'plotting',
-                                               'emcpy', 'defaults',
-                                               'map_gridded.yaml'))
-        config = get_schema(layer_schema, config, logger)
-        delvars = ['longitude', 'latitude', 'data', 'type', 'schema']
-        for d in delvars:
-            config.pop(d, None)
-        self.plotobj = update_object(self.plotobj, config, logger)
-
+        self.config = config
+        self.logger = logger
+        self.dataobj = dataobj
+        self.lonvar = []
+        self.latvar = []
+        self.datavar = []
+        self.plotobj = None
 
 # --------------------------------------------------------------------------------------------------
+
+    def data_prep(self):
+
+        # prepare data based on config
+        lonvar_cgv = self.config['longitude']['variable'].split('::')
+        self.collection = lonvar_cgv[0]
+        self.lonvar = self.dataobj.get_variable_data(lonvar_cgv[0], lonvar_cgv[1], lonvar_cgv[2], None)
+        self.lonvar = slice_var_from_str(self.config['longitude'], self.lonvar, self.logger)
+        latvar_cgv = self.config['latitude']['variable'].split('::')
+        self.latvar = self.dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], None)
+        self.latvar = slice_var_from_str(self.config['latitude'], self.latvar, self.logger)
+        datavar_cgv = self.config['data']['variable'].split('::')
+        self.datavar_name = datavar_cgv[1] + '::' + datavar_cgv[2]
+        self.datavar = self.dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1], datavar_cgv[2], None)
+        self.datavar = slice_var_from_str(self.config['data'], self.datavar, self.logger)
+        self.slice = self.config['data']['slices']
+
+# --------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def configure_plot(self):
+        pass
+
+

@@ -3,7 +3,7 @@ from eva.utilities.utils import get_schema, update_object
 import emcpy.plots.plots
 import os
 
-
+from abc import ABC, abstractmethod
 # --------------------------------------------------------------------------------------------------
 
 
@@ -39,23 +39,22 @@ class VerticalLine():
                     vertical_line_plot = VerticalLine(config, logger, None)
         """
 
-        # Get the x value to plot
-        # -----------------------
-        xval = config['x']
-
-        # Create declarative plotting HorizontalLine object
-        # -------------------------------------------
-        self.plotobj = emcpy.plots.plots.VerticalLine(xval)
-
-        # Get defaults from schema
-        # ------------------------
-        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'emcpy', 'defaults', 'vertical_line.yaml'))
-        config = get_schema(layer_schema, config, logger)
-        delvars = ['type', 'schema']
-        for d in delvars:
-            config.pop(d, None)
-        self.plotobj = update_object(self.plotobj, config, logger)
-
+        self.config = config
+        self.xval = None
 
 # --------------------------------------------------------------------------------------------------
+
+    def data_prep(self):
+
+        # Get the x value to plot
+        # -----------------------
+        self.xval = self.config['x']
+        
+
+# --------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def configure_plot(self):
+        pass
+
+                

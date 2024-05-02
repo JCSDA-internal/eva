@@ -14,6 +14,8 @@ numpy>=1.22.3
 pyproj
 #pyproj==3.1.0
 importlib-metadata==4.8.2
+#added because of modules
+contourpy==1.0.7
 
 # Additional packages
 git+https://github.com/NOAA-EMC/emcpy.git@9b6756341e9ae963baa7d3a256b8ada3da688d04#egg=emcpy
@@ -23,3 +25,4 @@ hvplot
 nbconvert
 bokeh
 geopandas
+geoviews

@@ -7,21 +7,16 @@ import hvplot.pandas
 import holoviews as hv
 from scipy.stats import linregress
 
-from eva.plotting.batch.base.diagnostics.histogram import Histogram
+from eva.plotting.batch.base.diagnostics.vertical_line import VerticalLine
 
 # --------------------------------------------------------------------------------------------------
 
 
-class HvplotHistogram(Histogram):
+class HvplotVerticalLine(VerticalLine):
 
     def configure_plot(self):
 
-        df = pd.DataFrame()
-        df["var"] = self.data
-        self.plotobj = df.hvplot.hist(bins=self.config['bins'], color=self.config['color'],
-                                      label=self.config['label'], height=600, width=600,
-                                      legend='top_left')
-
+        self.plotobj = hv.VLine(self.xval).opts(color='black', line_width=self.config['linewidth'])
         return self.plotobj
 
 # --------------------------------------------------------------------------------------------------
