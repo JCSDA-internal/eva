@@ -20,7 +20,7 @@ class EmcpyHistogram(Histogram):
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                       'emcpy', 'defaults', 'histogram.yaml'))
+                                       'batch', 'emcpy', 'defaults', 'histogram.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['type', 'schema', 'data']
         for d in delvars:

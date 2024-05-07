@@ -19,7 +19,7 @@ class EmcpyHorizontalLine(HorizontalLine):
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'emcpy', 'defaults',
+                                                         'batch', 'emcpy', 'defaults',
                                                          'horizontal_line.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['type', 'schema']

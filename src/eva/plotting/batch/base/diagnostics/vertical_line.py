@@ -39,6 +39,7 @@ class VerticalLine():
                     vertical_line_plot = VerticalLine(config, logger, None)
         """
 
+        self.logger = logger
         self.config = config
         self.xval = None
 

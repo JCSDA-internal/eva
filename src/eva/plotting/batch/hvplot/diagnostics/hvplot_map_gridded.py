@@ -25,8 +25,8 @@ class HvplotMapGridded(MapGridded):
         ds = dataset.sel(lev=data_slice)
         self.plotobj = ds.hvplot.quadmesh('lon_coord', 'lat_coord', z = self.datavar_name,
                                           hover_cols=[self.datavar_name], cmap=cmap,
-                                          geo=True, coastline=True) 
-
+                                          geo=True, coastline=True, xlabel='Longitude',
+                                          ylabel='Latitude', width=800, height=400) 
         return self.plotobj
 
 # --------------------------------------------------------------------------------------------------

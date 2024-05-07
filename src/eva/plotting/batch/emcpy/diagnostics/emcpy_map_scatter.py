@@ -1,7 +1,7 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object
-import emcpy.plots.plots
+import emcpy.plots.map_plots
 import os
 
 from eva.plotting.batch.base.diagnostics.map_scatter import MapScatter
@@ -17,7 +17,7 @@ class EmcpyMapScatter(MapScatter):
         # get defaults from schema
         layer_schema = self.config.get("schema",
                                   os.path.join(return_eva_path(),
-                                               'plotting',
+                                               'plotting','batch',
                                                'emcpy', 'defaults',
                                                'map_scatter.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)

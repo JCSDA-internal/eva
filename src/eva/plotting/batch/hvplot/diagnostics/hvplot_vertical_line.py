@@ -2,8 +2,6 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object
 import os
-import pandas as pd
-import hvplot.pandas
 import holoviews as hv
 from scipy.stats import linregress
 

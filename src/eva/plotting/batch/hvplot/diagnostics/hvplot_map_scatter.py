@@ -31,8 +31,8 @@ class HvplotMapScatter(MapScatter):
 
         self.plotobj = gdf.hvplot(global_extent=True, c=label, geo=True,
                                   cmap=cmap, legend=True, coastline=True,
-                                  s=int(marker_size)+3)
-
+                                  s=int(marker_size)+3, xlabel='Longitude',
+                                  ylabel='Latitude', width=800, height=400)
 
         return self.plotobj
 

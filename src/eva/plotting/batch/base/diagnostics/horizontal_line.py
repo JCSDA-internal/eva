@@ -38,6 +38,7 @@ class HorizontalLine():
                     horizontal_line_plot = HorizontalLine(config, logger)
         """
 
+        self.logger = logger
         self.config = config
         self.yval = None
 
@@ -47,13 +48,12 @@ class HorizontalLine():
 
         # Get the y value to plot
         # -----------------------
-        self.yval = config['y']
+        self.yval = self.config['y']
 
 # --------------------------------------------------------------------------------------------------
 
     @abstractmethod
     def configure_plot(self):
         pass
-
 
 

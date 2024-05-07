@@ -19,7 +19,7 @@ class EmcpyVerticalLine(VerticalLine):
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'emcpy', 'defaults', 'vertical_line.yaml'))
+                                                 'batch', 'emcpy', 'defaults', 'vertical_line.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['type', 'schema']
         for d in delvars:

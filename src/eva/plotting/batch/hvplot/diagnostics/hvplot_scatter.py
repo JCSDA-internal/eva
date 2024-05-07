@@ -37,7 +37,8 @@ class HvplotScatter(Scatter):
             plotobj = new_plot * slope
             plotobj.opts(show_legend=False)
         except Exception:
-            plot = df.hvplot.scatter('xdata', 'ydata', s=size, c=color, label=label)
+            plot = df.hvplot.scatter('xdata', 'ydata', s=size, c=color, label=label,
+                                     width=600, height=600)
             plotobj = hv.Overlay([plot, plot])
             plotobj.opts(show_legend=False)
 
