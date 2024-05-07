@@ -115,6 +115,8 @@ class MonDataSpace(EvaDatasetBase):
 
                 # Read station data file.  Note that the variable dimensions
                 # will NOT be the same for different station data files.
+                # y_range is set here because it's the number of obs which is not in the control
+                # file and is only known once the ieee file is read.
                 darr, cycle_tm, dims, lat, lon = self.read_stn_ieee(filename, coords, dims,
                                                                     ndims_used, dims_arr, vars)
                 y_range = np.arange(1, dims['ydef']+1)
@@ -168,8 +170,9 @@ class MonDataSpace(EvaDatasetBase):
             # --------------------------------------
             for x in range(len(coord_dict)):
                 if drop_coord[x] and coord_dict[x][1] in list(ds.coords):
-                    ds, chans_dict = \
-                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x], chans_dict)
+                    ds, chans_dict, levs_dict = \
+                       self.subset_coordinate(ds, coord_dict[x][1], requested_coord[x],
+                                              chans_dict, levs_dict)
 
             # Conditionally add channel, level, scan, and iteration related variables
             # -----------------------------------------------------------------------
@@ -227,7 +230,7 @@ class MonDataSpace(EvaDatasetBase):
 
     # ----------------------------------------------------------------------------------------------
 
-    def subset_coordinate(self, ds, coordinate, requested_subset, chans_dict):
+    def subset_coordinate(self, ds, coordinate, requested_subset, chans_dict, levs_dict=None):
 
         """
         Subset the input dataset along the specified coordinate dimension and update channel
@@ -284,11 +287,32 @@ class MonDataSpace(EvaDatasetBase):
                 chans_dict['chans_assim'] = new_chan_assim
                 chans_dict['chans_nassim'] = new_chan_nassim
 
+            # If Level coordinate has been reduced from "all" (by the yaml
+            # file) then reset level, level_yaxis_z, level_assim and level_nassim accordingly
+            if coordinate == 'Level':
+                new_levels_assim = []
+                new_levels_nassim = []
+
+                for x in requested_subset:
+                    if x in levs_dict['levels_assim']:
+                        new_levels_assim.append(x)
+                    if x in levs_dict['levels_nassim']:
+                        new_levels_nassim.append(x)
+
+                for x in range(len(new_levels_assim), len(requested_subset)):
+                    new_levels_assim.append(0)
+                for x in range(len(new_levels_nassim), len(requested_subset)):
+                    new_levels_nassim.append(0)
+
+                levs_dict['levels'] = requested_subset
+                levs_dict['levels_assim'] = new_levels_assim
+                levs_dict['levels_nassim'] = new_levels_nassim
+
         else:
             self.logger.info('Warning:  requested coordinate, ' + str(coordinate) + ' is not in ' +
                              ' dataset dimensions valid dimensions include ' + str(ds.dims))
 
-        return ds, chans_dict
+        return ds, chans_dict, levs_dict
 
     # ----------------------------------------------------------------------------------------------
 
@@ -446,11 +470,10 @@ class MonDataSpace(EvaDatasetBase):
             # Ignore any coordinates in the control file that have a value of 1.
             used = 0
             mydef = ["xdef", "ydef", "zdef"]
-            for x in range(len(dim_list)):
-                if dim_list[x] > 2:
-                    coords[mydef[used]] = coord_list[x]
-                    dims[mydef[used]] = dim_list[x]
-                    used += 1
+            for x in range(len(coord_list)):
+                coords[mydef[used]] = coord_list[x]
+                dims[mydef[used]] = dim_list[x]
+                used += 1
 
             # If Scan is in the coords calculate the scan positions.
             # scan_info[0] = num steps, [1] = start position, [2] = step size
@@ -773,8 +796,8 @@ class MonDataSpace(EvaDatasetBase):
             # dimensions are nvar, nlev, numobs
             rtn_array = np.dstack(mylist)
             dims['ydef'] = numobs
+            f.close()
 
-        f.close()
         rtn_lat = np.asarray(lat).reshape(-1)
         rtn_lon = np.asarray(lon).reshape(-1)
 
@@ -838,12 +861,18 @@ class MonDataSpace(EvaDatasetBase):
         y_range = None
         z_range = None
 
-        # - Return None for a coordinate that has value 0 or 1.
-        # - "Channel" can be either the x or y coordinate and can be
+        # - Return None for a dims['xdef'] or dims['ydef'] coordinate that has value 0.
+        # - Return None for a dims['zdef'] coordinate that has a value < 2.  Some
+        #     control files specify a non-existant zdef dimension which is interpreted
+        #     by the control file parser as having a value of 1.  That's the reasoning
+        #     behind setting dims['zdef'] only if it's > 1.
+        #
+        #   Additional special cases:
+        #   - "Channel" can be either the x or y coordinate and can be
         #      numbered non-consecutively, which has been captured in channo.
-        # - The z coordinate is never used for channel.
+        #   - DataType number has been captured in datatypes.
 
-        if dims['xdef'] > 1:
+        if dims['xdef'] > 0:
             if coords['xdef'] == 'Channel':
                 x_range = channo
             elif coords['xdef'] == 'DataType':
@@ -851,10 +880,10 @@ class MonDataSpace(EvaDatasetBase):
             else:
                 x_range = np.arange(1, dims['xdef']+1)
 
-        if dims['ydef'] > 1:
+        if dims['ydef'] > 0:
             y_range = channo if coords['ydef'] == 'Channel' else np.arange(1, dims['ydef']+1)
 
-        if dims['zdef'] > 1:
+        if dims['zdef'] > 0:
             z_range = np.arange(1, dims['zdef']+1)
 
         return x_range, y_range, z_range
@@ -876,14 +905,10 @@ class MonDataSpace(EvaDatasetBase):
 
         # Some ieee files (ozn) can be 1 or 2 dimensions depending on the
         # number of levels used.  Levels is the xdef, Regions is the ydef.
-        # All Ozn files use ydef, but many have xdef = 1.  The dims_arr[]
-        # will return the name(s) of the dimensions actually used.
-
-        # Ignore dims with values of 0 or 1
         ndims = len(dims)
         dims_arr = []
         for x in range(ndims):
-            if list(dims.values())[x] <= 1:
+            if list(dims.values())[x] <= 0:
                 ndims -= 1
             else:
                 dims_arr.append(list(dims)[x])
