@@ -8,6 +8,7 @@ from eva.plotting.batch.base.diagnostics.horizontal_line import HorizontalLine
 
 # --------------------------------------------------------------------------------------------------
 
+
 class EmcpyHorizontalLine(HorizontalLine):
 
     def configure_plot(self):
@@ -19,8 +20,7 @@ class EmcpyHorizontalLine(HorizontalLine):
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'batch', 'emcpy', 'defaults',
-                                                         'horizontal_line.yaml'))
+                                       'batch', 'emcpy', 'defaults', 'horizontal_line.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['type', 'schema']
         for d in delvars:

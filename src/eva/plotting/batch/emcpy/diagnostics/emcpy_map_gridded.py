@@ -8,6 +8,7 @@ from eva.plotting.batch.base.diagnostics.map_gridded import MapGridded
 
 # --------------------------------------------------------------------------------------------------
 
+
 class EmcpyMapGridded(MapGridded):
 
     def configure_plot(self):
@@ -15,11 +16,8 @@ class EmcpyMapGridded(MapGridded):
         # create declarative plotting MapGridded object
         self.plotobj = emcpy.plots.map_plots.MapGridded(self.latvar, self.lonvar, self.datavar)
         # get defaults from schema
-        layer_schema = self.config.get("schema",
-                                       os.path.join(return_eva_path(),
-                                                    'plotting','batch',
-                                                    'emcpy', 'defaults',
-                                                    'map_gridded.yaml'))
+        layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
+                                       'batch', 'emcpy', 'defaults', 'map_gridded.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['longitude', 'latitude', 'data', 'type', 'schema']
         for d in delvars:

@@ -52,7 +52,6 @@ class Density(ABC):
 
     def data_prep(self):
 
-
         # Get the data to plot from the data_collection
         # ---------------------------------------------
         varstr = self.config['data']['variable']
@@ -60,7 +59,7 @@ class Density(ABC):
 
         if len(var_cgv) != 3:
             self.logger.abort('In Density the variable \'var_cgv\' does not appear to ' +
-                         'be in the required format of collection::group::variable.')
+                              'be in the required format of collection::group::variable.')
 
         # Optionally get the channel to plot
         channel = None

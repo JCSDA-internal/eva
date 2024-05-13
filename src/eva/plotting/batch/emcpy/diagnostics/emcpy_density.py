@@ -20,7 +20,7 @@ class EmcpyDensity(Density):
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                 'batch', 'emcpy', 'defaults', 'density.yaml'))
+                                       'batch', 'emcpy', 'defaults', 'density.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['type', 'schema', 'data']
         for d in delvars:

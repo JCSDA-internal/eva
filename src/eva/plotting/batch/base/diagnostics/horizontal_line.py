@@ -55,5 +55,3 @@ class HorizontalLine():
     @abstractmethod
     def configure_plot(self):
         pass
-
-

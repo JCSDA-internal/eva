@@ -54,8 +54,6 @@ class MapScatter(ABC):
 
     def data_prep(self):
 
-        # prepare data based on config
-        # Optionally get the channel to plot
         channel = None
         if 'channel' in self.config['data']:
             channel = self.config['data'].get('channel')
@@ -66,9 +64,9 @@ class MapScatter(ABC):
         latvar = self.dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], None)
         latvar = slice_var_from_str(self.config['latitude'], latvar, self.logger)
         datavar_cgv = self.config['data']['variable'].split('::')
-        datavar = self.dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1], datavar_cgv[2], channel)
+        datavar = self.dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1],
+                                                 datavar_cgv[2], channel)
         datavar = slice_var_from_str(self.config['data'], datavar, self.logger)
-        # scatter data should be flattened
         self.lonvar = lonvar.flatten()
         self.latvar = latvar.flatten()
         self.datavar = datavar.flatten()

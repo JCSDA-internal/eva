@@ -18,10 +18,10 @@ class HvplotDensity(Density):
         color = self.config['color']
         label = self.config['label']
 
-        hover=HoverTool(tooltips=[('data', '$data')])
-        plotobj = df.hvplot.kde(filled=True, legend='top_left', color=color, 
+        hover = HoverTool(tooltips=[('data', '$data')])
+        plotobj = df.hvplot.kde(filled=True, legend='top_left', color=color,
                                 tools=[hover], label=label, height=600, width=600)
 
         return plotobj
 
-# --------------------------------------------------------------------------------------------------                                                                        
+# --------------------------------------------------------------------------------------------------

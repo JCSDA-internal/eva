@@ -85,7 +85,7 @@ class CreatePlot:
 
 
 class CreateFigure:
-  
+
     def __init__(self, nrows=1, ncols=1, figsize=(8, 6)):
         self.nrows = nrows
         self.ncols = ncols
@@ -133,10 +133,6 @@ class CreateFigure:
         final_list = [self.fig] + item_list
         self.fig = holoviews.Layout(final_list).cols(1)
 
-    #Create a running list of text objects if they exist
-    #list items will be seen as some sort of holoview text layout
-    #which can then be appended to the bottom of the image at the end
-
     def add_suptitle(self, text, **kwargs):
         self.fig.opts(title=text)
 
@@ -170,4 +166,3 @@ class CreateFigure:
 
     def _plot_legend(self, legend):
         self.fig.opts(legend_position='top_left', show_legend=True)
-

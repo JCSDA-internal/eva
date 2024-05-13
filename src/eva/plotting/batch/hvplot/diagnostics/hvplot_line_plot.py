@@ -8,6 +8,7 @@ from eva.plotting.batch.base.diagnostics.line_plot import LinePlot
 
 # --------------------------------------------------------------------------------------------------
 
+
 class HvplotLinePlot(LinePlot):
 
     def configure_plot(self):

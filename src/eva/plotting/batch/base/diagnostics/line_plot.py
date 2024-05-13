@@ -66,11 +66,13 @@ class LinePlot(ABC):
         var1_cgv = var1.split('::')
 
         if len(var0_cgv) != 3:
-            self.logger.abort('In Scatter comparison the first variable \'var0\' does not appear to ' +
-                         'be in the required format of collection::group::variable.')
+            self.logger.abort('In Scatter comparison the first variable \'var0\' ' +
+                              'does not appear to be in the required format of ' +
+                              'collection::group::variable.')
         if len(var1_cgv) != 3:
-            self.logger.abort('In Scatter comparison the first variable \'var1\' does not appear to ' +
-                         'be in the required format of collection::group::variable.')
+            self.logger.abort('In Scatter comparison the first variable \'var1\' ' +
+                              'does not appear to be in the required format of ' +
+                              'collection::group::variable.')
 
         # Optionally get the channel|level|datatype to plot
         channel = None
@@ -87,11 +89,10 @@ class LinePlot(ABC):
         if 'label' in self.config:
             self.label = self.config.get('label')
 
-
         xdata = self.dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2],
-                                          channel, level, datatype)
+                                               channel, level, datatype)
         ydata = self.dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2],
-                                          channel, level, datatype)
+                                               channel, level, datatype)
 
         # see if we need to slice data
         xdata = slice_var_from_str(self.config['x'], xdata, self.logger)
@@ -116,4 +117,3 @@ class LinePlot(ABC):
     @abstractmethod
     def configure_plot(self):
         pass
-     

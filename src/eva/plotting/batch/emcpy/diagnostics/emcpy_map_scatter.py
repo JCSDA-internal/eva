@@ -8,18 +8,14 @@ from eva.plotting.batch.base.diagnostics.map_scatter import MapScatter
 
 # --------------------------------------------------------------------------------------------------
 
+
 class EmcpyMapScatter(MapScatter):
 
     def configure_plot(self):
 
-        # create declarative plotting MapScatter object
         self.plotobj = emcpy.plots.map_plots.MapScatter(self.latvar, self.lonvar, self.datavar)
-        # get defaults from schema
-        layer_schema = self.config.get("schema",
-                                  os.path.join(return_eva_path(),
-                                               'plotting','batch',
-                                               'emcpy', 'defaults',
-                                               'map_scatter.yaml'))
+        layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
+                                       'batch', 'emcpy', 'defaults', 'map_scatter.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['longitude', 'latitude', 'data', 'type', 'schema']
         for d in delvars:

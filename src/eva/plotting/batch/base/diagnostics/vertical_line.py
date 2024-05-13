@@ -50,12 +50,9 @@ class VerticalLine():
         # Get the x value to plot
         # -----------------------
         self.xval = self.config['x']
-        
 
 # --------------------------------------------------------------------------------------------------
 
     @abstractmethod
     def configure_plot(self):
         pass
-
-                

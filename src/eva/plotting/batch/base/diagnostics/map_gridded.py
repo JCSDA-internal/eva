@@ -43,7 +43,6 @@ class MapGridded(ABC):
         """
         self.collection = None
         self.datavar_name = None
-        self.slice = None
 
         self.config = config
         self.logger = logger
@@ -60,21 +59,21 @@ class MapGridded(ABC):
         # prepare data based on config
         lonvar_cgv = self.config['longitude']['variable'].split('::')
         self.collection = lonvar_cgv[0]
-        self.lonvar = self.dataobj.get_variable_data(lonvar_cgv[0], lonvar_cgv[1], lonvar_cgv[2], None)
+        self.lonvar = self.dataobj.get_variable_data(lonvar_cgv[0], lonvar_cgv[1],
+                                                     lonvar_cgv[2], None)
         self.lonvar = slice_var_from_str(self.config['longitude'], self.lonvar, self.logger)
         latvar_cgv = self.config['latitude']['variable'].split('::')
-        self.latvar = self.dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], None)
+        self.latvar = self.dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1],
+                                                     latvar_cgv[2], None)
         self.latvar = slice_var_from_str(self.config['latitude'], self.latvar, self.logger)
         datavar_cgv = self.config['data']['variable'].split('::')
         self.datavar_name = datavar_cgv[1] + '::' + datavar_cgv[2]
-        self.datavar = self.dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1], datavar_cgv[2], None)
+        self.datavar = self.dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1],
+                                                      datavar_cgv[2], None)
         self.datavar = slice_var_from_str(self.config['data'], self.datavar, self.logger)
-        self.slice = self.config['data']['slices']
 
 # --------------------------------------------------------------------------------------------------
 
     @abstractmethod
     def configure_plot(self):
         pass
-
-

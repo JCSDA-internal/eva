@@ -8,6 +8,7 @@ from eva.plotting.batch.base.diagnostics.line_plot import LinePlot
 
 # --------------------------------------------------------------------------------------------------
 
+
 class EmcpyLinePlot(LinePlot):
 
     def configure_plot(self):
@@ -19,8 +20,7 @@ class EmcpyLinePlot(LinePlot):
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'batch', 'emcpy', 'defaults',
-                                                         'line_plot.yaml'))
+                                       'batch', 'emcpy', 'defaults', 'line_plot.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['x', 'y', 'type', 'schema', 'channel', 'level', 'datatype']
         for d in delvars:
