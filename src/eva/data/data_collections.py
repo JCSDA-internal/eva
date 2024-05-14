@@ -401,6 +401,7 @@ class DataCollections:
             'float32': '{:+.4e}',
             'int64': '{:+11d}',
             'int32': '{:+11d}',
+            'datetime64[ns]': '{}'
         }
 
         # Display a list of variables that are available in the collection
@@ -435,11 +436,11 @@ class DataCollections:
                         rms_string = ', RMS=' + minmaxrms_format.format(rms)
                     minmaxrms_string = ' | ' + min_string + ', ' + max_string + rms_string
                     full_str = '  ' + data_var.ljust(max_name_len) + ' (' + \
-                        str(data_var_value.dtype).ljust(7) + ')' + minmaxrms_string
+                        str(data_var_value.dtype)[0:7].ljust(7) + ')' + minmaxrms_string
                 else:
-                    # Just print variable
-                    min_string = 'Min=' + str(np.nanmin(data_var_value))
-                    max_string = 'Max=' + str(np.nanmax(data_var_value))
+                    # No min/max
+                    min_string = ''
+                    max_string = ''
                     minmaxrms_string = ' | ' + min_string + ', ' + max_string
                     full_str = '  ' + data_var.ljust(max_name_len) + ' (' + \
                         str(data_var_value.dtype)[0:7].ljust(7) + ')' + minmaxrms_string
