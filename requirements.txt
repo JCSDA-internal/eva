@@ -11,10 +11,10 @@ numpy>=1.22.3
 
 # Not explicitly part of eva but dependcies of eva dependencies already in spack-stack
 # versions need to be set to avoid other versions being picked
-pyproj==3.1.0
-importlib-metadata==4.8.2
+#pyproj==3.1.0
+#importlib-metadata==4.8.2
 
-# Additional packages
+## Additional packages
 git+https://github.com/NOAA-EMC/emcpy.git@9b6756341e9ae963baa7d3a256b8ada3da688d04#egg=emcpy
 scikit-learn
 seaborn
