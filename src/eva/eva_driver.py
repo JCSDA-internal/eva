@@ -104,7 +104,7 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
         'variables',
         ]
     for key in required_keys:
-        logger.assert_abort(key in eva_dict['time_series'], 'If running eva in time series ' +
+        logger.assert_abort(key in eva_dict['time_series'], 'If running Eva in time series ' +
                             f'mode the time series config must contain "{key}"')
 
     # Write message that this is a time series run

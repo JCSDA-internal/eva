@@ -1,6 +1,6 @@
-# (C) Copyright 2021-2022 NOAA/NWS/EMC
+# (C) Copyright 2024- NOAA/NWS/EMC
 #
-# (C) Copyright 2021-2022 United States Government as represented by the Administrator of the
+# (C) Copyright 2024- United States Government as represented by the Administrator of the
 # National Aeronautics and Space Administration. All Rights Reserved.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
@@ -73,8 +73,6 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
         collection_name = dataset_config['name']
         bias_file = get(dataset_config, self.logger, 'bias_file')
         lapse_file = get(dataset_config, self.logger, 'lapse_file')
-
-        print(bias_file)
 
         # Read the contents of the bias file (netCDF) into an xarray dataset
         bias_dataset = xr.open_dataset(bias_file)
