@@ -137,7 +137,7 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
         date += interval
         count += 1
         # Abort if count hits one million
-        logger.assert_abort(count < 1000000, 'You are planning to read more than one million ' +
+        logger.assert_abort(count < 1e6, 'You are planning to read more than one million ' +
                             'time steps. This is likely an error. Please check your configuration.')
 
     # Get the datasets configuration
