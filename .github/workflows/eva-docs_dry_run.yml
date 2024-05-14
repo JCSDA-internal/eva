@@ -1,6 +1,5 @@
 name: EVA Documentation Dry Run
 
-
 on:
   pull_request:
     types:
