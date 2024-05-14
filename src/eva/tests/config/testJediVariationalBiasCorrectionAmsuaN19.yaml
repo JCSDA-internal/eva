@@ -45,44 +45,44 @@ graphics:
           x:
             variable: time_series::MetaData::Dates
           y:
-            variable: time_series::bias_coefficients::constant
+            variable: time_series::BiasCoefficients::constant
           channel: 7
           markersize: 5
           color: 'blue'
-          label: 'bias_coefficients::constant'
+          label: 'BiasCoefficients::constant'
         - type: LinePlot
           x:
             variable: time_series::MetaData::Dates
           y:
-            variable: time_series::bias_coefficients::scan_angle
+            variable: time_series::BiasCoefficients::sensorScanAngle
           channel: 7
           markersize: 5
           color: 'orange'
-          label: 'bias_coefficients::scan_angle'
+          label: 'BiasCoefficients::sensorScanAngle'
         - type: LinePlot
           x:
             variable: time_series::MetaData::Dates
           y:
-            variable: time_series::bias_coefficients::scan_angle_order_2
+            variable: time_series::BiasCoefficients::sensorScanAngle_order_2
           channel: 7
           markersize: 5
           color: 'green'
-          label: 'bias_coefficients::scan_angle_order_2'
+          label: 'BiasCoefficients::sensorScanAngle_order_2'
         - type: LinePlot
           x:
             variable: time_series::MetaData::Dates
           y:
-            variable: time_series::bias_coefficients::scan_angle_order_3
+            variable: time_series::BiasCoefficients::sensorScanAngle_order_3
           channel: 7
           markersize: 5
           color: 'red'
-          label: 'bias_coefficients::scan_angle_order_3'
+          label: 'BiasCoefficients::sensorScanAngle_order_3'
         - type: LinePlot
           x:
             variable: time_series::MetaData::Dates
           y:
-            variable: time_series::bias_coefficients::scan_angle_order_4
+            variable: time_series::BiasCoefficients::sensorScanAngle_order_4
           channel: 7
           markersize: 5
           color: 'purple'
-          label: 'bias_coefficients::scan_angle_order_4'
+          label: 'BiasCoefficients::sensorScanAngle_order_4'
