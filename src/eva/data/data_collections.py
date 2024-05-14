@@ -407,9 +407,6 @@ class DataCollections:
         self.logger.info('-'*80)
         self.logger.info(fcol.bold + 'Collections available: ' + fcol.end)
         for collection in self._collections.keys():
-
-            #print(self._collections[collection])
-            #return
             self.logger.info('')
             self.logger.info('Collection name: ' + fcol.underline + collection + fcol.end)
             self.logger.info('\n Dimensions:')

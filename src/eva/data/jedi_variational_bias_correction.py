@@ -6,17 +6,15 @@
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
 
+
 # --------------------------------------------------------------------------------------------------
 
+
 import numpy as np
-import os
 import xarray as xr
 
 from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
-from eva.utilities.utils import parse_channel_list
-
-import netCDF4 as nc
 
 
 # --------------------------------------------------------------------------------------------------
@@ -25,10 +23,7 @@ import netCDF4 as nc
 class JediVariationalBiasCorrection(EvaDatasetBase):
 
     """
-    A class for executing data collection processing using IODA observation space.
-
-    This class inherits from `EvaDatasetBase` and implements the execute method to read the data
-    and process into the eva data collection format.
+    A class for executing data read for JEDI variational bias correction data.
 
     Args:
         EvaDatasetBase (class): The base class for dataset processing.
@@ -46,19 +41,6 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
 
     Notes:
         - The class inherits from `EvaDatasetBase` and extends its functionality.
-        - (Additional notes, if applicable)
-
-    Example:
-        ::
-
-                # Instantiate the class
-                ioda_instance = IodaObsSpace()
-
-                # Execute data collection processing using IODA observation space
-                ioda_instance.execute(dataset_config, data_collections, timing)
-
-                # Generate a default configuration dictionary for IODA observation space
-                default_config = ioda_instance.generate_default_config(filenames, collection_name)
     """
 
     # ----------------------------------------------------------------------------------------------
@@ -66,10 +48,7 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
     def execute(self, dataset_config, data_collections, timing):
 
         """
-        Executes data collection processing using IODA observation space.
-
-        This method reads and processes data based on the provided configuration, which contains
-        file names, variables etc. It iterates over files, groups, and variables.
+        Executes data read for JEDI variational bias correction data.
 
         Args:
             dataset_config (dict): Configuration settings for the dataset.
@@ -78,18 +57,6 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
 
         Returns:
             None
-
-        Notes:
-            - This method operates on instance-specific attributes.
-
-        Example:
-            ::
-
-                    # Instantiate the class
-                    ioda_instance = IodaObsSpace()
-
-                    # Execute data collection processing using IODA observation space
-                    ioda_instance.execute(dataset_config, data_collections, timing)
         """
 
         # Check for required keys in config
@@ -120,7 +87,6 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
              }
              )
 
-
         # Get all the predictor names
         predictor_names = bias_dataset['predictors'].values
 
@@ -146,7 +112,8 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
         new_data_vars['bias::number_obs_assimilated'] = \
             (['nchannels'], bias_dataset['number_obs_assimilated'].values)
 
-        # Create a new dataset with the new variables and existing 'channels' and 'number_obs_assimilated'
+        # Create a new dataset with the new variables and existing 'channels' and
+        # 'number_obs_assimilated'
         flat_dataset = xr.Dataset(
             data_vars=new_data_vars,
             coords={

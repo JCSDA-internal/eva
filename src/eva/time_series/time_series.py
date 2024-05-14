@@ -9,17 +9,22 @@
 
 # --------------------------------------------------------------------------------------------------
 
+
 import numpy as np
 import xarray as xr
 
+
 # --------------------------------------------------------------------------------------------------
+
 
 xr_aggregation_methods = {
     'mean': lambda ds, dim: ds.mean(dim=dim, skipna=True),
     'sum': lambda ds, dim: ds.sum(dim=dim, skipna=True),
 }
 
+
 # --------------------------------------------------------------------------------------------------
+
 
 def collapse_collection_to_time_series(logger, ind, dates, time_series_config, data_collections,
                                        data_collections_tmp):
