@@ -86,9 +86,6 @@ class GeovalSpace(EvaDatasetBase):
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
 
-        # Display the contents of the collections for helping the user with making plots
-        data_collections.display_collections()
-
     def generate_default_config(self, filenames, collection_name):
 
         """

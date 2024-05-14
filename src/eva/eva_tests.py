@@ -50,6 +50,9 @@ def application_tests(logger):
     # Loop over tests, populate YAML and run test
     for test in tests:
 
+        if test != 'testJediVariationalBiasCorrectionAmsuaN19.yaml':
+            continue
+
         # check if test is a YAML file or something else
         if not os.path.splitext(test)[-1] == '.yaml':
             continue

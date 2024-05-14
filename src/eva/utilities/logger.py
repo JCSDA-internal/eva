@@ -9,6 +9,7 @@
 
 import os
 import sys
+import traceback
 
 
 # --------------------------------------------------------------------------------------------------
@@ -20,11 +21,11 @@ class textcolors:
     A class that defines color codes for text in the terminal.
     """
 
+    red = '\033[91m'
     blue = '\033[94m'
     cyan = '\033[96m'
     green = '\033[92m'
     end = '\033[0m'
-
 
 # --------------------------------------------------------------------------------------------------
 
@@ -63,6 +64,9 @@ class Logger:
             # If found set element to environment variable
             if log_env is not None:
                 self.loggerdict[loglevel] = int(log_env) == 1
+
+        # Text colors
+        self.tc = textcolors()
 
     # ----------------------------------------------------------------------------------------------
 
@@ -146,7 +150,29 @@ class Logger:
             None
         """
 
-        self.send_message("ABORT", message)
-        sys.exit('ABORT\n')
+        # Make the text red
+        message = self.tc.red + message + self.tc.end
+
+        self.send_message('ABORT', message)
+
+        # Get traceback stack (without logger.py lines)
+        filtered_stack = [line for line in traceback.format_stack() if 'logger.py' not in line]
+
+        # Remove everything after 'logger.assert_abort' in last element of filtered_stack
+        filtered_stack[-1] = filtered_stack[-1].split('logger.assert_abort')[0]
+
+        traceback_str = '\n'.join(filtered_stack)
+
+        # Exit with traceback
+        sys.exit('\nHERE IS THE TRACEBACK: \n----------------------\n\n' + traceback_str)
+
+    # ----------------------------------------------------------------------------------------------
+
+    def assert_abort(self, condition, message):
+
+        if condition:
+            return
+        else:
+            self.abort(message)
 
 # --------------------------------------------------------------------------------------------------

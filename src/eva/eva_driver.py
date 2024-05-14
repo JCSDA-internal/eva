@@ -9,16 +9,170 @@
 
 # --------------------------------------------------------------------------------------------------
 
+from datetime import datetime
+import argparse
+import os
 
+from eva.utilities.config import get
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
 from eva.data.data_driver import data_driver
+from eva.time_series.time_series import collapse_collection_to_time_series
 from eva.transforms.transform_driver import transform_driver
 from eva.plotting.batch.base.plot_tools.figure_driver import figure_driver
 from eva.data.data_collections import DataCollections
+from eva.utilities.duration import iso_duration_to_timedelta
 from eva.utilities.utils import load_yaml_file
-import argparse
-import os
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def read_transform(logger, timing, eva_dict, data_collections):
+
+    """
+    Read the data and perform any transforms based on the configuration.
+
+    Parameters:
+        logger (Logger): An instance of the logger for logging messages.
+        timing (Timing): An instance of the timing object for timing the process.
+        eva_dict (dict): The configuration dictionary for the EVA process.
+        data_collections (DataCollections): An instance of the data collections object.
+
+    Returns:
+        None
+    """
+
+    # Get the datasets configuration
+    datasets_config = get(eva_dict, logger, 'datasets')
+
+    # Optionally suppress the display of the collection
+    suppress_collection_display = get(eva_dict, logger, 'suppress_collection_display', False)
+
+    # Loop over datasets reading each one in turn, internally appending the data_collections
+    for dataset_config in datasets_config:
+
+        # Prepare diagnostic data
+        logger.info('Running data driver')
+        timing.start('DataDriverExecute')
+        data_driver(dataset_config, data_collections, timing, logger)
+        timing.stop('DataDriverExecute')
+
+    # After reading all datasets display the collection
+    if not suppress_collection_display:
+        logger.info('Reading of Eva data complete: status of collections: ')
+        data_collections.display_collections()
+
+    # Perform any transforms
+    if 'transforms' in eva_dict:
+        logger.info(f'Running transform driver')
+        timing.start('TransformDriverExecute')
+        transform_driver(eva_dict, data_collections, timing, logger)
+        timing.stop('TransformDriverExecute')
+
+        # After reading all datasets display the collection
+        if not suppress_collection_display:
+            logger.info('Transformations of data complete: status of collections: ')
+            data_collections.display_collections()
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def read_transform_time_series(logger, timing, eva_dict, data_collections):
+
+    """
+    Read the data and perform transforms on the fly. Then collapse data into time series
+
+    Parameters:
+        logger (Logger): An instance of the logger for logging messages.
+        timing (Timing): An instance of the timing object for timing the process.
+        eva_dict (dict): The configuration dictionary for the EVA process.
+        data_collections (DataCollections): An instance of the data collections object.
+
+    Returns:
+        None
+    """
+
+    # Check for required keys
+    # -----------------------
+    required_keys = [
+        'begin_date',
+        'final_date',
+        'interval',
+        'collection',
+        'variables',
+        ]
+    for key in required_keys:
+        logger.assert_abort(key in eva_dict['time_series'], 'If running eva in time series ' +
+                            f'mode the time series config must contain "{key}"')
+
+    # Write message that this is a time series run
+    logger.info('This instance of Eva is being used to accumulate a time series.')
+
+    # Optionally suppress the display of the collection
+    suppress_collection_display = get(eva_dict, logger, 'suppress_collection_display', False)
+
+    # Get the datasets configuration
+    time_series_config = eva_dict['time_series']
+
+    # Extract the dates of the time series
+    begin_date = time_series_config['begin_date']
+    final_date = time_series_config['final_date']
+    interval = time_series_config['interval']
+
+    # Convert begin and end dates from ISO strings to datetime objects
+    begin_date = datetime.fromisoformat(begin_date)
+    final_date = datetime.fromisoformat(final_date)
+
+    # Convert interval ISO string to timedelta object
+    interval = iso_duration_to_timedelta(logger, interval)
+
+    # Make list of dates from begin to end with interval
+    dates = []
+    date = begin_date
+    count = 0
+    while date <= final_date:
+        dates.append(date)
+        date += interval
+        count += 1
+        # Abort if count hits one million
+        logger.assert_abort(count < 1000000, 'You are planning to read more than one million ' +
+                            'time steps. This is likely an error. Please check your configuration.')
+
+    # Get the datasets configuration
+    datasets_config = get(eva_dict, logger, 'datasets')
+
+    # Assert that datasets_config is the same length as dates
+    logger.assert_abort(len(datasets_config) == len(dates), 'When running in time series mode ' +
+                        'the number of datasets must be the same as the number of dates.')
+
+    # Loop over datasets reading each one in turn, internally appending the data_collections
+    for ind, dataset_config in enumerate(datasets_config):
+
+        # Create a temporary collection for this time step
+        data_collections_tmp = DataCollections()
+
+        # Prepare diagnostic data
+        logger.info('Running data driver')
+        timing.start('DataDriverExecute')
+        data_driver(dataset_config, data_collections_tmp, timing, logger)
+        timing.stop('DataDriverExecute')
+
+        # Perform any transforms on the fly
+        if 'transforms' in eva_dict:
+            logger.info(f'Running transform driver')
+            timing.start('TransformDriverExecute')
+            transform_driver(eva_dict, data_collections_tmp, timing, logger)
+            timing.stop('TransformDriverExecute')
+
+        # Collapse data into time series
+        collapse_collection_to_time_series(logger, ind, dates, time_series_config, data_collections,
+                                           data_collections_tmp)
+
+    if not suppress_collection_display:
+        logger.info('Computing of Eva time series complete: status of collection:')
+        data_collections.display_collections()
 
 
 # --------------------------------------------------------------------------------------------------
@@ -49,6 +203,7 @@ def eva(eva_config, eva_logger=None):
     logger.info('Starting Eva')
 
     # Convert incoming config (either dictionary or file) to dictionary
+    # -----------------------------------------------------------------
     timing.start('Generate Dictionary')
     if isinstance(eva_config, dict):
         eva_dict = eva_config
@@ -58,28 +213,23 @@ def eva(eva_config, eva_logger=None):
     timing.stop('Generate Dictionary')
 
     # Each diagnostic should have two dictionaries: data and graphics
+    # ---------------------------------------------------------------
     if not all(sub_config in eva_dict for sub_config in ['datasets', 'graphics']):
-        msg = "diagnostic config must contain 'datasets' and 'graphics'"
-        raise KeyError(msg)
+        logger.abort("The configuration must contain 'datasets' and 'graphics' keys.")
 
     # Create the data collections
     # ---------------------------
-    data_collections = DataCollections()
+    data_collections = DataCollections('time_series' in eva_dict)
 
-    # Prepare diagnostic data
-    logger.info(f'Running data driver')
-    timing.start('DataDriverExecute')
-    data_driver(eva_dict, data_collections, timing, logger)
-    timing.stop('DataDriverExecute')
-
-    # Create the transforms
-    if 'transforms' in eva_dict:
-        logger.info(f'Running transform driver')
-        timing.start('TransformDriverExecute')
-        transform_driver(eva_dict, data_collections, timing, logger)
-        timing.stop('TransformDriverExecute')
+    # Check to see if this a time series run of eva and then read and transform
+    # -------------------------------------------------------------------------
+    if 'time_series' in eva_dict:
+        read_transform_time_series(logger, timing, eva_dict, data_collections)
+    else:
+        read_transform(logger, timing, eva_dict, data_collections)
 
     # Generate figure(s)
+    # ------------------
     logger.info(f'Running figure driver')
     timing.start('FigureDriverExecute')
     figure_driver(eva_dict, data_collections, timing, logger)
