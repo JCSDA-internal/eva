@@ -1,4 +1,6 @@
 from bokeh.plotting import save, output_file
+from bokeh.embed import components # for pkl files
+import pickle as pkl # for pkl files
 import hvplot as hv
 import os
 
@@ -68,8 +70,15 @@ class CreateFigure:
         if not os.path.exists(pathfile_dir):
             os.makedirs(pathfile_dir)
         bokeh_fig = hv.render(self.fig, backend='bokeh')
-        output_file(pathfile)
-        save(bokeh_fig)
+        
+	# Eventually make this part optional
+        script, div = components(plot)
+        save_dict = {'div' : div, 'script' : script}
+        with open(pathfile, 'wb') as f:
+            pkl.dump(save_dict, f)
+
+        #output_file(pathfile)
+        #save(bokeh_fig)
 
     def close_figure(self):
         pass
