@@ -142,20 +142,17 @@ class CreateFigure:
         pathfile_dir = os.path.dirname(pathfile)
         if not os.path.exists(pathfile_dir):
             os.makedirs(pathfile_dir)
-<<<<<<< HEAD
         bokeh_fig = hv.render(self.fig, backend='bokeh')
         
 	# Eventually make this part optional
-        script, div = components(plot)
+        script, div = components(bokeh_fig)
         save_dict = {'div' : div, 'script' : script}
         with open(pathfile, 'wb') as f:
             pkl.dump(save_dict, f)
 
         #output_file(pathfile)
         #save(bokeh_fig)
-=======
-        holoviews.save(self.fig, pathfile, backend="bokeh")
->>>>>>> feature/hvplot_backend_dev
+        #holoviews.save(self.fig, pathfile, backend="bokeh")
 
     def close_figure(self):
         pass
