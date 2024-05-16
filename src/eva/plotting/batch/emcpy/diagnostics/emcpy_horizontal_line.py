@@ -11,7 +11,29 @@ from eva.plotting.batch.base.diagnostics.horizontal_line import HorizontalLine
 
 class EmcpyHorizontalLine(HorizontalLine):
 
+    """
+    EmcpyHorizontalLine class is a subclass of the HorizontalLine class, designed for
+    configuring and plotting horizontal line visualizations using the emcpy library.
+
+    Attributes:
+        plotobj (object): A declarative plotting HorizontalLine object
+                          specific to emcpy horizontal lines.
+        yval (float): The y-value of the horizontal line.
+        config (dict): Configuration settings for the plot.
+        logger (Logger): Logger object for logging messages and errors.
+
+    Methods:
+        configure_plot(): Configures the plotting settings for the horizontal line.
+    """
+
     def configure_plot(self):
+
+        """
+        Configures the plotting settings for the horizontal line.
+
+        Returns:
+            plotobj: The configured plot object for emcpy horizontal lines.
+        """
 
         # Create declarative plotting HorizontalLine object
         # -------------------------------------------

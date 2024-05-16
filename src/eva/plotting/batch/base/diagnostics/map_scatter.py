@@ -1,6 +1,5 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-import os
 import numpy as np
 
 from abc import ABC, abstractmethod
@@ -22,9 +21,6 @@ class MapScatter(ABC):
             logger (Logger): An instance of the logger for logging messages.
             dataobj: An instance of the data object containing input data.
 
-        This class initializes and configures a scatter plot on a map based on the provided
-        configuration. The scatter plot is created using a declarative plotting library from EMCPy
-        (https://github.com/NOAA-EMC/emcpy).
 
         Example:
             ::
@@ -53,6 +49,7 @@ class MapScatter(ABC):
 # --------------------------------------------------------------------------------------------------
 
     def data_prep(self):
+        """ Preparing data for configure_plot  """
 
         channel = None
         if 'channel' in self.config['data']:
@@ -79,6 +76,8 @@ class MapScatter(ABC):
 
     @abstractmethod
     def configure_plot(self):
+        """ Virtual method for configuring plot based on selected backend  """
+
         pass
 
 # --------------------------------------------------------------------------------------------------

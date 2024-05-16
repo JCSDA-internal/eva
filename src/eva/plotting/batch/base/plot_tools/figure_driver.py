@@ -34,7 +34,7 @@ def figure_driver(config, data_collections, timing, logger):
 
     This function generates and saves multiple figures based on the provided configuration. It
     processes each graphic specified in the configuration and creates corresponding figures with
-    plots.
+    plots. This function also uses the plotting backend specified in the configuration.
     """
 
     # Get list of graphics from configuration

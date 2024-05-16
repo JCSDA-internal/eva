@@ -11,7 +11,29 @@ from eva.plotting.batch.base.diagnostics.line_plot import LinePlot
 
 class EmcpyLinePlot(LinePlot):
 
+    """
+    EmcpyLinePlot class is a subclass of the LinePlot class, designed for configuring
+    and plotting line plot visualizations using the emcpy library.
+
+    Attributes:
+        plotobj (object): A declarative plotting LinePlot object specific to emcpy line plots.
+        xdata (array-like): The x-data for the line plot.
+        ydata (array-like): The y-data for the line plot.
+        config (dict): Configuration settings for the plot.
+        logger (Logger): Logger object for logging messages and errors.
+
+    Methods:
+        configure_plot(): Configures the plotting settings for the line plot.
+    """
+
     def configure_plot(self):
+
+        """
+        Configures the plotting settings for the line plot.
+
+        Returns:
+            plotobj: The configured plot object for emcpy line plots.
+        """
 
         # Create declarative plotting LinePlot object
         # -------------------------------------------

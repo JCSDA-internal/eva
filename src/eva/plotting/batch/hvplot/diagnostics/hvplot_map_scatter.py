@@ -13,9 +13,19 @@ from eva.plotting.batch.base.diagnostics.map_scatter import MapScatter
 
 
 class HvplotMapScatter(MapScatter):
+    """
+    Subclass of MapScatter for generating scatter map plots using hvplot.
 
+    Attributes:
+        Inherits attributes from the MapScatter class.
+    """
     def configure_plot(self):
+        """
+        Configures and generates a scatter map plot using hvplot.
 
+        Returns:
+            plotobj: plot object representing the generated scatter map plot.
+        """
         df = pd.DataFrame()
         df['Latitude'] = self.latvar
         df['Longitude'] = self.lonvar

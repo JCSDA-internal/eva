@@ -1,7 +1,5 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object
-import emcpy.plots.plots
-import os
 
 from abc import ABC, abstractmethod
 # --------------------------------------------------------------------------------------------------
@@ -20,10 +18,6 @@ class VerticalLine():
             config (dict): A dictionary containing the configuration for the vertical line plot.
             logger (Logger): An instance of the logger for logging messages.
             dataobj: Not used in this context.
-
-        This class initializes and configures a vertical line plot based on the provided
-        configuration. The vertical line plot is created using a declarative plotting library from
-        EMCPy (https://github.com/NOAA-EMC/emcpy).
 
         Example:
 
@@ -46,6 +40,7 @@ class VerticalLine():
 # --------------------------------------------------------------------------------------------------
 
     def data_prep(self):
+        """ Preparing data for configure_plot  """
 
         # Get the x value to plot
         # -----------------------
@@ -55,4 +50,5 @@ class VerticalLine():
 
     @abstractmethod
     def configure_plot(self):
+        """ Virtual method for configuring plot based on selected backend  """
         pass

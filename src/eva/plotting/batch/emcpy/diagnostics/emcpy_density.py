@@ -11,7 +11,28 @@ from eva.plotting.batch.base.diagnostics.density import Density
 
 class EmcpyDensity(Density):
 
+    """
+    EmcpyDensity class inherits from the Density class and provides methods
+    to configure plotting settings for density plots using the emcpy library.
+
+    Attributes:
+        plotobj: A declarative plotting density object for emcpy density plots.
+        data: Data to be used for plotting.
+        config: Configuration settings for the plot.
+        logger: Logger object for logging messages and errors.
+
+    Methods:
+        configure_plot(): Configures the plotting settings for the density plot.
+    """
+
     def configure_plot(self):
+
+        """
+        Configures the plotting settings for the density plot.
+
+        Returns:
+            plotobj: Plotting object configured with the specified settings.
+        """
 
         # Create declarative plotting density object
         # --------------------------------------------

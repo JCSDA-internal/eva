@@ -10,9 +10,26 @@ from eva.plotting.batch.base.diagnostics.vertical_line import VerticalLine
 
 
 class EmcpyVerticalLine(VerticalLine):
+    """
+    EmcpyVerticalLine class is a subclass of the VerticalLine class, designed for
+    configuring and plotting vertical line visualizations using the emcpy library.
 
+    Attributes:
+        plotobj (object): A plotting object specific to emcpy vertical lines.
+        xval (float): The x-value of the vertical line.
+        config (dict): Configuration settings for the plot.
+        logger (Logger): Logger object for logging messages and errors.
+
+    Methods:
+        configure_plot(): Configures the plotting settings for the vertical line.
+    """
     def configure_plot(self):
+        """
+        Configures the plotting settings for the vertical line.
 
+        Returns:
+            plotobj: The configured plot object for emcpy vertical lines.
+        """
         # Create declarative plotting VerticalLine object
         # -------------------------------------------
         self.plotobj = emcpy.plots.plots.VerticalLine(self.xval)

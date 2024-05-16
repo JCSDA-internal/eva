@@ -1,7 +1,3 @@
-from eva.eva_path import return_eva_path
-from eva.utilities.config import get
-from eva.utilities.utils import get_schema, update_object
-import os
 import pandas as pd
 import hvplot.pandas
 import holoviews as hv
@@ -13,8 +9,19 @@ from eva.plotting.batch.base.diagnostics.scatter import Scatter
 
 
 class HvplotScatter(Scatter):
+    """
+    Subclass of Scatter for generating scatter plots using hvplot.
 
+    Attributes:
+        Inherits attributes from the Scatter class.
+    """
     def configure_plot(self):
+        """
+        Configures and generates a scatter plot using hvplot.
+
+        Returns:
+            plotobj: plot object representing the generated scatter plot.
+        """
         # Save and access name of variables
         df = pd.DataFrame()
         df['xdata'] = self.xdata

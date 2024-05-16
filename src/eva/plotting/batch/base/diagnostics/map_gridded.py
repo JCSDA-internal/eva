@@ -1,8 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-import os
 
-import numpy as np
 from abc import ABC, abstractmethod
 
 # --------------------------------------------------------------------------------------------------
@@ -15,16 +13,12 @@ class MapGridded(ABC):
     def __init__(self, config, logger, dataobj):
 
         """
-        Creates a gridded map plot based on the provided configuration.
+        Creates a gridded map plot abstract class based on the provided configuration.
 
         Args:
             config (dict): A dictionary containing the configuration for the gridded map plot.
             logger (Logger): An instance of the logger for logging messages.
             dataobj: An instance of the data object containing input data.
-
-        This class initializes and configures a gridded map plot based on the provided
-        configuration. The gridded map plot is created using a declarative plotting library from
-        EMCPy (https://github.com/NOAA-EMC/emcpy).
 
         Example:
 
@@ -55,6 +49,7 @@ class MapGridded(ABC):
 # --------------------------------------------------------------------------------------------------
 
     def data_prep(self):
+        """ Preparing data for configure_plot  """
 
         # prepare data based on config
         lonvar_cgv = self.config['longitude']['variable'].split('::')
@@ -76,4 +71,5 @@ class MapGridded(ABC):
 
     @abstractmethod
     def configure_plot(self):
+        """ Virtual method for configuring plot based on selected backend  """
         pass

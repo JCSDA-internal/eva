@@ -1,18 +1,24 @@
-from eva.eva_path import return_eva_path
-from eva.utilities.config import get
-from eva.utilities.utils import get_schema, update_object
 import pandas as pd
 import hvplot.pandas
-
 from eva.plotting.batch.base.diagnostics.line_plot import LinePlot
 
 # --------------------------------------------------------------------------------------------------
 
 
 class HvplotLinePlot(LinePlot):
+    """
+    Subclass of LinePlot for generating line plots using hvplot.
 
+    Attributes:
+        Inherits attributes from the LinePlot class.
+    """
     def configure_plot(self):
+        """
+        Configures and generates a line plot using hvplot.
 
+        Returns:
+            plotobj: plot object representing the generated line plot.
+        """
         df = pd.DataFrame()
         df['x'] = self.xdata
         df['y'] = self.ydata

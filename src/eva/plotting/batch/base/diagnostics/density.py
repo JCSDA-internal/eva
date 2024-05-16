@@ -1,7 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-import os
 import numpy as np
 
 from abc import ABC, abstractmethod
@@ -16,7 +15,7 @@ class Density(ABC):
     def __init__(self, config, logger, dataobj):
 
         """
-        Creates a density plot based on the provided configuration and data.
+        Creates a density plot abstract class based on the provided configuration and data.
 
         Args:
             config (dict): A dictionary containing the configuration for the density plot.
@@ -52,6 +51,8 @@ class Density(ABC):
 
     def data_prep(self):
 
+        """ Preparing data for configure_plot  """
+
         # Get the data to plot from the data_collection
         # ---------------------------------------------
         varstr = self.config['data']['variable']
@@ -77,5 +78,12 @@ class Density(ABC):
         # Missing data should also be removed
         mask = ~np.isnan(data)
         self.data = data[mask]
+
+# --------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def configure_plot(self):
+        """ Virtual method for configuring plot based on selected backend  """
+        pass
 
 # --------------------------------------------------------------------------------------------------

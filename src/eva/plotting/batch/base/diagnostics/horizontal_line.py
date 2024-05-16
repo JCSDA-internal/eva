@@ -1,7 +1,5 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object
-import emcpy.plots.plots
-import os
 
 from abc import ABC, abstractmethod
 # --------------------------------------------------------------------------------------------------
@@ -14,15 +12,12 @@ class HorizontalLine():
     def __init__(self, config, logger, dataobj):
 
         """
-        Creates a horizontal line plot based on the provided configuration.
+        Creates a horizontal line plot abstract class based on the provided configuration.
 
         Args:
             config (dict): A dictionary containing the configuration for the horizontal line plot.
             logger (Logger): An instance of the logger for logging messages.
-
-        This class initializes and configures a horizontal line plot based on the provided
-        configuration. The horizontal line plot is created using a declarative plotting library from
-        EMCPy (https://github.com/NOAA-EMC/emcpy).
+            dataobj: An instance of the data object containing input data.
 
         Example:
 
@@ -45,6 +40,7 @@ class HorizontalLine():
 # --------------------------------------------------------------------------------------------------
 
     def data_prep(self):
+        """ Preparing data for configure_plot  """
 
         # Get the y value to plot
         # -----------------------
@@ -54,4 +50,5 @@ class HorizontalLine():
 
     @abstractmethod
     def configure_plot(self):
+        """ Virtual method for configuring plot based on selected backend  """
         pass

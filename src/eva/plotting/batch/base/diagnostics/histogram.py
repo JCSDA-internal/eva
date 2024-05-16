@@ -1,8 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-import emcpy.plots.plots
-import os
 import numpy as np
 
 from abc import ABC, abstractmethod
@@ -17,16 +15,13 @@ class Histogram(ABC):
     def __init__(self, config, logger, dataobj):
 
         """
-        Creates a histogram plot based on the provided configuration and data.
+        Creates a histogram plot abstract class based on the provided configuration and data.
 
         Args:
             config (dict): A dictionary containing the configuration for the histogram plot.
             logger (Logger): An instance of the logger for logging messages.
             dataobj: An instance of the data object containing input data.
 
-        This class initializes and configures a histogram plot based on the provided configuration
-        and data. The histogram plot is created using a declarative plotting library from EMCPy
-        (https://github.com/NOAA-EMC/emcpy).
 
         Example:
 
@@ -56,6 +51,7 @@ class Histogram(ABC):
 # --------------------------------------------------------------------------------------------------
 
     def data_prep(self):
+        """ Preparing data for configure_plot  """
 
         # Get the data to plot from the data_collection
         # ---------------------------------------------
@@ -87,6 +83,7 @@ class Histogram(ABC):
 
     @abstractmethod
     def configure_plot(self):
+        """ Virtual method for configuring plot based on selected backend  """
         pass
 
 # --------------------------------------------------------------------------------------------------

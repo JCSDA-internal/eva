@@ -1,18 +1,23 @@
-from eva.eva_path import return_eva_path
-from eva.utilities.config import get
-from eva.utilities.utils import get_schema, update_object
 import hvplot.xarray
-import numpy as np
-
 from eva.plotting.batch.base.diagnostics.map_gridded import MapGridded
 
 # --------------------------------------------------------------------------------------------------
 
 
 class HvplotMapGridded(MapGridded):
+    """
+    Subclass of MapGridded for generating gridded map plots using hvplot.
 
+    Attributes:
+        Inherits attributes from the MapGridded class.
+    """
     def configure_plot(self):
+        """
+        Configures and generates a gridded map plot using hvplot.
 
+        Returns:
+            plotobj: plot object representing the generated map plot.
+        """
         cmap = self.config['cmap']
         x = eval(self.config['data']['slices'])
         data_slice = x[0]
