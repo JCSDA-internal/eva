@@ -1,7 +1,6 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
-import os
 import numpy as np
 
 from abc import ABC, abstractmethod
@@ -16,33 +15,29 @@ class Scatter(ABC):
     def __init__(self, config, logger, dataobj):
 
         """
-        Creates a scatter plot on a map based on the provided configuration.
+        Creates a scatter plot abstract class based on the provided configuration.
 
         Args:
             config (dict): A dictionary containing the configuration for the scatter plot on a map.
             logger (Logger): An instance of the logger for logging messages.
             dataobj: An instance of the data object containing input data.
 
-        This class initializes and configures a scatter plot on a map based on the provided
-        configuration. The scatter plot is created using a declarative plotting library from EMCPy
-        (https://github.com/NOAA-EMC/emcpy).
 
         Example:
 
             ::
 
                     config = {
-                        "longitude": {"variable": "collection::group::variable"},
-                        "latitude": {"variable": "collection::group::variable"},
-                        "data": {"variable": "collection::group::variable",
-                                 "channel": "channel_name"},
+                        "x": {"variable": "collection::group::variable"},
+                        "y": {"variable": "collection::group::variable"},
                         "plot_property": "property_value",
                         "plot_option": "option_value",
                         "schema": "path_to_schema_file.yaml"
                     }
                     logger = Logger()
-                    map_scatter_plot = MapScatter(config, logger, None)
+                    scatter_plot = Scatter(config, logger, None)
         """
+
         self.config = config
         self.logger = logger
         self.dataobj = dataobj
@@ -53,6 +48,7 @@ class Scatter(ABC):
 # --------------------------------------------------------------------------------------------------
 
     def data_prep(self):
+        """ Preparing data for configure_plot  """
 
         # Get the data to plot from the data_collection
         # ---------------------------------------------
@@ -98,6 +94,7 @@ class Scatter(ABC):
 
     @abstractmethod
     def configure_plot(self):
+        """ Virtual method for configuring plot based on selected backend  """
         pass
 
 # --------------------------------------------------------------------------------------------------
