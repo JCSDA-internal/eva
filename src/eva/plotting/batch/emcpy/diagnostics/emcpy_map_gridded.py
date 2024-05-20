@@ -15,12 +15,7 @@ class EmcpyMapGridded(MapGridded):
     configuring and plotting gridded map visualizations using the emcpy library.
 
     Attributes:
-        plotobj (object): A declarative plotting MapGridded object specific to emcpy gridded maps.
-        latvar (array-like): Latitude variable for the gridded map.
-        lonvar (array-like): Longitude variable for the gridded map.
-        datavar (array-like): Data variable for the gridded map.
-        config (dict): Configuration settings for the plot.
-        logger (Logger): Logger object for logging messages and errors.
+        Inherits attributes from the MapGridded class.
 
     Methods:
         configure_plot(): Configures the plotting settings for the gridded map.

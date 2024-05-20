@@ -16,10 +16,7 @@ class EmcpyDensity(Density):
     to configure plotting settings for density plots using the emcpy library.
 
     Attributes:
-        plotobj: A declarative plotting density object for emcpy density plots.
-        data: Data to be used for plotting.
-        config: Configuration settings for the plot.
-        logger: Logger object for logging messages and errors.
+        Inherits attributes from the Density class.
 
     Methods:
         configure_plot(): Configures the plotting settings for the density plot.

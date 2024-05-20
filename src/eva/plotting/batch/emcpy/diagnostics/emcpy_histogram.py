@@ -16,10 +16,7 @@ class EmcpyHistogram(Histogram):
     and plotting histogram visualizations using the emcpy library.
 
     Attributes:
-        plotobj (object): A declarative plotting histogram object specific to emcpy histograms.
-        data (object): Data object to be used for plotting.
-        config (dict): Configuration settings for the plot.
-        logger (Logger): Logger object for logging messages and errors.
+        Inherits attributes from the Histogram class.
 
     Methods:
         configure_plot(): Configures the plotting settings for the histogram.

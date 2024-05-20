@@ -16,11 +16,7 @@ class EmcpyLinePlot(LinePlot):
     and plotting line plot visualizations using the emcpy library.
 
     Attributes:
-        plotobj (object): A declarative plotting LinePlot object specific to emcpy line plots.
-        xdata (array-like): The x-data for the line plot.
-        ydata (array-like): The y-data for the line plot.
-        config (dict): Configuration settings for the plot.
-        logger (Logger): Logger object for logging messages and errors.
+        Inherits attributes from the LinePlot class.
 
     Methods:
         configure_plot(): Configures the plotting settings for the line plot.
