@@ -359,7 +359,7 @@ graphics:
           x: 0
           linewidth: 0.5
         - type: HorizontalLine
-          y: 1 
+          y: 1
           linewidth: 0.5
 
 
