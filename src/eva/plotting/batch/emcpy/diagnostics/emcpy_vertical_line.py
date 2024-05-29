@@ -4,39 +4,39 @@ from eva.utilities.utils import get_schema, update_object
 import emcpy.plots.plots
 import os
 
-from eva.plotting.batch.base.diagnostics.scatter import Scatter
+from eva.plotting.batch.base.diagnostics.vertical_line import VerticalLine
 
 # --------------------------------------------------------------------------------------------------
 
 
-class EmcpyScatter(Scatter):
+class EmcpyVerticalLine(VerticalLine):
     """
-    EmcpyScatter class is a subclass of the Scatter class, specialized for
-    configuring and plotting scatter visualizations using the emcpy library.
+    EmcpyVerticalLine class is a subclass of the VerticalLine class, designed for
+    configuring and plotting vertical line visualizations using the emcpy library.
 
     Attributes:
-        Inherits attributes from the Scatter class.
+        Inherits attributes from the VerticalLine class.
 
     Methods:
-        configure_plot(): Configures the plotting settings for the scatter plot.
+        configure_plot(): Configures the plotting settings for the vertical line.
     """
     def configure_plot(self):
         """
-        Configures the plotting settings for the scatter plot.
+        Configures the plotting settings for the vertical line.
 
         Returns:
-            plotobj: The configured plot object for emcpy scatter plots.
+            plotobj: The configured plot object for emcpy vertical lines.
         """
-        # Create declarative plotting Scatter object
-        # ------------------------------------------
-        self.plotobj = emcpy.plots.plots.Scatter(self.xdata, self.ydata)
+        # Create declarative plotting VerticalLine object
+        # -------------------------------------------
+        self.plotobj = emcpy.plots.plots.VerticalLine(self.xval)
 
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                       'batch', 'emcpy', 'defaults', 'scatter.yaml'))
+                                       'batch', 'emcpy', 'defaults', 'vertical_line.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
-        delvars = ['x', 'y', 'type', 'schema']
+        delvars = ['type', 'schema']
         for d in delvars:
             new_config.pop(d, None)
         self.plotobj = update_object(self.plotobj, new_config, self.logger)

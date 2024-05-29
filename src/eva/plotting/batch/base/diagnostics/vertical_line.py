@@ -1,9 +1,7 @@
 from eva.eva_path import return_eva_path
 from eva.utilities.utils import get_schema, update_object
-import emcpy.plots.plots
-import os
 
-
+from abc import ABC, abstractmethod
 # --------------------------------------------------------------------------------------------------
 
 
@@ -21,10 +19,6 @@ class VerticalLine():
             logger (Logger): An instance of the logger for logging messages.
             dataobj: Not used in this context.
 
-        This class initializes and configures a vertical line plot based on the provided
-        configuration. The vertical line plot is created using a declarative plotting library from
-        EMCPy (https://github.com/NOAA-EMC/emcpy).
-
         Example:
 
             ::
@@ -39,23 +33,22 @@ class VerticalLine():
                     vertical_line_plot = VerticalLine(config, logger, None)
         """
 
-        # Get the x value to plot
-        # -----------------------
-        xval = config['x']
-
-        # Create declarative plotting HorizontalLine object
-        # -------------------------------------------
-        self.plotobj = emcpy.plots.plots.VerticalLine(xval)
-
-        # Get defaults from schema
-        # ------------------------
-        layer_schema = config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                                         'emcpy', 'defaults', 'vertical_line.yaml'))
-        config = get_schema(layer_schema, config, logger)
-        delvars = ['type', 'schema']
-        for d in delvars:
-            config.pop(d, None)
-        self.plotobj = update_object(self.plotobj, config, logger)
-
+        self.logger = logger
+        self.config = config
+        self.xval = None
 
 # --------------------------------------------------------------------------------------------------
+
+    def data_prep(self):
+        """ Preparing data for configure_plot  """
+
+        # Get the x value to plot
+        # -----------------------
+        self.xval = self.config['x']
+
+# --------------------------------------------------------------------------------------------------
+
+    @abstractmethod
+    def configure_plot(self):
+        """ Virtual method for configuring plot based on selected backend  """
+        pass

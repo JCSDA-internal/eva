@@ -4,39 +4,43 @@ from eva.utilities.utils import get_schema, update_object
 import emcpy.plots.plots
 import os
 
-from eva.plotting.batch.base.diagnostics.scatter import Scatter
+from eva.plotting.batch.base.diagnostics.density import Density
 
 # --------------------------------------------------------------------------------------------------
 
 
-class EmcpyScatter(Scatter):
+class EmcpyDensity(Density):
+
     """
-    EmcpyScatter class is a subclass of the Scatter class, specialized for
-    configuring and plotting scatter visualizations using the emcpy library.
+    EmcpyDensity class inherits from the Density class and provides methods
+    to configure plotting settings for density plots using the emcpy library.
 
     Attributes:
-        Inherits attributes from the Scatter class.
+        Inherits attributes from the Density class.
 
     Methods:
-        configure_plot(): Configures the plotting settings for the scatter plot.
+        configure_plot(): Configures the plotting settings for the density plot.
     """
+
     def configure_plot(self):
+
         """
-        Configures the plotting settings for the scatter plot.
+        Configures the plotting settings for the density plot.
 
         Returns:
-            plotobj: The configured plot object for emcpy scatter plots.
+            plotobj: Plotting object configured with the specified settings.
         """
-        # Create declarative plotting Scatter object
-        # ------------------------------------------
-        self.plotobj = emcpy.plots.plots.Scatter(self.xdata, self.ydata)
+
+        # Create declarative plotting density object
+        # --------------------------------------------
+        self.plotobj = emcpy.plots.plots.Density(self.data)
 
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                       'batch', 'emcpy', 'defaults', 'scatter.yaml'))
+                                       'batch', 'emcpy', 'defaults', 'density.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
-        delvars = ['x', 'y', 'type', 'schema']
+        delvars = ['type', 'schema', 'data']
         for d in delvars:
             new_config.pop(d, None)
         self.plotobj = update_object(self.plotobj, new_config, self.logger)
