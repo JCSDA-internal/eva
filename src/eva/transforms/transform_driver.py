@@ -60,10 +60,4 @@ def transform_driver(config, data_collections, timing, logger):
         transform_method(transform, data_collections)
         timing.stop(f'Transform: {transform_type}')
 
-    # Display the contents of the collections after updating with transforms
-    if transforms:
-        logger.info('Tranforms complete. Collections after transforms:')
-        data_collections.display_collections()
-
-
 # --------------------------------------------------------------------------------------------------

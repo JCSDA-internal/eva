@@ -120,9 +120,6 @@ class JediLog(EvaDatasetBase):
                 # Add to the Eva dataset
                 data_collections.create_or_add_to_collection(collection_name, convergence_ds)
 
-        # Write out all the collections
-        data_collections.display_collections()
-
     # ----------------------------------------------------------------------------------------------
 
     def get_from_log(self, search_term, separator, position, custom_log=None):

@@ -32,7 +32,7 @@ class DataCollections:
 
     """Manage collections of xarray Datasets with variable manipulations."""
 
-    def __init__(self):
+    def __init__(self, time_series=False):
 
         """Initialize the DataCollections instance."""
 
@@ -41,6 +41,9 @@ class DataCollections:
 
         # Create a logger
         self.logger = Logger('DataCollections')
+
+        # If this is a time series, store it
+        self.time_series = False if not time_series else True
 
     # ----------------------------------------------------------------------------------------------
 
@@ -60,6 +63,11 @@ class DataCollections:
             ValueError: If an existing empty collection with the same name is detected.
             ValueError: If concatenation dimension is missing or invalid.
         """
+
+        # If time_series collection name must also be time_series
+        if self.time_series and collection_name != 'time_series':
+            self.logger.abort('In create_or_add_to_collection: time_series collection must ' +
+                              'be \'time_series\'')
 
         # Collections should only be xarray datasets
         if not isinstance(collection, Dataset):
@@ -149,6 +157,11 @@ class DataCollections:
             ValueError: If variable is not an xarray DataArray.
         """
 
+        # If time_series collection name must also be time_series
+        if self.time_series and collection_name != 'time_series':
+            self.logger.abort('In add_variable_to_collection: time_series collection must ' +
+                              'be \'time_series\'')
+
         # Assert that new variable is an xarray Dataarray
         if not isinstance(variable, DataArray):
             self.logger.abort('In add_variable_to_collection: variable must be xarray.DataArray')
@@ -196,6 +209,11 @@ class DataCollections:
                         corresponding 'Channel', 'Level', or 'DataType' dimension
                         is missing.
         """
+
+        # If time_series collection name must also be time_series
+        if self.time_series and collection_name != 'time_series':
+            self.logger.abort('In get_variable_data_array: time_series collection must ' +
+                              'be \'time_series\'')
 
         group_variable_name = group_name + '::' + variable_name
         data_array = self._collections[collection_name][group_variable_name]
@@ -273,6 +291,11 @@ class DataCollections:
         Returns:
             ndarray: The selected variable data as a NumPy array.
         """
+
+        # If time_series collection name must also be time_series
+        if self.time_series and collection_name != 'time_series':
+            self.logger.abort('In get_variable_data: time_series collection must ' +
+                              'be \'time_series\'')
 
         variable_array = self.get_variable_data_array(collection_name, group_name, variable_name,
                                                       channels, levels, datatypes)
@@ -378,6 +401,7 @@ class DataCollections:
             'float32': '{:+.4e}',
             'int64': '{:+11d}',
             'int32': '{:+11d}',
+            'datetime64[ns]': '{}'
         }
 
         # Display a list of variables that are available in the collection
@@ -388,7 +412,7 @@ class DataCollections:
             self.logger.info('Collection name: ' + fcol.underline + collection + fcol.end)
             self.logger.info('\n Dimensions:')
             for dim in list(self._collections[collection].dims):
-                dim_value = self._collections[collection].dims[dim]
+                dim_value = self._collections[collection].sizes[dim]
                 self.logger.info(f'  {dim}: {dim_value}')
             self.logger.info('\n Coordinates:')
             for coord in list(self._collections[collection].coords):
@@ -411,8 +435,25 @@ class DataCollections:
                         rms = np.sqrt(np.nanmean(data_var_value**2))
                         rms_string = ', RMS=' + minmaxrms_format.format(rms)
                     minmaxrms_string = ' | ' + min_string + ', ' + max_string + rms_string
-                self.logger.info('  ' + data_var.ljust(max_name_len) + ' (' +
-                                 str(data_var_value.dtype).ljust(7) + ')' + minmaxrms_string)
+                    full_str = '  ' + data_var.ljust(max_name_len) + ' (' + \
+                        str(data_var_value.dtype)[0:7].ljust(7) + ')' + minmaxrms_string
+                else:
+                    # No min/max
+                    min_string = ''
+                    max_string = ''
+                    minmaxrms_string = ' | ' + min_string + ', ' + max_string
+                    full_str = '  ' + data_var.ljust(max_name_len) + ' (' + \
+                        str(data_var_value.dtype)[0:7].ljust(7) + ')' + minmaxrms_string
+                self.logger.info(full_str)
+
+        # Add the raw xarray display of the collection for more information about coords/dims
+        self.logger.info(' ')
+        self.logger.info('/'*80)
+        self.logger.info(' ')
+        self.logger.info(f'Raw xarray display of the {fcol.underline + collection + fcol.end} ' +
+                         'collection:')
+        self.logger.info(' ')
+        self.logger.info(str(self._collections[collection]))
         self.logger.info('-'*80)
 
     # ----------------------------------------------------------------------------------------------
