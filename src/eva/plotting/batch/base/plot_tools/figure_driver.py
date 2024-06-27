@@ -34,7 +34,7 @@ def figure_driver(config, data_collections, timing, logger):
 
     This function generates and saves multiple figures based on the provided configuration. It
     processes each graphic specified in the configuration and creates corresponding figures with
-    plots.
+    plots. This function also uses the plotting backend specified in the configuration.
     """
 
     # Get list of graphics from configuration
@@ -192,21 +192,13 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
         layer_list = []
         for layer in plot.get("layers"):
 
-            # Temporary case to handle different diagnostics
-            if handler.BACKEND_NAME == 'Emcpy':
-                eva_class_name = layer.get("type")
-                eva_module_name = camelcase_to_underscore(eva_class_name)
-                full_module = "eva.plotting.batch.emcpy.diagnostics."+eva_module_name
-                layer_class = getattr(im.import_module(full_module), eva_class_name)
-                layer_list.append(layer_class(layer, logger, data_collections).plotobj)
-            else:
-                eva_class_name = handler.BACKEND_NAME + layer.get("type")
-                eva_module_name = camelcase_to_underscore(eva_class_name)
-                full_module = handler.MODULE_NAME + eva_module_name
-                layer_class = getattr(im.import_module(full_module), eva_class_name)
-                layer = layer_class(layer, logger, data_collections)
-                layer.data_prep()
-                layer_list.append(layer.configure_plot())
+            eva_class_name = handler.BACKEND_NAME + layer.get("type")
+            eva_module_name = camelcase_to_underscore(eva_class_name)
+            full_module = handler.MODULE_NAME + eva_module_name
+            layer_class = getattr(im.import_module(full_module), eva_class_name)
+            layer = layer_class(layer, logger, data_collections)
+            layer.data_prep()
+            layer_list.append(layer.configure_plot())
 
         # get mapping dictionary
         proj = None

@@ -1,0 +1,46 @@
+# Data read
+# ---------
+datasets:
+  - name: experiment
+    type: SocaRestart
+    soca_filenames: ${data_input_path}/ocn.3dvar_soca.an.2018-04-15T00:00:00Z.nc
+    geometry_file: ${data_input_path}/soca_gridspec.72x35x25.nc
+
+    variables: [ave_ssh, Salt]
+    coordinate variables: [lon, lat]
+
+graphics:
+
+  plotting_backend: Hvplot
+  figure_list:
+
+# Map plots
+# ---------
+
+  # Observations
+  - batch figure:
+      variables: [ave_ssh, Salt]
+    figure:
+      figure size: [20,10]
+      layout: [1,1]
+      title: 'SOCA | ${variable}'
+      output name: map_plots/SOCA/soca_2dfield_${variable}.html
+    plots:
+      - mapping:
+          projection: plcarr
+          domain: global
+        add_map_features: ['coastline']
+        add_colorbar:
+          label: ${variable}
+        add_grid:
+        layers:
+        - type: MapGridded
+          longitude:
+            variable: experiment::SOCAgrid::lon
+          latitude:
+            variable: experiment::SOCAgrid::lat
+          data:
+            variable: experiment::SOCAVars::${variable}
+            slices: '[0,...]'
+          cmap: 'viridis'
+          colorbar: true

@@ -37,13 +37,13 @@ graphics:
     - figure:
         layout: [3,1]
         figure size: [20,18]
-        tight layout:
+        #tight layout:
         title: "Valid: 2023062006"
         output name: line_plots/minimization/gfs_gdas.summary.gnorms.png
-        plot logo:
-          which: 'noaa/nws'
-          loc: 'upper left'
-          subplot_orientation: 'first'
+        #plot logo:
+        #  which: 'noaa/nws'
+        #  loc: 'upper left'
+        #  subplot_orientation: 'first'
 
       plots:
         - add_xlabel: 'Cycle Time'

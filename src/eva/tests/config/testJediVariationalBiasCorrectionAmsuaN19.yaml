@@ -1,0 +1,88 @@
+suppress_collection_display: False
+
+datasets:
+  - name: experiment
+    type: JediVariationalBiasCorrection
+    bias_file: ${data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-11T15:00:00Z.satbias
+    lapse_file: ${data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-11T15:00:00Z.tlapse
+
+  - name: experiment
+    type: JediVariationalBiasCorrection
+    bias_file: ${data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-11T21:00:00Z.satbias
+    lapse_file: ${data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-11T21:00:00Z.tlapse
+
+time_series:
+
+  begin_date: '2020-12-15T00:00:00'
+  final_date: '2020-12-15T06:00:00'
+  interval: 'PT6H'
+
+  collection: experiment
+  variables:
+    - all
+
+graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
+  # Correlation scatter plots
+  # -------------------------
+
+  # JEDI h(x) vs Observations
+  - figure:
+      layout: [1,1]
+      title: 'AMSUA-N19 Channel 7 Bias Coefficients'
+      output name: time_series/amsua_n19/varbc/7/varbc_time_series.png
+    plots:
+      - add_xlabel: 'Datetime'
+        add_ylabel: 'Bias Coefficients'
+        add_grid:
+        add_legend:
+          loc: 'upper left'
+        layers:
+        - type: LinePlot
+          x:
+            variable: time_series::MetaData::Dates
+          y:
+            variable: time_series::BiasCoefficients::constant
+          channel: 7
+          markersize: 5
+          color: 'blue'
+          label: 'BiasCoefficients::constant'
+        - type: LinePlot
+          x:
+            variable: time_series::MetaData::Dates
+          y:
+            variable: time_series::BiasCoefficients::sensorScanAngle
+          channel: 7
+          markersize: 5
+          color: 'orange'
+          label: 'BiasCoefficients::sensorScanAngle'
+        - type: LinePlot
+          x:
+            variable: time_series::MetaData::Dates
+          y:
+            variable: time_series::BiasCoefficients::sensorScanAngle_order_2
+          channel: 7
+          markersize: 5
+          color: 'green'
+          label: 'BiasCoefficients::sensorScanAngle_order_2'
+        - type: LinePlot
+          x:
+            variable: time_series::MetaData::Dates
+          y:
+            variable: time_series::BiasCoefficients::sensorScanAngle_order_3
+          channel: 7
+          markersize: 5
+          color: 'red'
+          label: 'BiasCoefficients::sensorScanAngle_order_3'
+        - type: LinePlot
+          x:
+            variable: time_series::MetaData::Dates
+          y:
+            variable: time_series::BiasCoefficients::sensorScanAngle_order_4
+          channel: 7
+          markersize: 5
+          color: 'purple'
+          label: 'BiasCoefficients::sensorScanAngle_order_4'

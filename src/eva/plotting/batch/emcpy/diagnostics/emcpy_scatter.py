@@ -10,9 +10,23 @@ from eva.plotting.batch.base.diagnostics.scatter import Scatter
 
 
 class EmcpyScatter(Scatter):
+    """
+    EmcpyScatter class is a subclass of the Scatter class, specialized for
+    configuring and plotting scatter visualizations using the emcpy library.
 
+    Attributes:
+        Inherits attributes from the Scatter class.
+
+    Methods:
+        configure_plot(): Configures the plotting settings for the scatter plot.
+    """
     def configure_plot(self):
+        """
+        Configures the plotting settings for the scatter plot.
 
+        Returns:
+            plotobj: The configured plot object for emcpy scatter plots.
+        """
         # Create declarative plotting Scatter object
         # ------------------------------------------
         self.plotobj = emcpy.plots.plots.Scatter(self.xdata, self.ydata)
@@ -20,7 +34,7 @@ class EmcpyScatter(Scatter):
         # Get defaults from schema
         # ------------------------
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
-                                       'emcpy', 'defaults', 'scatter.yaml'))
+                                       'batch', 'emcpy', 'defaults', 'scatter.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
         delvars = ['x', 'y', 'type', 'schema']
         for d in delvars:
