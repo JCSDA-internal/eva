@@ -98,9 +98,6 @@ class CsvSpace(EvaDatasetBase):
         data_collections.create_or_add_to_collection(collection_name, ds)
         ds.close()
 
-        # Display the contents of the collections for helping the user with making plots
-        data_collections.display_collections()
-
     # ----------------------------------------------------------------------------------------------
 
     def generate_default_config(self, filenames, collection_name):

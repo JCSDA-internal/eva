@@ -297,9 +297,6 @@ class GsiObsSpace(EvaDatasetBase):
         # Change the channel dimension name
         data_collections.adjust_channel_dimension_name('nchans')
 
-        # Display the contents of the collections for helping the user with making plots
-        data_collections.display_collections()
-
     # ----------------------------------------------------------------------------------------------
 
     def generate_default_config(self, filenames, collection_name):

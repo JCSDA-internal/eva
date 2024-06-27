@@ -1,0 +1,73 @@
+suppress_collection_display: False
+
+datasets:
+  - name: experiment
+    type: IodaObsSpace
+    filenames:
+      - ${data_input_path}/ioda_obs_space.amsua_n19.hofx.2020-12-14T210000Z.nc4
+    channels: &channels 3,8
+    groups:
+      - name: ObsValue
+        variables: &variables [brightnessTemperature]
+      - name: hofx
+  - name: experiment
+    type: IodaObsSpace
+    filenames:
+      - ${data_input_path}/ioda_obs_space.amsua_n19.hofx.2020-12-14T210000Z.nc4
+    channels: *channels
+    groups:
+      - name: ObsValue
+      - name: hofx
+
+transforms:
+
+  # Generate omb for JEDI
+  - transform: arithmetic
+    new name: experiment::ObsValueMinusHofx::${variable}
+    equals: experiment::ObsValue::${variable}-experiment::hofx::${variable}
+    for:
+      variable: *variables
+
+time_series:
+
+  begin_date: '2020-12-14T21:00:00'
+  final_date: '2020-12-15T03:00:00'
+  interval: 'PT6H'
+
+  collection: experiment
+  variables:
+    - ObsValueMinusHofx::brightnessTemperature
+  aggregation_methods:
+    - mean
+  dimension: Location
+
+graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
+  # Correlation scatter plots
+  # -------------------------
+
+  # JEDI h(x) vs Observations
+  - figure:
+      layout: [1,1]
+      title: 'Mean OmB | AMSU-A NOAA-19 | ObsValueMinusHofx::brightnessTemperature'
+      output name: time_series/amsua_n19/brightnessTemperature_mean/3/time_series_omb.png
+    plots:
+      - add_xlabel: 'Datetime'
+        add_ylabel: 'JEDI h(x)'
+        add_grid:
+        add_legend:
+          loc: 'upper left'
+        layers:
+        - type: LinePlot
+          x:
+            variable: time_series::MetaData::Dates
+          y:
+            variable: time_series::ObsValueMinusHofx::brightnessTemperature_mean
+          channel: 3
+          markersize: 5
+          color: 'black'
+          label: 'Observation minus h(x)'
+
