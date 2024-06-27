@@ -883,7 +883,7 @@ class MonDataSpace(EvaDatasetBase):
         if dims['ydef'] > 0:
             y_range = channo if coords['ydef'] == 'Channel' else np.arange(1, dims['ydef']+1)
 
-        if dims['zdef'] > 1:
+        if dims['zdef'] > 0:
             z_range = np.arange(1, dims['zdef']+1)
 
         return x_range, y_range, z_range
