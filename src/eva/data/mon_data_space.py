@@ -799,6 +799,10 @@ class MonDataSpace(EvaDatasetBase):
             dims['ydef'] = numobs
             f.close()
 
+        else:
+            rtn_array = np.zeros((len(vars),1,1), float)
+            dims['ydef'] = 1
+
         rtn_lat = np.asarray(lat).reshape(-1)
         rtn_lon = np.asarray(lon).reshape(-1)
 
