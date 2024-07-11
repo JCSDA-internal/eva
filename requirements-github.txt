@@ -1,7 +1,7 @@
 pyyaml>=6.0
 pycodestyle>=2.9.1
 netCDF4>=1.6.1
-matplotlib==3.5.2
+matplotlib>=3.9.0
 cartopy>=0.21.1
 scikit-learn>=1.1.2
 xarray>=2022.6.0
@@ -12,4 +12,4 @@ bokeh<3.5.0,>=3.4.0
 geopandas>=0.13.2
 geoviews>=1.10.0
 nbsite
-git+https://github.com/NOAA-EMC/emcpy.git@9b6756341e9ae963baa7d3a256b8ada3da688d04#egg=emcpy
+git+https://github.com/NOAA-EMC/emcpy.git@f7b863d9508b921a78d7ff0e53de0b95e9a176f7#egg=emcpy
