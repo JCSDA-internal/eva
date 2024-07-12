@@ -63,6 +63,10 @@ class MonDataSpace(EvaDatasetBase):
         # Get control file and parse
         # --------------------------
         control_file = get(dataset_config, self.logger, 'control_file')
+        if not os.path.isfile(control_file[0]):
+            self.logger.info(f'Warning: control file {control_file[0]} not found, unable' +
+                             ' to plot')
+            exit(1)
 
         dims_arr = []
         if self.is_stn_data(control_file[0]):
@@ -794,6 +798,10 @@ class MonDataSpace(EvaDatasetBase):
             rtn_array = np.dstack(mylist)
             dims['ydef'] = numobs
             f.close()
+
+        else:
+            rtn_array = np.zeros((len(vars), 1, 1), float)
+            dims['ydef'] = 1
 
         rtn_lat = np.asarray(lat).reshape(-1)
         rtn_lon = np.asarray(lon).reshape(-1)
