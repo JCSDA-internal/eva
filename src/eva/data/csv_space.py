@@ -157,5 +157,5 @@ class CsvSpace(EvaDatasetBase):
                               f" Date information found was {date_config}")
 
         return np.array([np.datetime64(datetime.strptime(ds,
-                               '%Y%m%d%H').strftime('%Y-%m-%dT%H:%M:%S.%f000000'),
-                               'ns') for ds in date_str_list])
+                                       '%Y%m%d%H').strftime('%Y-%m-%dT%H:%M:%S.%f000000'),
+                                       'ns') for ds in date_str_list])
