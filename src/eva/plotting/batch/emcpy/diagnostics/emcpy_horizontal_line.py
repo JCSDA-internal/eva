@@ -43,7 +43,8 @@ class EmcpyHorizontalLine(HorizontalLine):
         delvars = ['type', 'schema']
         for d in delvars:
             new_config.pop(d, None)
-        self.plotobj = update_object(self.plotobj, self.config, self.logger)
+
+        self.plotobj = update_object(self.plotobj, new_config, self.logger)
 
         return self.plotobj
 
