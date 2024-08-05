@@ -74,7 +74,8 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
                                                  varname_cgv[2], channel, level, datatype)
 
     # Reorder the data array
-    datavar = np.sort(datavar)
+    if datavar.size > 1:
+        datavar = np.sort(datavar)
 
     # Decide how many values to throw out on each end of the dataset
     n = datavar.size

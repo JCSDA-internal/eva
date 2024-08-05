@@ -33,7 +33,7 @@ class EmcpyMapScatter(MapScatter):
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
                                        'batch', 'emcpy', 'defaults', 'map_scatter.yaml'))
         new_config = get_schema(layer_schema, self.config, self.logger)
-        delvars = ['longitude', 'latitude', 'data', 'type', 'schema']
+        delvars = ['longitude', 'latitude', 'data', 'type', 'schema', 'level']
         for d in delvars:
             new_config.pop(d, None)
         self.plotobj = update_object(self.plotobj, new_config, self.logger)
