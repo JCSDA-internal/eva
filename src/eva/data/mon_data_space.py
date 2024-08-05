@@ -800,7 +800,9 @@ class MonDataSpace(EvaDatasetBase):
             f.close()
 
         else:
-            rtn_array = np.zeros((len(vars), 1, 1), float)
+            rtn_array = np.zeros((len(vars), dims[dims_arr[0]], 1), float)
+            lat.append(0)
+            lon.append(0)
             dims['ydef'] = 1
 
         rtn_lat = np.asarray(lat).reshape(-1)

@@ -51,18 +51,24 @@ class MapScatter(ABC):
     def data_prep(self):
         """ Preparing data for configure_plot  """
 
+        # Optionally get the channel|level|datatype to plot
         channel = None
         if 'channel' in self.config['data']:
             channel = self.config['data'].get('channel')
+        level = None
+        if 'level' in self.config:
+            level = self.config.get('level')
+
         lonvar_cgv = self.config['longitude']['variable'].split('::')
         lonvar = self.dataobj.get_variable_data(lonvar_cgv[0], lonvar_cgv[1], lonvar_cgv[2], None)
         lonvar = slice_var_from_str(self.config['longitude'], lonvar, self.logger)
         latvar_cgv = self.config['latitude']['variable'].split('::')
         latvar = self.dataobj.get_variable_data(latvar_cgv[0], latvar_cgv[1], latvar_cgv[2], None)
         latvar = slice_var_from_str(self.config['latitude'], latvar, self.logger)
+
         datavar_cgv = self.config['data']['variable'].split('::')
         datavar = self.dataobj.get_variable_data(datavar_cgv[0], datavar_cgv[1],
-                                                 datavar_cgv[2], channel)
+                                                 datavar_cgv[2], channel, level)
         datavar = slice_var_from_str(self.config['data'], datavar, self.logger)
         self.lonvar = lonvar.flatten()
         self.latvar = latvar.flatten()
