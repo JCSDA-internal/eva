@@ -82,7 +82,7 @@ def vminvmaxcmap(logger, option_dict, plots_dict, data_collections):
     n_throw_out = ((100-percentage_capture) * n / 100) / 2
 
     # The value needs to be an integer
-    n_throw_out = np.floor(n_throw_out)
+    n_throw_out = np.floor(n_throw_out).astype(int)
 
     # Create new array with only the data to consider
     if n_throw_out == 0:
