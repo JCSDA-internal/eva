@@ -1,0 +1,119 @@
+suppress_collection_display: false
+datasets:
+- name: control
+  type: IodaObsSpace
+  filenames:
+  - ${data_input_path}/amsua_n19.20230726T030000Z.nc4
+  channels: 3,8
+  groups:
+  - name: ObsValue
+    variables:
+    - brightnessTemperature
+  - name: GsiHofXBc
+  - name: hofx0
+  - name: MetaData
+  - name: oman
+- name: control
+  type: IodaObsSpace
+  filenames:
+  - ${data_input_path}/amsua_n19.20230726T090000Z.nc4
+  channels: 3,8
+  groups:
+  - name: ObsValue
+    variables:
+    - brightnessTemperature
+  - name: GsiHofXBc
+  - name: hofx0
+  - name: MetaData
+  - name: oman
+- name: experiment
+  type: IodaObsSpace
+  filenames:
+  - ${data_input_path}/amsua_n19.20230726T030000Z.nc4
+  channels: 3,8
+  groups:
+  - name: ObsValue
+    variables:
+    - brightnessTemperature
+  - name: GsiHofXBc
+  - name: hofx0
+  - name: MetaData
+  - name: oman
+- name: experiment
+  type: IodaObsSpace
+  filenames:
+  - ${data_input_path}/amsua_n19.20230726T090000Z.nc4
+  channels: 3,8
+  groups:
+  - name: ObsValue
+    variables:
+    - brightnessTemperature
+  - name: GsiHofXBc
+  - name: hofx0
+  - name: MetaData
+  - name: oman
+transforms:
+- transform: arithmetic
+  new name: control::ObsValueMinusHofx::${variable}
+  equals: control::ObsValue::${variable}-control::hofx0::${variable}
+  for:
+    variable: &id001
+    - brightnessTemperature
+- transform: arithmetic
+  new name: experiment::ObsValueMinusHofx::${variable}
+  equals: experiment::ObsValue::${variable}-experiment::hofx0::${variable}
+  for:
+    variable: *id001
+time_series:
+- begin_date: '2023-07-26T03:00:00'
+  final_date: '2023-07-26T09:00:00'
+  interval: PT6H
+  collection: experiment
+  variables:
+  - ObsValueMinusHofx::brightnessTemperature
+  aggregation_methods:
+  - mean
+  dimension: Location
+- begin_date: '2023-07-26T03:00:00'
+  final_date: '2023-07-26T09:00:00'
+  interval: PT6H
+  collection: control
+  variables:
+  - ObsValueMinusHofx::brightnessTemperature
+  aggregation_methods:
+  - mean
+  dimension: Location
+graphics:
+  plotting_backend: Emcpy
+  figure_list:
+  - figure:
+      layout:
+      - 1
+      - 1
+      title: Mean OmB | AMSU-A NOAA-19 | Ch 3 | ObsValueMinusHofx::brightnessTemperature
+      output name: time_series/amsua_n19/brightnessTemperature_mean/3/time_series_compare_omb.png
+    plots:
+    - add_xlabel: Datetime
+      add_ylabel: JEDI h(x)
+      add_grid: null
+      add_legend:
+        loc: upper left
+      layers:
+      - type: LinePlot
+        x:
+          variable: control_time_series::MetaData::Dates
+        y:
+          variable: control_time_series::ObsValueMinusHofx::brightnessTemperature_mean
+        channel: 3
+        markersize: 5
+        color: black
+        label: Observation minus h(x) - ctrl
+      - type: LinePlot
+        x:
+          variable: experiment_time_series::MetaData::Dates
+        y:
+          variable: experiment_time_series::ObsValueMinusHofx::brightnessTemperature_mean
+        channel: 3
+        markersize: 5
+        color: blue
+        label: Observation minus h(x) - exp

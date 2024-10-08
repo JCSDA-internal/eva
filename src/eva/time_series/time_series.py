@@ -26,7 +26,7 @@ xr_aggregation_methods = {
 # --------------------------------------------------------------------------------------------------
 
 
-def collapse_collection_to_time_series(logger, ind, dates, time_series_config, data_collections,
+def collapse_collection_to_time_series(logger, ind, date, time_series_config, data_collections,
                                        data_collections_tmp):
 
     # Parse the configuration
@@ -83,7 +83,7 @@ def collapse_collection_to_time_series(logger, ind, dates, time_series_config, d
     # -------------------------------------------------------------------------
     dims = {dim: dataset_aggregated.sizes[dim] for dim in dataset_aggregated.dims}
     data_array_shape = tuple(dims[dim] for dim in dims)
-    dataset_aggregated['MetaData::Dates'] = xr.DataArray(np.full(data_array_shape, dates[ind]),
+    dataset_aggregated['MetaData::Dates'] = xr.DataArray(np.full(data_array_shape, date),
                                                          dims=dataset_aggregated.dims)
 
     # Add the time index to the aggregated dataset
@@ -93,8 +93,8 @@ def collapse_collection_to_time_series(logger, ind, dates, time_series_config, d
 
     # Append the dataset with the aggregation
     concat_dimension = 'TimeIndex' if ind > 0 else None
-    data_collections.create_or_add_to_collection('time_series', dataset_aggregated,
-                                                 concat_dimension)
+    data_collections.create_or_add_to_collection(f'{collection_to_ts}_time_series',
+                                                 dataset_aggregated, concat_dimension)
 
 
 # --------------------------------------------------------------------------------------------------
