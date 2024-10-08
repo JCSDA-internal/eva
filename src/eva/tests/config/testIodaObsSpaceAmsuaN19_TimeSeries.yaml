@@ -63,9 +63,9 @@ graphics:
         layers:
         - type: LinePlot
           x:
-            variable: time_series::MetaData::Dates
+            variable: experiment_time_series::MetaData::Dates
           y:
-            variable: time_series::ObsValueMinusHofx::brightnessTemperature_mean
+            variable: experiment_time_series::ObsValueMinusHofx::brightnessTemperature_mean
           channel: 3
           markersize: 5
           color: 'black'
