@@ -3,7 +3,7 @@ datasets:
 - name: control
   type: IodaObsSpace
   filenames:
-  - ${data_input_path}/amsua_n19.20230726T030000Z.nc4
+  - ${data_input_path}/ctrl_amsua_n19.20230726T030000Z.nc4
   channels: 3,8
   groups:
   - name: ObsValue
@@ -16,7 +16,7 @@ datasets:
 - name: control
   type: IodaObsSpace
   filenames:
-  - ${data_input_path}/amsua_n19.20230726T090000Z.nc4
+  - ${data_input_path}/ctrl_amsua_n19.20230726T090000Z.nc4
   channels: 3,8
   groups:
   - name: ObsValue
@@ -29,7 +29,7 @@ datasets:
 - name: experiment
   type: IodaObsSpace
   filenames:
-  - ${data_input_path}/amsua_n19.20230726T030000Z.nc4
+  - ${data_input_path}/exp_amsua_n19.20230726T030000Z.nc4
   channels: 3,8
   groups:
   - name: ObsValue
@@ -42,7 +42,7 @@ datasets:
 - name: experiment
   type: IodaObsSpace
   filenames:
-  - ${data_input_path}/amsua_n19.20230726T090000Z.nc4
+  - ${data_input_path}/exp_amsua_n19.20230726T090000Z.nc4
   channels: 3,8
   groups:
   - name: ObsValue
