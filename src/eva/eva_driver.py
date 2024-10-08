@@ -153,11 +153,12 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
 
         # Save transforms to transform_dict based on collection
         transform_dict = defaultdict(list)
-        for transform in get(eva_dict, logger, 'transforms'):
-            # Get collection name
-            name = transform['new name'].split('::')[0]
-            if name == time_series_config['collection']:
-                transform_dict['transforms'].append(transform)
+        if 'transforms' in eva_dict:
+            for transform in get(eva_dict, logger, 'transforms'):
+                # Get collection name
+                name = transform['new name'].split('::')[0]
+                if name == time_series_config['collection']:
+                    transform_dict['transforms'].append(transform)
 
         # Assert that datasets_config is the same length as dates
         logger.assert_abort(len(datasets_config) == len(dates), 'When running in time ' +
@@ -177,7 +178,7 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
             timing.stop('DataDriverExecute')
 
             # Perform any transforms on the fly
-            if 'transforms' in transform_dict:
+            if transform_dict:
                 logger.info(f'Running transform driver')
                 timing.start('TransformDriverExecute')
                 transform_driver(transform_dict, data_collections_tmp, timing, logger)
