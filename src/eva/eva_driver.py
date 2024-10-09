@@ -12,6 +12,7 @@
 from datetime import datetime
 import argparse
 import os
+from collections import defaultdict
 
 from eva.utilities.config import get
 from eva.utilities.logger import Logger
@@ -94,85 +95,103 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
         None
     """
 
-    # Check for required keys
-    # -----------------------
-    required_keys = [
-        'begin_date',
-        'final_date',
-        'interval',
-        'collection',
-        'variables',
-        ]
-    for key in required_keys:
-        logger.assert_abort(key in eva_dict['time_series'], 'If running Eva in time series ' +
-                            f'mode the time series config must contain "{key}"')
+    # Iterate through list of time series dictionaries
+    for time_series_config in eva_dict['time_series']:
 
-    # Write message that this is a time series run
-    logger.info('This instance of Eva is being used to accumulate a time series.')
+        # Check for required keys
+        # -----------------------
+        required_keys = [
+            'begin_date',
+            'final_date',
+            'interval',
+            'collection',
+            'variables',
+            ]
+        for key in required_keys:
+            logger.assert_abort(key in time_series_config, 'If running Eva in time series ' +
+                                f'mode the time series config must contain "{key}"')
 
-    # Optionally suppress the display of the collection
-    suppress_collection_display = get(eva_dict, logger, 'suppress_collection_display', False)
+        # Write message that this is a time series run
+        logger.info('This instance of Eva is being used to accumulate a time series.')
 
-    # Get the datasets configuration
-    time_series_config = eva_dict['time_series']
+        # Optionally suppress the display of the collection
+        suppress_collection_display = get(eva_dict, logger, 'suppress_collection_display', False)
 
-    # Extract the dates of the time series
-    begin_date = time_series_config['begin_date']
-    final_date = time_series_config['final_date']
-    interval = time_series_config['interval']
+        # Extract the dates of the time series
+        begin_date = time_series_config['begin_date']
+        final_date = time_series_config['final_date']
+        interval = time_series_config['interval']
 
-    # Convert begin and end dates from ISO strings to datetime objects
-    begin_date = datetime.fromisoformat(begin_date)
-    final_date = datetime.fromisoformat(final_date)
+        # Convert begin and end dates from ISO strings to datetime objects
+        begin_date = datetime.fromisoformat(begin_date)
+        final_date = datetime.fromisoformat(final_date)
 
-    # Convert interval ISO string to timedelta object
-    interval = iso_duration_to_timedelta(logger, interval)
+        # Convert interval ISO string to timedelta object
+        interval = iso_duration_to_timedelta(logger, interval)
 
-    # Make list of dates from begin to end with interval
-    dates = []
-    date = begin_date
-    count = 0
-    while date <= final_date:
-        dates.append(date)
-        date += interval
-        count += 1
-        # Abort if count hits one million
-        logger.assert_abort(count < 1e6, 'You are planning to read more than one million ' +
-                            'time steps. This is likely an error. Please check your configuration.')
+        # Make list of dates from begin to end with interval
+        dates = []
+        date = begin_date
+        count = 0
+        while date <= final_date:
+            dates.append(date)
+            date += interval
+            count += 1
+            # Abort if count hits one million
+            logger.assert_abort(count < 1e6, 'You are planning to read more than one million ' +
+                                'time steps. This is likely an error. Please check your ' +
+                                'configuration.')
 
-    # Get the datasets configuration
-    datasets_config = get(eva_dict, logger, 'datasets')
+        # Get all datasets configuration
+        all_datasets = get(eva_dict, logger, 'datasets')
 
-    # Assert that datasets_config is the same length as dates
-    logger.assert_abort(len(datasets_config) == len(dates), 'When running in time series mode ' +
-                        'the number of datasets must be the same as the number of dates.')
+        # Find all dataset_configs with collection name
+        datasets_config = []
+        for dataset in all_datasets:
+            if dataset['name'] == time_series_config["collection"]:
+                datasets_config.append(dataset)
 
-    # Loop over datasets reading each one in turn, internally appending the data_collections
-    for ind, dataset_config in enumerate(datasets_config):
-
-        # Create a temporary collection for this time step
-        data_collections_tmp = DataCollections()
-
-        # Prepare diagnostic data
-        logger.info('Running data driver')
-        timing.start('DataDriverExecute')
-        data_driver(dataset_config, data_collections_tmp, timing, logger)
-        timing.stop('DataDriverExecute')
-
-        # Perform any transforms on the fly
+        # Save transforms to transform_dict based on collection
+        transform_dict = defaultdict(list)
         if 'transforms' in eva_dict:
-            logger.info(f'Running transform driver')
-            timing.start('TransformDriverExecute')
-            transform_driver(eva_dict, data_collections_tmp, timing, logger)
-            timing.stop('TransformDriverExecute')
+            for transform in get(eva_dict, logger, 'transforms'):
+                # Get collection name
+                name = transform['new name'].split('::')[0]
+                if name == time_series_config['collection']:
+                    transform_dict['transforms'].append(transform)
 
-        # Collapse data into time series
-        collapse_collection_to_time_series(logger, ind, dates, time_series_config, data_collections,
-                                           data_collections_tmp)
+        # Assert that datasets_config is the same length as dates
+        logger.assert_abort(len(datasets_config) == len(dates), 'When running in time ' +
+                            'series mode the number of datasets must be the same as the ' +
+                            'number of dates.')
 
-    if not suppress_collection_display:
-        logger.info('Computing of Eva time series complete: status of collection:')
-        data_collections.display_collections()
+        # Loop over datasets reading each one in turn, internally appending the data_collections
+        for ind, dataset_config in enumerate(datasets_config):
+
+            # Create a temporary collection for this time step
+            data_collections_tmp = DataCollections()
+
+            # Prepare diagnostic data
+            logger.info('Running data driver')
+            timing.start('DataDriverExecute')
+            data_driver(dataset_config, data_collections_tmp, timing, logger)
+            timing.stop('DataDriverExecute')
+
+            # Perform any transforms on the fly
+            if transform_dict:
+                logger.info(f'Running transform driver')
+                timing.start('TransformDriverExecute')
+                transform_driver(transform_dict, data_collections_tmp, timing, logger)
+                timing.stop('TransformDriverExecute')
+
+            # Collapse data into time series
+            date = dates[ind]
+            collapse_collection_to_time_series(logger, ind, date, time_series_config,
+                                               data_collections, data_collections_tmp)
+
+        if not suppress_collection_display:
+            logger.info('Computing of Eva time series complete: status of collection:')
+            data_collections.display_collections()
 
 
 # --------------------------------------------------------------------------------------------------

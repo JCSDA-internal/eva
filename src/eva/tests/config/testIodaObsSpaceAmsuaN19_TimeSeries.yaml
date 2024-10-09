@@ -30,16 +30,16 @@ transforms:
 
 time_series:
 
-  begin_date: '2020-12-14T21:00:00'
-  final_date: '2020-12-15T03:00:00'
-  interval: 'PT6H'
+  - begin_date: '2020-12-14T21:00:00'
+    final_date: '2020-12-15T03:00:00'
+    interval: 'PT6H'
 
-  collection: experiment
-  variables:
-    - ObsValueMinusHofx::brightnessTemperature
-  aggregation_methods:
-    - mean
-  dimension: Location
+    collection: experiment
+    variables:
+      - ObsValueMinusHofx::brightnessTemperature
+    aggregation_methods:
+      - mean
+    dimension: Location
 
 graphics:
 
@@ -63,9 +63,9 @@ graphics:
         layers:
         - type: LinePlot
           x:
-            variable: time_series::MetaData::Dates
+            variable: experiment_time_series::MetaData::Dates
           y:
-            variable: time_series::ObsValueMinusHofx::brightnessTemperature_mean
+            variable: experiment_time_series::ObsValueMinusHofx::brightnessTemperature_mean
           channel: 3
           markersize: 5
           color: 'black'

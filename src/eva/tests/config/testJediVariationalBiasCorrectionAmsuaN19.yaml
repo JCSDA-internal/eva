@@ -13,13 +13,13 @@ datasets:
 
 time_series:
 
-  begin_date: '2020-12-15T00:00:00'
-  final_date: '2020-12-15T06:00:00'
-  interval: 'PT6H'
+  - begin_date: '2020-12-15T00:00:00'
+    final_date: '2020-12-15T06:00:00'
+    interval: 'PT6H'
 
-  collection: experiment
-  variables:
-    - all
+    collection: experiment
+    variables:
+      - all
 
 graphics:
 
@@ -43,45 +43,45 @@ graphics:
         layers:
         - type: LinePlot
           x:
-            variable: time_series::MetaData::Dates
+            variable: experiment_time_series::MetaData::Dates
           y:
-            variable: time_series::BiasCoefficients::constant
+            variable: experiment_time_series::BiasCoefficients::constant
           channel: 7
           markersize: 5
           color: 'blue'
           label: 'BiasCoefficients::constant'
         - type: LinePlot
           x:
-            variable: time_series::MetaData::Dates
+            variable: experiment_time_series::MetaData::Dates
           y:
-            variable: time_series::BiasCoefficients::sensorScanAngle
+            variable: experiment_time_series::BiasCoefficients::sensorScanAngle
           channel: 7
           markersize: 5
           color: 'orange'
           label: 'BiasCoefficients::sensorScanAngle'
         - type: LinePlot
           x:
-            variable: time_series::MetaData::Dates
+            variable: experiment_time_series::MetaData::Dates
           y:
-            variable: time_series::BiasCoefficients::sensorScanAngle_order_2
+            variable: experiment_time_series::BiasCoefficients::sensorScanAngle_order_2
           channel: 7
           markersize: 5
           color: 'green'
           label: 'BiasCoefficients::sensorScanAngle_order_2'
         - type: LinePlot
           x:
-            variable: time_series::MetaData::Dates
+            variable: experiment_time_series::MetaData::Dates
           y:
-            variable: time_series::BiasCoefficients::sensorScanAngle_order_3
+            variable: experiment_time_series::BiasCoefficients::sensorScanAngle_order_3
           channel: 7
           markersize: 5
           color: 'red'
           label: 'BiasCoefficients::sensorScanAngle_order_3'
         - type: LinePlot
           x:
-            variable: time_series::MetaData::Dates
+            variable: experiment_time_series::MetaData::Dates
           y:
-            variable: time_series::BiasCoefficients::sensorScanAngle_order_4
+            variable: experiment_time_series::BiasCoefficients::sensorScanAngle_order_4
           channel: 7
           markersize: 5
           color: 'purple'

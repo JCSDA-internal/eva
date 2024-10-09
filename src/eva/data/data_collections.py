@@ -65,9 +65,9 @@ class DataCollections:
         """
 
         # If time_series collection name must also be time_series
-        if self.time_series and collection_name != 'time_series':
-            self.logger.abort('In create_or_add_to_collection: time_series collection must ' +
-                              'be \'time_series\'')
+        if self.time_series and 'time_series' not in collection_name:
+            self.logger.abort('In get_variable_data: time_series collection must ' +
+                              'have name containing \'time_series\'')
 
         # Collections should only be xarray datasets
         if not isinstance(collection, Dataset):
@@ -158,9 +158,9 @@ class DataCollections:
         """
 
         # If time_series collection name must also be time_series
-        if self.time_series and collection_name != 'time_series':
-            self.logger.abort('In add_variable_to_collection: time_series collection must ' +
-                              'be \'time_series\'')
+        if self.time_series and 'time_series' not in collection_name:
+            self.logger.abort('In get_variable_data: time_series collection must ' +
+                              'have name containing \'time_series\'')
 
         # Assert that new variable is an xarray Dataarray
         if not isinstance(variable, DataArray):
@@ -211,9 +211,9 @@ class DataCollections:
         """
 
         # If time_series collection name must also be time_series
-        if self.time_series and collection_name != 'time_series':
-            self.logger.abort('In get_variable_data_array: time_series collection must ' +
-                              'be \'time_series\'')
+        if self.time_series and 'time_series' not in collection_name:
+            self.logger.abort('In get_variable_data: time_series collection must ' +
+                              'have name containing \'time_series\'')
 
         group_variable_name = group_name + '::' + variable_name
         data_array = self._collections[collection_name][group_variable_name]
@@ -293,9 +293,9 @@ class DataCollections:
         """
 
         # If time_series collection name must also be time_series
-        if self.time_series and collection_name != 'time_series':
+        if self.time_series and 'time_series' not in collection_name:
             self.logger.abort('In get_variable_data: time_series collection must ' +
-                              'be \'time_series\'')
+                              'have name containing \'time_series\'')
 
         variable_array = self.get_variable_data_array(collection_name, group_name, variable_name,
                                                       channels, levels, datatypes)
