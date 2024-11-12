@@ -12,19 +12,22 @@
 from datetime import datetime
 import argparse
 import os
+import os.path
 from collections import defaultdict
+import xarray as xr
+import numpy as np
 
 from eva.utilities.config import get
 from eva.utilities.logger import Logger
 from eva.utilities.timing import Timing
 from eva.data.data_driver import data_driver
+from eva.time_series.time_series import add_empty_to_timeseries
 from eva.time_series.time_series import collapse_collection_to_time_series
 from eva.transforms.transform_driver import transform_driver
 from eva.plotting.batch.base.plot_tools.figure_driver import figure_driver
 from eva.data.data_collections import DataCollections
 from eva.utilities.duration import iso_duration_to_timedelta
 from eva.utilities.utils import load_yaml_file
-
 
 # --------------------------------------------------------------------------------------------------
 
@@ -95,6 +98,9 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
         None
     """
 
+    # Set empty data_array
+    # empty_data_array = False
+
     # Iterate through list of time series dictionaries
     for time_series_config in eva_dict['time_series']:
 
@@ -160,13 +166,42 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
                 if name == time_series_config['collection']:
                     transform_dict['transforms'].append(transform)
 
-        # Assert that datasets_config is the same length as dates
-        logger.assert_abort(len(datasets_config) == len(dates), 'When running in time ' +
-                            'series mode the number of datasets must be the same as the ' +
-                            'number of dates.')
+        # Enforce that first file exists
+        first_file = datasets_config[0]['filenames'][0]
+        if not os.path.isfile(first_file):
+            logger.abort('First file provided to timeseries must exist.')
+        elif os.stat(first_file).st_size == 0:
+            logger.abort('First file provided to timeseries must be nonzero.')
+
+        # Prepare empty data array for missing times
+        data_collections_tmp = DataCollections()
+        data_driver(datasets_config[0], data_collections_tmp, timing, logger)
+        temp_collection = time_series_config["collection"]
+        temp_group = datasets_config[0]['groups'][0]['name']
+        temp_var = datasets_config[0]['groups'][0]['variables'][0]
+        data_array = data_collections_tmp.get_variable_data_array(temp_collection,
+                                                                  temp_group, temp_var)
+        empty_data_array = xr.full_like(data_array, np.nan)
 
         # Loop over datasets reading each one in turn, internally appending the data_collections
         for ind, dataset_config in enumerate(datasets_config):
+
+            # Pull out information to check for missing date
+            date = dates[ind]
+
+            # Check if file exists. If it doesn't, add empty and continue
+            filename = dataset_config['filenames'][0]
+            if not os.path.isfile(filename):
+                add_empty_to_timeseries(logger, date, time_series_config,
+                                        datasets_config[0], empty_data_array,
+                                        data_collections)
+                continue
+            # Check if file exists but is empty, add empty and continue
+            elif os.stat(filename).st_size == 0:
+                add_empty_to_timeseries(logger, date, time_series_config,
+                                        datasets_config[0], empty_data_array,
+                                        data_collections)
+                continue
 
             # Create a temporary collection for this time step
             data_collections_tmp = DataCollections()
@@ -185,7 +220,6 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
                 timing.stop('TransformDriverExecute')
 
             # Collapse data into time series
-            date = dates[ind]
             collapse_collection_to_time_series(logger, ind, date, time_series_config,
                                                data_collections, data_collections_tmp)
 

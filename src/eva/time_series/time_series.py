@@ -12,7 +12,7 @@
 
 import numpy as np
 import xarray as xr
-
+from eva.data.data_collections import DataCollections
 
 # --------------------------------------------------------------------------------------------------
 
@@ -21,6 +21,75 @@ xr_aggregation_methods = {
     'mean': lambda ds, dim: ds.mean(dim=dim, skipna=True),
     'sum': lambda ds, dim: ds.sum(dim=dim, skipna=True),
 }
+
+
+# --------------------------------------------------------------------------------------------------
+
+def add_empty_to_timeseries(logger, date, time_series_config, dataset_config, data_array,
+                            data_collections):
+
+    ''' Add empty collection to timeseries for missing date  '''
+    collection_to_ts = dataset_config['name']
+    group_list = [dataset_config['groups'][0]['name']]
+    variable_list = dataset_config['groups'][0]['variables']
+
+    for idx in range(1, len(dataset_config['groups'])):
+        group_list.append(dataset_config['groups'][idx]['name'])
+
+    dataset_tmp = DataCollections()
+
+    # Add groups and variables to empty dataset.
+    for group in group_list:
+        for variable in variable_list:
+            # Create empty data array
+            dataset_tmp.add_variable_to_collection("Empty", group, variable, data_array)
+
+    # Extract xarray
+    dataset_tmp = dataset_tmp.get_data_collection("Empty")
+
+    # Optional: aggregation methods
+    aggregation_methods = time_series_config.get('aggregation_methods', [])
+
+    # If specifying aggregation methods it must be accompanied by a dimension
+    if aggregation_methods:
+        logger.assert_abort('dimension' in time_series_config, 'When specifying aggregation '
+                            'methods a dimension must also be specified.')
+        dimension = time_series_config['dimension']
+
+    dataset_aggregated = xr.Dataset()
+
+    # If there is no aggregation method specified, just add the dataset to the time series
+    if not aggregation_methods:
+        dataset_aggregated = xr.merge([dataset_aggregated, dataset_tmp])
+    else:
+        for aggregation_method in aggregation_methods:
+            # Assert that aggregation_method is in the aggregation methods
+            logger.assert_abort(aggregation_method in xr_aggregation_methods,
+                                f'Unknown aggregation method {aggregation_method}')
+
+            # Compute the aggregation_method - nan for empty
+            dataset_am = xr_aggregation_methods[aggregation_method](dataset_tmp, dim=dimension)
+
+            # Append each variable name in dataset_am with _aggregation_method
+            rename_dict = {var: f"{var}_{aggregation_method}" for var in dataset_am.data_vars}
+            dataset_am = dataset_am.rename(rename_dict)
+
+            # Merge all the results into the aggregated dataset
+            dataset_aggregated = xr.merge([dataset_aggregated, dataset_am])
+
+    # Get all dims of dataset_aggregated and create empty array with those dims
+    dims = {dim: dataset_aggregated.sizes[dim] for dim in dataset_aggregated.dims}
+    data_array_shape = tuple(dims[dim] for dim in dims)
+    dataset_aggregated['MetaData::Dates'] = xr.DataArray(np.full(data_array_shape, date),
+                                                         dims=dataset_aggregated.dims)
+
+    # Add the time index to the aggregated dataset
+    dataset_aggregated = dataset_aggregated.expand_dims('TimeIndex')
+    dataset_aggregated['TimeIndex'] = [0]
+
+    # Append the dataset with the aggregation
+    data_collections.create_or_add_to_collection(f'{collection_to_ts}_time_series',
+                                                 dataset_aggregated, 'TimeIndex')
 
 
 # --------------------------------------------------------------------------------------------------
