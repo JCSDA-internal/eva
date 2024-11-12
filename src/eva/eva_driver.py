@@ -12,7 +12,6 @@
 from datetime import datetime
 import argparse
 import os
-import os.path
 from collections import defaultdict
 import xarray as xr
 import numpy as np
@@ -97,9 +96,6 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
     Returns:
         None
     """
-
-    # Set empty data_array
-    # empty_data_array = False
 
     # Iterate through list of time series dictionaries
     for time_series_config in eva_dict['time_series']:
