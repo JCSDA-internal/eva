@@ -10,6 +10,15 @@ datasets:
       - name: ObsValue
         variables: &variables [brightnessTemperature]
       - name: hofx
+  #Empty
+  - name: experiment
+    type: IodaObsSpace
+    filenames:
+      - ${data_input_path}/ioda_obs_space.amsua_n19.hofx.2020-12-14T000000Z.nc4
+    channels: *channels
+    groups:
+      - name: ObsValue
+      - name: hofx
   - name: experiment
     type: IodaObsSpace
     filenames:
@@ -31,7 +40,7 @@ transforms:
 time_series:
 
   - begin_date: '2020-12-14T21:00:00'
-    final_date: '2020-12-15T03:00:00'
+    final_date: '2020-12-15T09:00:00'
     interval: 'PT6H'
 
     collection: experiment

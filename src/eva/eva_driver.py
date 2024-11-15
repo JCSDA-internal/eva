@@ -22,6 +22,7 @@ from eva.utilities.timing import Timing
 from eva.data.data_driver import data_driver
 from eva.time_series.time_series import add_empty_to_timeseries
 from eva.time_series.time_series import collapse_collection_to_time_series
+from eva.time_series.time_series_utils import create_empty_data, get_filename, check_file
 from eva.transforms.transform_driver import transform_driver
 from eva.plotting.batch.base.plot_tools.figure_driver import figure_driver
 from eva.data.data_collections import DataCollections
@@ -162,22 +163,10 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
                 if name == time_series_config['collection']:
                     transform_dict['transforms'].append(transform)
 
-        # Enforce that first file exists
-        first_file = datasets_config[0]['filenames'][0]
-        if not os.path.isfile(first_file):
-            logger.abort('First file provided to timeseries must exist.')
-        elif os.stat(first_file).st_size == 0:
-            logger.abort('First file provided to timeseries must be nonzero.')
-
-        # Prepare empty data array for missing times
-        data_collections_tmp = DataCollections()
-        data_driver(datasets_config[0], data_collections_tmp, timing, logger)
-        temp_collection = time_series_config["collection"]
-        temp_group = datasets_config[0]['groups'][0]['name']
-        temp_var = datasets_config[0]['groups'][0]['variables'][0]
-        data_array = data_collections_tmp.get_variable_data_array(temp_collection,
-                                                                  temp_group, temp_var)
-        empty_data_array = xr.full_like(data_array, np.nan)
+        # Check if first file is empty. If it is, abort.
+        empty_dataset_config = datasets_config[0]
+        filename = get_filename(empty_dataset_config, logger)
+        check_file(filename, logger)
 
         # Loop over datasets reading each one in turn, internally appending the data_collections
         for ind, dataset_config in enumerate(datasets_config):
@@ -185,18 +174,16 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
             # Pull out information to check for missing date
             date = dates[ind]
 
-            # Check if file exists. If it doesn't, add empty and continue
-            filename = dataset_config['filenames'][0]
+            # Check if file exists, if not add empty and continue
+            filename = get_filename(dataset_config, logger)
             if not os.path.isfile(filename):
-                add_empty_to_timeseries(logger, date, time_series_config,
-                                        datasets_config[0], empty_data_array,
-                                        data_collections)
+                add_empty_to_timeseries(logger, date, ind, timing, time_series_config,
+                                        empty_dataset_config, data_collections)
                 continue
-            # Check if file exists but is empty, add empty and continue
+            # Check if file exists but is size zero, add empty and continue
             elif os.stat(filename).st_size == 0:
-                add_empty_to_timeseries(logger, date, time_series_config,
-                                        datasets_config[0], empty_data_array,
-                                        data_collections)
+                add_empty_to_timeseries(logger, date, ind, timing, time_series_config,
+                                        empty_dataset_config, data_collections)
                 continue
 
             # Create a temporary collection for this time step
