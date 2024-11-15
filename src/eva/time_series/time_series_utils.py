@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import xarray as xr
-from abc import ABC, abstractmethod
 from eva.data.data_driver import data_driver
 from eva.data.data_collections import DataCollections
 
@@ -32,7 +31,8 @@ def check_file(filename, logger):
 
 
 def create_empty_data(timeseries_config, dataset_config, timing, logger):
-    """ Creating an empty data array to use for missing cycle times  """
+    """ Creating an empty data collection to use for missing cycle times  """
+
     dc_tmp = DataCollections()
     collection = timeseries_config["collection"]
     data_driver(dataset_config, dc_tmp, timing, logger)
