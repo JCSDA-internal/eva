@@ -1,0 +1,26 @@
+setuptools>=59.4.0
+pyyaml>=6.0
+pycodestyle>=2.8.0
+netCDF4
+matplotlib
+cartopy>=0.21.1
+scipy>=1.9.3
+xarray>=2022.3.0
+pandas>=1.4.0
+numpy==1.22.3
+
+# Not explicitly part of eva but dependcies of eva dependencies already in spack-stack
+# versions need to be set to avoid other versions being picked
+pyproj
+importlib-metadata==4.8.2
+contourpy==1.0.7
+
+# Additional packages
+git+https://github.com/NOAA-EMC/emcpy.git@f7b863d9508b921a78d7ff0e53de0b95e9a176f7#egg=emcpy
+scikit-learn
+seaborn
+hvplot
+nbconvert
+bokeh
+geopandas
+geoviews
