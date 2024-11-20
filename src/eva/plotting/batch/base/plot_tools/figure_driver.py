@@ -241,8 +241,11 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
             fig.tight_layout(**figure_conf['tight layout'])
         else:
             fig.tight_layout()
+        figure_conf.pop('tight layout')
+
     if 'plot logo' in figure_conf:
         fig.plot_logo(**figure_conf['plot logo'])
+        figure_conf.pop('plot logo')
 
     saveargs = get_saveargs(figure_conf)
     fig.save_figure(output_file, **saveargs)

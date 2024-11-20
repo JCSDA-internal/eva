@@ -30,9 +30,10 @@ graphics:
         figure size: [12,10]
         title: 'hirs4_metop-a | Channel 1 | Obs Count'
         output name: lineplots/hirs4_metop-a/hirs4_metop-a.0.count.png
-        #plot logo:
-        #  which: 'noaa/nws'
-        #  loc: 'upper right'
+        plot logo:
+          which: 'noaa/nws'
+          loc: 'upper right'
+        tight layout:
       plots:
         - add_xlabel: 'Cycle Time'
           add_ylabel: 'Observation Count'
