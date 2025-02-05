@@ -1,0 +1,13 @@
+# Filled Contour default yaml
+corner_mask: False
+colors = None
+alpha:
+cmap: 'viridis'
+norm:
+vmin:
+vmax:
+origin:
+extent:
+locator:
+extend:
+colorbar: True
