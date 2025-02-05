@@ -12,8 +12,8 @@ from eva.plotting.batch.base.diagnostics.filled_contour_plot import FilledContou
 class EmcpyFilledContourPlot(FilledContourPlot):
 
     """
-    EmcpyFilledContourPlot class is a subclass of the FilledContourPlot class, designed for configuring
-    and plotting contour plot visualizations using the emcpy library.
+    EmcpyFilledContourPlot class is a subclass of the FilledContourPlot class, designed for
+    configuring and plotting filled contour plot visualizations using the emcpy library.
 
     Attributes:
         Inherits attributes from the FilledContourPlot class.

@@ -18,7 +18,8 @@ class ContourPlot(ABC):
         Creates a Filled Contour plot abstract class based on the provided configuration.
 
         Args:
-            config (dict): A dictionary containing the configuration for the filled contour plot on a map.
+            config (dict): A dictionary containing the configuration for the filled contour
+                           plot on a map.
             logger (Logger): An instance of the logger for logging messages.
             dataobj: An instance of the data object containing input data.
 
