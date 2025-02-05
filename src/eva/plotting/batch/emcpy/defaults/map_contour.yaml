@@ -1,0 +1,11 @@
+# MapContour class default schema
+levels:
+clabel: False
+colors: 'black'
+linewidths: 1.5
+linestyles: '-'
+cmap:
+vmin:
+vmax:
+alpha:
+colorbar: False
