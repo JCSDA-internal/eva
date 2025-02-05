@@ -1,0 +1,9 @@
+# Contour default yaml
+corner_mask: False
+colors: 'black'
+alpha:
+cmap:
+norm:
+vmin:
+vmax:
+levels:
