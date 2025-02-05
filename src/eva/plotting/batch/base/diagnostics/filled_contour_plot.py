@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 # --------------------------------------------------------------------------------------------------
 
 
-class ContourPlot(ABC):
+class FilledContourPlot(ABC):
 
     """Base class for creating Filled Contour plots."""
 
@@ -37,7 +37,7 @@ class ContourPlot(ABC):
                         "schema": "path_to_schema_file.yaml"
                     }
                     logger = Logger()
-                    scatter_plot = Scatter(config, logger, None)
+                    filled_contour_plot = FilledContourPlot(config, logger, None)
         """
 
         self.config = config
@@ -67,10 +67,10 @@ class ContourPlot(ABC):
             self.logger.abort('Contour: comparison first var \'var0\' does not appear to ' +
                               'be in the required format of collection::group::variable.')
         if len(var1_cgv) != 3:
-            self.logger.abort('Contour: comparison first var \'var1\' does not appear to ' +
+            self.logger.abort('Contour: comparison second var \'var1\' does not appear to ' +
                               'be in the required format of collection::group::variable.')
         if len(var2_cgv) != 3:
-            self.logger.abort('Contour: comparison first var \'var2\' does not appear to ' +
+            self.logger.abort('Contour: comparison third var \'var2\' does not appear to ' +
                               'be in the required format of collection::group::variable.')
 
         # Optionally get the channel to plot
@@ -79,7 +79,6 @@ class ContourPlot(ABC):
             channel = self.config.get('channel')
 
         xdata = self.dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel)
-        xdata1 = self.dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2])
         ydata = self.dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel)
         zdata = self.dataobj.get_variable_data(var2_cgv[0], var2_cgv[1], var2_cgv[2], channel)
 
