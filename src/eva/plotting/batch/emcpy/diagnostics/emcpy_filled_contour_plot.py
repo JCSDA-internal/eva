@@ -31,8 +31,8 @@ class EmcpyFilledContourPlot(FilledContourPlot):
             plotobj: The configured plot object for emcpy filled contour plots.
         """
 
-        # Create declarative plotting ContourPlot object
-        # -------------------------------------------
+        # Create declarative plotting FilledContourPlot object
+        # ----------------------------------------------------
         self.plotobj = emcpy.plots.plots.FilledContourPlot(self.xdata, self.ydata, self.z)
 
         # Get defaults from schema
