@@ -91,18 +91,6 @@ class ContourPlot(ABC):
         ydata = ydata.flatten()
         zdata = zdata.flatten()
 
-        # Remove NaN values to enable regression
-        # --------------------------------------
-        mask = ~np.isnan(xdata)
-        xdata = xdata[mask]
-        ydata = ydata[mask]
-        zdata = zdata[mask]
-
-        mask = ~np.isnan(ydata)
-        self.xdata = xdata[mask]
-        self.ydata = ydata[mask]
-        self.zdata = zdata[mask]
-
     @abstractmethod
     def configure_plot(self):
         """ Virtual method for configuring plot based on selected backend  """
