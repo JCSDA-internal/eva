@@ -153,7 +153,7 @@ def satellite_dataset(ds):
             for ipred in range(ds.dims['BC_angord_arr_dim']):
                 pred = '_{}'.format(ipred+1)
                 out_var = var+pred
-                data_vars[out_var] = (('nobs', 'nchans'), data[:,:,ipred])
+                data_vars[out_var] = (('nobs', 'nchans'), data[:, :, ipred])
 
         # Deals with how to handle nobs data
         else:
