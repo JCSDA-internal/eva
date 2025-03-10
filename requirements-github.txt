@@ -6,7 +6,7 @@ cartopy>=0.21.1
 scikit-learn>=1.1.2
 xarray>=2022.6.0
 seaborn>=0.12.2
-holoviews=1.11.0
+holoviews==1.11.0
 hvplot>=0.8.2
 nbconvert>=6.5.4
 bokeh<3.6.0,>=3.5.0
