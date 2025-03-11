@@ -6,6 +6,7 @@ from eva.data.data_collections import DataCollections
 
 
 filename_retrieval = {
+    "GsiObsSpace": lambda dataset_config: dataset_config["filenames"][0],
     "IodaObsSpace": lambda dataset_config: dataset_config["filenames"][0],
     "JediVariationalBiasCorrection": lambda dataset_config: dataset_config["bias_file"],
 }
