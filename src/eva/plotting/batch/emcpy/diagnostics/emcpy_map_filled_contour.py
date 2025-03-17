@@ -30,7 +30,8 @@ class EmcpyMapFilledContour(MapFilledContour):
         """
 
         # Create declarative plotting MapContour object
-        self.plotobj = emcpy.plots.map_plots.MapFilledContour(self.latvar, self.lonvar, self.datavar)
+        self.plotobj = emcpy.plots.map_plots.MapFilledContour(self.latvar, self.lonvar,
+                                                              self.datavar)
         # get defaults from schema
         layer_schema = self.config.get('schema', os.path.join(return_eva_path(), 'plotting',
                                        'batch', 'emcpy', 'defaults', 'map_filled_contour.yaml'))
