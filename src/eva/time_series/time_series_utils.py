@@ -6,19 +6,36 @@ from eva.data.data_collections import DataCollections
 
 
 filename_retrieval = {
-    "IodaObsSpace": lambda dataset_config: dataset_config["filenames"][0],
+    "IodaObsSpace": lambda dataset_config: dataset_config["filenames"],
     "JediVariationalBiasCorrection": lambda dataset_config: dataset_config["bias_file"],
 }
 
 
-def get_filename(dataset_config, logger):
-    """ Retrieve filename using given type  """
+def update_filename(dataset_config, filename, logger):
+    """ Update the filename associated with a dataset_config """
+    match dataset_config['type']:
+        case 'IodaObsSpace':
+            dataset_config['filenames'] = [filename]
+        case 'JediVariationalBiasCorrection':
+            dataset_config['bias_file'] = filename
+        case _:
+            logger.abort(f'Unknown dataset_type {dataset_type} in update_filename')
+
+    return dataset_config
+
+
+def get_filenames(dataset_config, logger):
+    """ Retrieve filenames using given type  """
 
     dataset_type = dataset_config["type"]
     logger.assert_abort(dataset_type in filename_retrieval,
                         f'Unknown dataset_type {dataset_type}')
-    filename = filename_retrieval[dataset_type](dataset_config)
-    return filename
+    filenames = filename_retrieval[dataset_type](dataset_config)
+
+    # Ensure filenames is always a list, handling None as an empty list
+    if filenames is None:
+        return []
+    return filenames if isinstance(filenames, list) else [filenames]
 
 
 def check_file(filename, logger):

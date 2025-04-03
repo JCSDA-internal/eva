@@ -21,6 +21,7 @@ from eva.time_series.time_series_utils import create_empty_data
 xr_aggregation_methods = {
     'mean': lambda ds, dim: ds.mean(dim=dim, skipna=True),
     'sum': lambda ds, dim: ds.sum(dim=dim, skipna=True),
+    'count': lambda ds, dim: ds.count(dim=dim),
 }
 
 

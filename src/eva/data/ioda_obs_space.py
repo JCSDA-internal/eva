@@ -164,10 +164,15 @@ class IodaObsSpace(EvaDatasetBase):
         # Loop over filenames
         # -------------------
         total_loc = 0
+
         for filename in filenames:
+            self.logger.info(f'now processing file {filename}')
+
             # Assert that file exists
             if not os.path.exists(filename):
-                logger.abort(f'In IodaObsSpace file \'{filename}\' does not exist')
+                self.logger.info(f'Warning:  In IodaObsSpace file \'{filename}\' ' +
+                                 'does not exist, skipping')
+                continue
 
             # Get file header
             ds_header = open_dataset(filename)
@@ -176,6 +181,7 @@ class IodaObsSpace(EvaDatasetBase):
             locations_this_file = range(total_loc, total_loc + ds_header['Location'].size)
             ds_header = ds_header.assign_coords({"Location": locations_this_file})
             total_loc = total_loc + ds_header['Location'].size
+            self.logger.info(f'total_loc: {total_loc}')
 
             if 'Cluster' in ds_header.keys():
                 clusters_this_file = range(0, ds_header['Cluster'].size)
@@ -189,6 +195,7 @@ class IodaObsSpace(EvaDatasetBase):
             if 'Channel' in ds_header.keys():
                 sensor_channels = ds_header['Channel']
                 add_channels = True
+                self.logger.info(f'sensor_channels: {sensor_channels}')
 
             # Merge in the header and close
             ds_groups = ds_groups.merge(ds_header)
