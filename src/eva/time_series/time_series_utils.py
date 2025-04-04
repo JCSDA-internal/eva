@@ -6,6 +6,7 @@ from eva.data.data_collections import DataCollections
 
 
 filename_retrieval = {
+    "GsiObsSpace": lambda dataset_config: dataset_config["filenames"],
     "IodaObsSpace": lambda dataset_config: dataset_config["filenames"],
     "JediVariationalBiasCorrection": lambda dataset_config: dataset_config["bias_file"],
 }
@@ -14,6 +15,8 @@ filename_retrieval = {
 def update_filename(dataset_config, filename, logger):
     """ Update the filename associated with a dataset_config """
     match dataset_config['type']:
+        case 'GsiObsSpace':
+            dataset_config['filenames'] = [filename]
         case 'IodaObsSpace':
             dataset_config['filenames'] = [filename]
         case 'JediVariationalBiasCorrection':

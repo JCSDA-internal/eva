@@ -130,7 +130,6 @@ def satellite_dataset(ds):
     coords = {
         'nchans': (('nchans'), ds['sensor_chan'].data),
         'nobs': (('nobs'), np.arange(0, iters)),
-        'BC_angord_arr_dim': (('BC_angord_arr_dim'), np.arange(0, 4))
     }
 
     data_vars = {}
@@ -147,10 +146,14 @@ def satellite_dataset(ds):
             data_vars[var] = (('nchans'), ds[var].data)
 
         # If variable is BC_angord, reshape data
+        # Split BC_angord (if it's there) into N variables BC_angord_1, BC_angord_2, etc.
         elif var == 'BC_angord':
             data = np.reshape(ds['BC_angord'].data,
                               (iters, nchans, ds.dims['BC_angord_arr_dim']))
-            data_vars[var] = (('nobs', 'nchans', 'BC_angord_arr_dim'), data)
+            for ipred in range(ds.dims['BC_angord_arr_dim']):
+                pred = '_{}'.format(ipred+1)
+                out_var = var+pred
+                data_vars[out_var] = (('nobs', 'nchans'), data[:, :, ipred])
 
         # Deals with how to handle nobs data
         else:
