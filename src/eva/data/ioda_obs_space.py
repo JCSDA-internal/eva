@@ -181,7 +181,6 @@ class IodaObsSpace(EvaDatasetBase):
             locations_this_file = range(total_loc, total_loc + ds_header['Location'].size)
             ds_header = ds_header.assign_coords({"Location": locations_this_file})
             total_loc = total_loc + ds_header['Location'].size
-            self.logger.info(f'total_loc: {total_loc}')
 
             if 'Cluster' in ds_header.keys():
                 clusters_this_file = range(0, ds_header['Cluster'].size)
@@ -195,7 +194,6 @@ class IodaObsSpace(EvaDatasetBase):
             if 'Channel' in ds_header.keys():
                 sensor_channels = ds_header['Channel']
                 add_channels = True
-                self.logger.info(f'sensor_channels: {sensor_channels}')
 
             # Merge in the header and close
             ds_groups = ds_groups.merge(ds_header)
