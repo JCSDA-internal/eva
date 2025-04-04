@@ -166,7 +166,6 @@ class IodaObsSpace(EvaDatasetBase):
         total_loc = 0
 
         for filename in filenames:
-            self.logger.info(f'now processing file {filename}')
 
             # Assert that file exists
             if not os.path.exists(filename):
