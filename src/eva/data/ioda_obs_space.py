@@ -164,10 +164,14 @@ class IodaObsSpace(EvaDatasetBase):
         # Loop over filenames
         # -------------------
         total_loc = 0
+
         for filename in filenames:
+
             # Assert that file exists
             if not os.path.exists(filename):
-                logger.abort(f'In IodaObsSpace file \'{filename}\' does not exist')
+                self.logger.info(f'Warning:  In IodaObsSpace file \'{filename}\' ' +
+                                 'does not exist, skipping')
+                continue
 
             # Get file header
             ds_header = open_dataset(filename)

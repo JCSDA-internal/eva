@@ -22,7 +22,8 @@ from eva.utilities.timing import Timing
 from eva.data.data_driver import data_driver
 from eva.time_series.time_series import add_empty_to_timeseries
 from eva.time_series.time_series import collapse_collection_to_time_series
-from eva.time_series.time_series_utils import create_empty_data, get_filename, check_file
+from eva.time_series.time_series_utils import create_empty_data, get_filenames
+from eva.time_series.time_series_utils import check_file, update_filename
 from eva.transforms.transform_driver import transform_driver
 from eva.plotting.batch.base.plot_tools.figure_driver import figure_driver
 from eva.data.data_collections import DataCollections
@@ -163,48 +164,44 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
                 if name == time_series_config['collection']:
                     transform_dict['transforms'].append(transform)
 
-        # Check if first file is empty. If it is, abort.
         empty_dataset_config = datasets_config[0]
-        filename = get_filename(empty_dataset_config, logger)
-        check_file(filename, logger)
+        fctr = 0
 
         # Loop over datasets reading each one in turn, internally appending the data_collections
-        for ind, dataset_config in enumerate(datasets_config):
+        for dataset_config in datasets_config:
 
-            # Pull out information to check for missing date
-            date = dates[ind]
+            # Loop over filenames
+            for filename in get_filenames(dataset_config, logger):
 
-            # Check if file exists, if not add empty and continue
-            filename = get_filename(dataset_config, logger)
-            if not os.path.isfile(filename):
-                add_empty_to_timeseries(logger, date, ind, timing, time_series_config,
-                                        empty_dataset_config, data_collections)
-                continue
-            # Check if file exists but is size zero, add empty and continue
-            elif os.stat(filename).st_size == 0:
-                add_empty_to_timeseries(logger, date, ind, timing, time_series_config,
-                                        empty_dataset_config, data_collections)
-                continue
+                date = dates[fctr]
 
-            # Create a temporary collection for this time step
-            data_collections_tmp = DataCollections()
+                # Skip any non-existant or 0 sized filename
+                if not os.path.isfile(filename) or os.stat(filename).st_size == 0:
+                    add_empty_to_timeseries(logger, date, fctr, timing, time_series_config,
+                                            empty_dataset_config, data_collections)
+                    fctr += 1
+                    continue
 
-            # Prepare diagnostic data
-            logger.info('Running data driver')
-            timing.start('DataDriverExecute')
-            data_driver(dataset_config, data_collections_tmp, timing, logger)
-            timing.stop('DataDriverExecute')
+                # Create a temporary collection for this time step
+                data_collections_tmp = DataCollections()
 
-            # Perform any transforms on the fly
-            if transform_dict:
-                logger.info(f'Running transform driver')
-                timing.start('TransformDriverExecute')
-                transform_driver(transform_dict, data_collections_tmp, timing, logger)
-                timing.stop('TransformDriverExecute')
+                # Prepare diagnostic data
+                timing.start('DataDriverExecute')
+                tmp_config = update_filename(dataset_config, filename, logger)
+                data_driver(tmp_config, data_collections_tmp, timing, logger)
+                timing.stop('DataDriverExecute')
 
-            # Collapse data into time series
-            collapse_collection_to_time_series(logger, ind, date, time_series_config,
-                                               data_collections, data_collections_tmp)
+                # Perform any transforms on the fly
+                if transform_dict:
+                    logger.info(f'Running transform driver')
+                    timing.start('TransformDriverExecute')
+                    transform_driver(transform_dict, data_collections_tmp, timing, logger)
+                    timing.stop('TransformDriverExecute')
+
+                # Collapse data into time series
+                collapse_collection_to_time_series(logger, fctr, date, time_series_config,
+                                                   data_collections, data_collections_tmp)
+                fctr += 1
 
         if not suppress_collection_display:
             logger.info('Computing of Eva time series complete: status of collection:')
