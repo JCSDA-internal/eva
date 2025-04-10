@@ -1,0 +1,9 @@
+# GriddedPlot class default schema
+cmap: 'viridis'
+norm:
+vmin:
+vmax:
+edgecolors:
+shading: 'auto'
+alpha:
+colorbar: True
