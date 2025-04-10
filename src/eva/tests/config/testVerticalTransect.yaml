@@ -1,0 +1,43 @@
+datasets:
+  - group: increment
+    type: LatLon
+    filename: ${data_input_path}/gdas.t00z.atminc.nc
+    name: experiment
+    variables: [T_inc, lev, lon]
+
+graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
+  # Map plots
+  # ---------
+
+  # Observations
+  - batch figure:
+      variables: [T_inc]
+    figure:
+      figure size: [20,10]
+      layout: [1,1]
+      title: 'Vertical Transect of Temperature Increment from GSI'
+      output name: gridded_plots/increments/${variable}/vert_transect_inc_${variable}.png
+    plots:
+      - add_colorbar:
+          label: Temperature
+          orientation: vertical
+        add_xlabel: Longitude
+        add_ylabel: Level
+        layers:
+        - type: GriddedPlot
+          x:
+            variable: experiment::increment::lon
+          y:
+            variable: experiment::increment::lev
+          z:
+            variable: experiment::increment::T_inc
+            slices: '[:,48,:]'
+          label: T increment
+          colorbar: true
+          cmap: 'coolwarm'
+          vmin: -1
+          vmax: 1
