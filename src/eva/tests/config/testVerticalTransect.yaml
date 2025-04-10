@@ -1,7 +1,7 @@
 datasets:
   - group: increment
     type: LatLon
-    filename: /scratch1/NCEPDEV/da/Kevin.Dougherty/eva/src/eva/tests/data/gdas.t00z.atminc.nc
+    filename: ${data_input_path}/gdas.t00z.atminc.nc
     name: experiment
     variables: [T_inc, lev, lon]
 
