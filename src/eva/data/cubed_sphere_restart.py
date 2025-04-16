@@ -11,7 +11,6 @@
 
 import numpy as np
 import xarray as xr
-# from netCDF4 import Dataset
 from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 
@@ -34,7 +33,7 @@ def read_fms_tiles(files, variables, logger, use_dask=False):
         dict: {varname: DataArray with 'tile' dimension}
     """
     if len(files) != len(set(files)):
-        print(f'Duplicate files were found: {files}. \nExiting ...')
+        logger.abort(f'Duplicate files were found: {files}. \nExiting ...')
 
     data_arrays_by_var = {var: [] for var in variables}
 
@@ -51,11 +50,11 @@ def read_fms_tiles(files, variables, logger, use_dask=False):
                 chunks={} if use_dask else None
             )
         except Exception as e:
-            print(f"Error reading {file}: {e}")
+            logger.abort(f"Error reading {file}: {e}")
 
         for var in variables:
             if var not in ds:
-                print(f"{var} not found in {file}. \nExiting ...")
+                logger.abort(f"{var} not found in {file}. \nExiting ...")
 
             da = ds[var].squeeze()
 
