@@ -11,7 +11,7 @@
 
 import numpy as np
 import xarray as xr
-from netCDF4 import Dataset
+# from netCDF4 import Dataset
 from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 
@@ -19,49 +19,57 @@ from eva.utilities.config import get
 # --------------------------------------------------------------------------------------------------
 
 
-def read_fms_tiles(files, variable, logger):
-
+def read_fms_tiles(files, variables, logger, use_dask=False):
     """
-    Given a list of FMS netCDF files and a variable name,
-    stitches the files together into an N+1 dimension variable.
+    Reads specified variables from a list of cubed-sphere NetCDF files,
+    stacking across a 'tile' dimension.
 
     Args:
-        files (list): List of netCDF file paths.
-        variable (str): Name of the variable to extract.
-        logger (Logger): Logger object for logging messages.
+        files (list): List of NetCDF file paths.
+        variables (list): Variables to retain.
+        logger: Logger for error handling.
+        use_dask (bool): Whether to use Dask for lazy loading.
 
     Returns:
-        np.ndarray: Combined variable array from input files.
+        dict: {varname: DataArray with 'tile' dimension}
     """
-
-    # Check there are no duplicates in files
     if len(files) != len(set(files)):
-        logger.abort('Duplicate files were found in input file ' +
-                     f'list: {files}. \nExiting ...')
+        print(f'Duplicate files were found: {files}. \nExiting ...')
 
-    # Loop through nc files and store variable data in outvar
+    data_arrays_by_var = {var: [] for var in variables}
+
     for i, file in enumerate(files):
+        try:
+            # First open only the metadata (no data loaded)
+            with xr.open_dataset(file, chunks={} if use_dask else None) as temp_ds:
+                drop_vars = [var for var in temp_ds.variables if var not in variables]
 
-        with Dataset(file, mode='r') as f:
-            try:
-                var = np.squeeze(f.variables[variable][:])
-            except KeyError:
-                logger.abort(f"{variable} is not a valid variable. \nExiting ...")
+            # Now re-open with drop_variables
+            ds = xr.open_dataset(
+                file,
+                drop_variables=drop_vars,
+                chunks={} if use_dask else None
+            )
+        except Exception as e:
+            print(f"Error reading {file}: {e}")
 
-            if variable in ['lon', 'geolon']:
-                # transform longitudes to be -180 to 180
-                var[np.where(var > 180)] = var[np.where(var > 180)] - 360
+        for var in variables:
+            if var not in ds:
+                print(f"{var} not found in {file}. \nExiting ...")
 
-            if i == 0:
-                # need to create outvar on the first file
-                outvar = np.empty(var.shape+(len(files),), dtype=var.dtype)
-            # add values to the correct part of the array
-            outvar[..., i] = var
+            da = ds[var].squeeze()
 
-    return outvar
+            if var in ['lon', 'geolon']:
+                da = da.where(da <= 180, da - 360)
+
+            da = da.expand_dims(tile=[i])
+            data_arrays_by_var[var].append(da)
+
+    # Concatenate and convert to NumPy arrays
+    return {var: xr.concat(das, dim='tile').values for var, das in data_arrays_by_var.items()}
 
 
-# --------------------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------------------
 
 
 class CubedSphereRestart(EvaDatasetBase):
@@ -69,9 +77,8 @@ class CubedSphereRestart(EvaDatasetBase):
     """
     A class for handling Cubed Sphere Restart data.
     """
-
+    
     def execute(self, dataset_config, data_collections, timing):
-
         """
         Executes the processing of Cubed Sphere Restart data.
 
@@ -80,7 +87,6 @@ class CubedSphereRestart(EvaDatasetBase):
             data_collections (DataCollections): Object for managing data collections.
             timing: Timing object for tracking execution time.
         """
-
         # Filenames to be read into this collection
         # -----------------------------------------
         restart_filenames = get(dataset_config, self.logger, 'restart_filenames')
@@ -91,41 +97,43 @@ class CubedSphereRestart(EvaDatasetBase):
         threshold = float(get(dataset_config, self.logger, 'missing_value_threshold', 1.0e30))
 
         # Get collection name
-        # ---------------------------
+        # -------------------
         collection_name = dataset_config['name']
 
         # Get the variables to be read
-        # -------------------------
+        # ----------------------------
         orog_vars = get(dataset_config, self.logger, 'orography variables')
         vars_2d = get(dataset_config, self.logger, '2d variables', default=[])
         vars_3d = get(dataset_config, self.logger, '3d variables', default=[])
 
-        # Read orographic fields first
-        # -------------------------
         var_dict = {}
+
+        # Read orographic fields first
+        # ----------------------------
         group_name = 'FV3Orog'
+        var_arrays = read_fms_tiles(orog_filenames, orog_vars, self.logger, use_dask=False)
+
         for var in orog_vars:
-            var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                 read_fms_tiles(orog_filenames, var, self.logger))
+            var_dict[group_name + '::' + var] = (["lon", "lat", "tile"], var_arrays[var])
 
         # 2D variables
-        # -------------------------
+        # ------------
         group_name = 'FV3Vars2D'
+        var_arrays = read_fms_tiles(restart_filenames, vars_2d, self.logger, use_dask=False)
+
         for var in vars_2d:
-            var_dict[group_name + '::' + var] = (["lon", "lat", "tile"],
-                                                 read_fms_tiles(restart_filenames,
-                                                                var, self.logger))
+            var_dict[group_name + '::' + var] = (["lon", "lat", "tile"], var_arrays[var])
 
         # 3D variables
-        # -------------------------
+        # ------------
         group_name = 'FV3Vars3D'
+        var_arrays = read_fms_tiles(restart_filenames, vars_3d, self.logger, use_dask=False)
+
         for var in vars_3d:
-            var_dict[group_name + '::' + var] = (["lev", "lon", "lat", "tile"],
-                                                 read_fms_tiles(restart_filenames,
-                                                                var, self.logger))
+            var_dict[group_name + '::' + var] = (["lev", "lon", "lat", "tile"], var_arrays[var])
 
         # Create dataset_config from data dictionary
-        # -------------------------
+        # ------------------------------------------
         ds = xr.Dataset(var_dict)
 
         # Assert that the collection contains at least one variable
@@ -133,7 +141,7 @@ class CubedSphereRestart(EvaDatasetBase):
         if not ds.keys():
             self.logger.abort('Collection \'' + collection_name + '\', group \'' +
                               group_name + '\' does not have any variables.')
-
+        
         # Add the dataset_config to the collections
         # -------------------------
         data_collections.create_or_add_to_collection(collection_name, ds)
