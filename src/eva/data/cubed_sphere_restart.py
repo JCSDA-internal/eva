@@ -67,7 +67,6 @@ def read_fms_tiles(files, variables, logger, use_dask=False):
     # Concatenate and convert to NumPy arrays
     return {var: xr.concat(das, dim='tile').values for var, das in data_arrays_by_var.items()}
 
-
     # --------------------------------------------------------------------------------------------------
 
 
@@ -76,7 +75,7 @@ class CubedSphereRestart(EvaDatasetBase):
     """
     A class for handling Cubed Sphere Restart data.
     """
-    
+
     def execute(self, dataset_config, data_collections, timing):
         """
         Executes the processing of Cubed Sphere Restart data.
@@ -140,7 +139,7 @@ class CubedSphereRestart(EvaDatasetBase):
         if not ds.keys():
             self.logger.abort('Collection \'' + collection_name + '\', group \'' +
                               group_name + '\' does not have any variables.')
-        
+
         # Add the dataset_config to the collections
         # -------------------------
         data_collections.create_or_add_to_collection(collection_name, ds)
