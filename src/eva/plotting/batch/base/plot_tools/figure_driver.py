@@ -185,6 +185,9 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
     figure_layout = figure_conf.get("layout")
     file_type = figure_conf.get("figure file type", "png")
     output_file = get_output_file(figure_conf)
+    
+    # Set up layer class cache to avoid in loop
+    layer_class_cache = {}
 
     # Set up layers and plots
     plot_list = []
@@ -195,7 +198,9 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
             eva_class_name = handler.BACKEND_NAME + layer.get("type")
             eva_module_name = camelcase_to_underscore(eva_class_name)
             full_module = handler.MODULE_NAME + eva_module_name
-            layer_class = getattr(im.import_module(full_module), eva_class_name)
+            if eva_class_name not in layer_class_cache:
+                layer_class_cache[eva_class_name] = getattr(im.import_module(full_module), eva_class_name)
+            layer_class = layer_class_cache[eva_class_name]
             layer = layer_class(layer, logger, data_collections)
             layer.data_prep()
             layer_list.append(layer.configure_plot())
