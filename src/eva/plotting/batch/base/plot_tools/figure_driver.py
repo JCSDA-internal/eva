@@ -180,7 +180,7 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
         dynamic_option_module = im.import_module(mod_name)
         dynamic_option_method = getattr(dynamic_option_module, dynamic_option['type'])
         plots = dynamic_option_method(logger, dynamic_option, plots, data_collections)
-    
+
     # Setup figure details
     # --------------------
     nrows, ncols = figure_conf.get("layout", (1, 1))
