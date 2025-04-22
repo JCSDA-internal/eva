@@ -62,8 +62,8 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
         # Check for required keys in config
         required_keys = [
             'name',
-            'bias_file',
-            'lapse_file',
+            'bias_files',
+            'lapse_files',
             ]
         for key in required_keys:
             self.logger.assert_abort(key in dataset_config, "For JediVariationalBiasCorrection " +
@@ -71,60 +71,69 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
 
         # Parse config
         collection_name = dataset_config['name']
-        bias_file = get(dataset_config, self.logger, 'bias_file')
-        lapse_file = get(dataset_config, self.logger, 'lapse_file')
+        bias_files = get(dataset_config, self.logger, 'bias_files')
+        lapse_files = get(dataset_config, self.logger, 'lapse_files')
+
+        # Verify same number of bais_files and lapse_files
+        self.logger.assert_abort(len(bias_files) == len(lapse_files), 'The number of bias_files '
+                                 'and lapse_files in the input yaml file must be the same.')
 
         groups = [
             'BiasCoefficients',
             'BiasCoefficientErrors',
         ]
 
+        ds_groups = xr.Dataset()
+
         # Create a new dataset to store the bias data
-        bias_dataset = xr.open_dataset(bias_file)
+        for bfile, lfile in zip(bias_files, lapse_files):
+            bias_dataset = xr.open_dataset(bfile)
 
-        # Get record dimension size
-        self.logger.assert_abort(len(bias_dataset['Record']) == 1, 'This code currently only  '
-                                 'supports reading VarBC files where the Record diminsion is 1')
+            # Get record dimension size
+            self.logger.assert_abort(len(bias_dataset['Record']) == 1, 'This code currently only  '
+                                     'supports reading VarBC files where the Record diminsion is 1')
 
-        # Loop over groups, open and store in bias_dataset
-        for group in groups:
-            dsg = xr.open_dataset(bias_file, group=group)
+            # Loop over groups, open and store in bias_dataset
+            for group in groups:
+                dsg = xr.open_dataset(bfile, group=group)
 
-            # Rename variables with group
-            dsg = dsg.rename_vars({var: f'{group}::{var}' for var in dsg.data_vars})
+                # Rename variables with group
+                dsg = dsg.rename_vars({var: f'{group}::{var}' for var in dsg.data_vars})
 
-            # Store the data in the bias_dataset
-            bias_dataset = xr.merge([bias_dataset, dsg])
+                # Store the data in the bias_dataset
+                bias_dataset = xr.merge([bias_dataset, dsg])
 
-        # Now add coordinate for channels dimension going from 0 to channel
-        bias_dataset = bias_dataset.assign_coords(
-            {'Channel': range(len(bias_dataset.Channel))}
-        )
+            # Now add coordinate for channels dimension going from 0 to channel
+            bias_dataset = bias_dataset.assign_coords(
+                {'Channel': range(len(bias_dataset.Channel))}
+            )
 
-        # Squeeze the record dimension and remove record coordinate
-        bias_dataset = bias_dataset.squeeze('Record')
-        bias_dataset = bias_dataset.drop_vars('Record')
+            # Squeeze the record dimension and remove record coordinate
+            bias_dataset = bias_dataset.squeeze('Record')
+            bias_dataset = bias_dataset.drop_vars('Record')
 
-        # Rename numberObservationsUsed to Bias::numberObservationsUsed
-        bias_dataset = bias_dataset.rename_vars(
-            {'numberObservationsUsed': 'Bias::numberObservationsUsed'}
-        )
+            # Rename numberObservationsUsed to Bias::numberObservationsUsed
+            bias_dataset = bias_dataset.rename_vars(
+                {'numberObservationsUsed': 'Bias::numberObservationsUsed'}
+            )
 
-        # Remove attrributes from the dataset
-        bias_dataset.attrs = {}
+            # Remove attrributes from the dataset
+            bias_dataset.attrs = {}
 
-        # Read the t-lapse file (text) into a dataset
-        with open(lapse_file, 'r') as f:
-            lapse_data = f.readlines()
+            # Read the t-lapse file (text) into a dataset
+            with open(lfile, 'r') as f:
+                lapse_data = f.readlines()
 
-        # Store the third element of each line as numpy array
-        lapse_data = np.array([float(line.split()[2]) for line in lapse_data])
+            # Store the third element of each line as numpy array
+            lapse_data = np.array([float(line.split()[2]) for line in lapse_data])
 
-        # Store lapse data in flat_dataset with channel as dimension/coordinate
-        bias_dataset['Bias::tlapse'] = xr.DataArray(lapse_data, dims=['Channel'])
+            # Store lapse data in flat_dataset with channel as dimension/coordinate
+            # and merge to ds_groups
+            bias_dataset['Bias::tlapse'] = xr.DataArray(lapse_data, dims=['Channel'])
+            ds_groups = ds_groups.merge(bias_dataset)
 
-        # Add bias_dataset to data_collections
-        data_collections.create_or_add_to_collection(collection_name, bias_dataset)
+        # Add ds_groups to data_collections
+        data_collections.create_or_add_to_collection(collection_name, ds_groups, 'Channel')
 
     # ----------------------------------------------------------------------------------------------
 
@@ -148,8 +157,8 @@ class JediVariationalBiasCorrection(EvaDatasetBase):
         """
 
         return {
-            'bias_file': filenames[0],
-            'lapse_file': filenames[1],
+            'bias_files': [filenames[0]],
+            'lapse_files': [filenames[1]],
             'name': collection_name
             }
 
