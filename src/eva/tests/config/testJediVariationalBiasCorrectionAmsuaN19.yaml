@@ -4,25 +4,26 @@ datasets:
   - name: experiment
     type: JediVariationalBiasCorrection
     bias_files:
-      - {data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-11T15:00:00Z.satbias
-      - {data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-11T21:00:00Z.satbias
+      - ../data/gsi.x0048v2.bc.amsua_n19.2021-12-11T15:00:00Z.satbias
+      - ../data/gsi.x0048v2.bc.amsua_n19.2021-12-11T21:00:00Z.satbias
     lapse_files:
-      - {data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-11T15:00:00Z.tlapse
-      - {data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-11T21:00:00Z.tlapse
+      - ../data/gsi.x0048v2.bc.amsua_n19.2021-12-11T15:00:00Z.tlapse
+      - ../data/gsi.x0048v2.bc.amsua_n19.2021-12-11T21:00:00Z.tlapse
 
   # Empty
   - name: experiment
     type: JediVariationalBiasCorrection
     bias_files:
-      - {data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-12T03:00:00Z.satbias
+      - ../data/gsi.x0048v2.bc.amsua_n19.2021-12-12T03:00:00Z.satbias
     lapse_files:
-      - {data_input_path}/gsi.x0048v2.bc.amsua_n19.2021-12-12T03:00:00Z.tlapse
+      - ../data/gsi.x0048v2.bc.amsua_n19.2021-12-12T03:00:00Z.tlapse
 
 time_series:
 
   - begin_date: '2021-12-11T15:00:00'
     final_date: '2021-12-12T03:00:00'
     interval: 'PT6H'
+-
     collection: experiment
     variables:
       - all
