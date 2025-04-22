@@ -1,0 +1,9 @@
+# MapContour class default schema
+levels:
+clabel: False
+colors:
+cmap: 'viridis'
+vmin:
+vmax:
+alpha:
+colorbar: False
