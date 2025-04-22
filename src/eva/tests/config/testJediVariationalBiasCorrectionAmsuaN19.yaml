@@ -23,7 +23,7 @@ time_series:
   - begin_date: '2021-12-11T15:00:00'
     final_date: '2021-12-12T03:00:00'
     interval: 'PT6H'
--
+
     collection: experiment
     variables:
       - all
