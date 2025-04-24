@@ -38,11 +38,7 @@ class LatLon(EvaDatasetBase):
                               f' The valid types are {valid_groups}')
 
         # open the input netCDF file
-        ds = xr.open_dataset(filename)
-
-        # Drop data variables not in user requested variables
-        vars_to_remove = list(set(list(ds.keys())) - set(variables))
-        ds = ds.drop_vars(vars_to_remove)
+        ds = xr.open_dataset(filename, engine='netcdf4')[variables]
 
         # rename variables in dataset_config
         rename_dict = {}
