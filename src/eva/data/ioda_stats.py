@@ -178,7 +178,7 @@ class IodaStats(EvaDatasetBase):
 
             # Read header part of the file to get coordinates
             ds_groups = Dataset()
-            
+
             # Save sensor_channels for later
             add_channels = False
             if 'Channel' in ds_header.keys():
@@ -237,7 +237,7 @@ class IodaStats(EvaDatasetBase):
                 for group_var in group_vars:
                     rename_dict[group_var] = group_name.replace('/', '_') + '::' + group_var
                 ds = ds.rename(rename_dict)
-                
+
                 # Reset channel numbers from header and copy channel numbers
                 # into MetaData for easier use
                 if add_channels:
