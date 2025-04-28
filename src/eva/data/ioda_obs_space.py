@@ -142,8 +142,9 @@ class IodaObsSpace(EvaDatasetBase):
 
         # Get channels for radiances
         # --------------------------
-        channels_str_or_list = get(dataset_config, self.logger, 'channels', [])
+        channels_str_or_list = get(dataset_config, self.logger, 'channels', default=[])
 
+        self.logger.info(f"channels_str_or_list: {channels_str_or_list}")
         # Convert channels to list
         channels = []
         if channels_str_or_list is not []:
