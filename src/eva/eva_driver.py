@@ -159,8 +159,14 @@ def read_transform_time_series(logger, timing, eva_dict, data_collections):
         transform_dict = defaultdict(list)
         if 'transforms' in eva_dict:
             for transform in get(eva_dict, logger, 'transforms'):
+
                 # Get collection name
-                name = transform['new name'].split('::')[0]
+                name = None
+                if 'new name' in transform:
+                    name = transform['new name'].split('::')[0]
+                elif 'variable_name' in transform:
+                    name = transform['variable_name'].split('::')[0]
+
                 if name == time_series_config['collection']:
                     transform_dict['transforms'].append(transform)
 
