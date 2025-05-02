@@ -8,17 +8,17 @@ from abc import ABC, abstractmethod
 # --------------------------------------------------------------------------------------------------
 
 
-class ContourPlot(ABC):
+class GriddedPlot(ABC):
 
-    """Base class for creating Contour plots."""
+    """Base class for creating Gridded plots."""
 
     def __init__(self, config, logger, dataobj):
 
         """
-        Creates a Contour plot abstract class based on the provided configuration.
+        Creates a Gridded plot abstract class based on the provided configuration.
 
         Args:
-            config (dict): A dictionary containing the configuration for the contour plot.
+            config (dict): A dictionary containing the configuration for the gridded plot.
             logger (Logger): An instance of the logger for logging messages.
             dataobj: An instance of the data object containing input data.
 
@@ -36,7 +36,7 @@ class ContourPlot(ABC):
                         "schema": "path_to_schema_file.yaml"
                     }
                     logger = Logger()
-                    contour_plot = ContourPlot(config, logger, None)
+                    gridded_plot = GriddedPlot(config, logger, None)
         """
 
         self.config = config
@@ -63,13 +63,13 @@ class ContourPlot(ABC):
         var2_cgv = var2.split('::')
 
         if len(var0_cgv) != 3:
-            self.logger.abort('Contour: comparison first var \'var0\' does not appear to ' +
+            self.logger.abort('Gridded: comparison first var \'var0\' does not appear to ' +
                               'be in the required format of collection::group::variable.')
         if len(var1_cgv) != 3:
-            self.logger.abort('Contour: comparison second var \'var1\' does not appear to ' +
+            self.logger.abort('Gridded: comparison second var \'var1\' does not appear to ' +
                               'be in the required format of collection::group::variable.')
         if len(var2_cgv) != 3:
-            self.logger.abort('Contour: comparison second var \'var2\' does not appear to ' +
+            self.logger.abort('Gridded: comparison second var \'var2\' does not appear to ' +
                               'be in the required format of collection::group::variable.')
 
         # Optionally get the channel to plot
@@ -82,14 +82,9 @@ class ContourPlot(ABC):
         zdata = self.dataobj.get_variable_data(var2_cgv[0], var2_cgv[1], var2_cgv[2], channel)
 
         # see if we need to slice data
-        xdata = slice_var_from_str(self.config['x'], xdata, self.logger)
-        ydata = slice_var_from_str(self.config['y'], ydata, self.logger)
-        zdata = slice_var_from_str(self.config['z'], zdata, self.logger)
-
-        # contour data should be flattened
-        xdata = xdata.flatten()
-        ydata = ydata.flatten()
-        zdata = zdata.flatten()
+        self.xdata = slice_var_from_str(self.config['x'], xdata, self.logger)
+        self.ydata = slice_var_from_str(self.config['y'], ydata, self.logger)
+        self.zdata = slice_var_from_str(self.config['z'], zdata, self.logger)
 
     @abstractmethod
     def configure_plot(self):

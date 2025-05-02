@@ -118,6 +118,7 @@ def figure_driver(config, data_collections, timing, logger):
                 logger.abort("Batch Figure must provide variables, even if with channels")
 
             # Loop over variables and channels
+            # FUTURE NOTE: This can be parallelized. Could add multiprocessing option.
             for variable in variables:
                 for step_var in step_vars:
                     batch_conf_this = {}
@@ -180,76 +181,93 @@ def make_figure(handler, figure_conf, plots, dynamic_options, data_collections, 
         dynamic_option_method = getattr(dynamic_option_module, dynamic_option['type'])
         plots = dynamic_option_method(logger, dynamic_option, plots, data_collections)
 
-    # Grab some figure configuration
-    # -------------------
-    figure_layout = figure_conf.get("layout")
-    file_type = figure_conf.get("figure file type", "png")
+    # Setup figure details
+    # --------------------
+    nrows, ncols = figure_conf.get("layout", (1, 1))
+    figsize = tuple(figure_conf.get("figure size", (10, 8)))
     output_file = get_output_file(figure_conf)
+    file_type = figure_conf.get("figure file type", "png")
 
-    # Set up layers and plots
+    # Initialize layer cache
+    layer_class_cache = {}
+
+    def get_layer_class(layer_type):
+        eva_class_name = handler.BACKEND_NAME + layer_type
+        if eva_class_name not in layer_class_cache:
+            module_name = camelcase_to_underscore(eva_class_name)
+            full_module = handler.MODULE_NAME + module_name
+            layer_class_cache[eva_class_name] = getattr(
+                im.import_module(full_module), eva_class_name
+            )
+        return layer_class_cache[eva_class_name]
+
+    # Build all subplots
     plot_list = []
+    # FUTURE NOTE: This can be parallelized. Could add multiprocessing option.
     for plot in plots:
+        # 1. Configure each layer
         layer_list = []
-        for layer in plot.get("layers"):
+        for layer_cfg in plot.get("layers", []):
+            layer_type = layer_cfg.get("type")
+            if not layer_type:
+                logger.warning("Layer missing 'type': %s", layer_cfg)
+                continue
+            layer_class = get_layer_class(layer_type)
+            layer_obj = layer_class(layer_cfg, logger, data_collections)
+            layer_obj.data_prep()
+            layer_list.append(layer_obj.configure_plot())
 
-            eva_class_name = handler.BACKEND_NAME + layer.get("type")
-            eva_module_name = camelcase_to_underscore(eva_class_name)
-            full_module = handler.MODULE_NAME + eva_module_name
-            layer_class = getattr(im.import_module(full_module), eva_class_name)
-            layer = layer_class(layer, logger, data_collections)
-            layer.data_prep()
-            layer_list.append(layer.configure_plot())
+        # 2. Extract mapping (projection/domain)
+        proj, domain = None, None
+        if "mapping" in plot:
+            mapopt = plot["mapping"]
+            proj = mapopt.get("projection")
+            domain = mapopt.get("domain")
 
-        # get mapping dictionary
-        proj = None
-        domain = None
-        if 'mapping' in plot.keys():
-            mapoptions = plot.get('mapping')
-            # TODO make this configurable and not hard coded
-            proj = mapoptions['projection']
-            domain = mapoptions['domain']
-
-        # create a subplot based on specified layers
+        # 3. Create plot object
         plotobj = handler.create_plot(layer_list, proj, domain)
-        # make changes to subplot based on YAML configuration
+
+        # 4. Apply additional plot configuration
         for key, value in plot.items():
-            if key not in ['layers', 'mapping', 'statistics']:
-                if isinstance(value, dict):
-                    getattr(plotobj, key)(**value)
-                elif value is None:
-                    getattr(plotobj, key)()
-                else:
-                    getattr(plotobj, key)(value)
-            if key in ['statistics']:
-                # call the stats helper
+            if key in ["layers", "mapping"]:
+                continue  # already processed
+            if key == "statistics":
                 stats_helper(logger, plotobj, data_collections, value)
+                continue
+
+            # Refactored to call `getattr()` once and
+            # add fail safe if method does not exist
+            method = getattr(plotobj, key, None)
+            if callable(method):
+                try:
+                    if isinstance(value, dict):
+                        method(**value)
+                    elif value is None:
+                        method()
+                    else:
+                        method(value)
+                except Exception as e:
+                    logger.warning(f"Failed to apply plot method '{key}': {e}")
+            else:
+                logger.warning(f"Unknown plot method: '{key}'")
 
         plot_list.append(plotobj)
 
-    # create figure
-    nrows = figure_conf['layout'][0]
-    ncols = figure_conf['layout'][1]
-    figsize = tuple(figure_conf['figure size'])
+    # Create figure and attach subplots
     fig = handler.create_figure(nrows, ncols, figsize)
     fig.plot_list = plot_list
     fig.create_figure()
 
-    if 'title' in figure_conf:
+    if "title" in figure_conf:
         fig.add_suptitle(figure_conf['title'])
-    if 'tight layout' in figure_conf:
-        if isinstance(figure_conf['tight layout'], dict):
-            fig.tight_layout(**figure_conf['tight layout'])
-        else:
-            fig.tight_layout()
-        figure_conf.pop('tight layout')
+    if "tight layout" in figure_conf:
+        layout_val = figure_conf.pop("tight layout")
+        fig.tight_layout(**layout_val) if isinstance(layout_val, dict) else fig.tight_layout()
+    if "plot logo" in figure_conf:
+        fig.plot_logo(**figure_conf.pop("plot logo"))
 
-    if 'plot logo' in figure_conf:
-        fig.plot_logo(**figure_conf['plot logo'])
-        figure_conf.pop('plot logo')
-
-    saveargs = get_saveargs(figure_conf)
-    fig.save_figure(output_file, **saveargs)
-
+    # Save and close
+    fig.save_figure(output_file, **get_saveargs(figure_conf))
     fig.close_figure()
 
 

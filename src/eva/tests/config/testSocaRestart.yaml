@@ -34,7 +34,7 @@ graphics:
           label: ${variable}
         add_grid:
         layers:
-        - type: MapGridded
+        - type: MapFilledContour
           longitude:
             variable: experiment::SOCAgrid::lon
           latitude:
