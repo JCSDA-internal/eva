@@ -1,0 +1,117 @@
+suppress_collection_display: False
+
+datasets:
+- name: experiment
+  type: IodaObsSpace
+  filenames:
+  - ${data_input_path}/soca_argo/ncdiag.jra55.ob.PT6H.insitu_profile_argo.2021-08-12T03:00:00Z.nc4
+  - ${data_input_path}/soca_argo/ncdiag.jra55.ob.PT6H.insitu_profile_argo.2021-08-12T09:00:00Z.nc4
+  - ${data_input_path}/soca_argo/ncdiag.jra55.ob.PT6H.insitu_profile_argo.2021-08-12T15:00:00Z.nc4
+  - ${data_input_path}/soca_argo/ncdiag.jra55.ob.PT6H.insitu_profile_argo.2021-08-12T21:00:00Z.nc4
+  groups:
+  - name: ObsValue
+    variables: &variables
+    - waterTemperature
+    - salinity
+  - name: ombg
+  - name: oman
+  - name: EffectiveQC0
+  - name: MetaData
+
+transforms:
+- transform: accept where
+  new name: experiment::ombgPassedQc::${variable}
+  starting field: experiment::ombg::${variable}
+  where:
+  - experiment::EffectiveQC0::${variable} == 0
+  for:
+    variable: *variables
+- transform: accept where
+  new name: experiment::omanPassedQc::${variable}
+  starting field: experiment::oman::${variable}
+  where:
+  - experiment::EffectiveQC0::${variable} == 0
+  for:
+    variable: *variables
+
+time_series:
+- begin_date: '2021-08-12T03:00:00'
+  final_date: '2021-08-12T21:00:00'
+  interval: PT6H
+  collection: experiment
+  groups:
+  - omanPassedQc
+  - ombgPassedQc
+  variables: *variables
+  aggregation_methods:
+  - count
+  - std
+  dimension: Location
+
+graphics:
+  plotting_backend: Emcpy
+  figure_list:
+
+  - batch figure:
+      variables: *variables
+    figure:
+      layout:
+      - 1
+      - 1
+      title: Obs Counts | ARGO (In-situ) | ${variable_title}
+      output name: time_series/insitu_profile_argo/${variable}/jedi_timeseries_count_insitu_profile_argo_${variable}.png
+    plots:
+    - add_xlabel: Datetime
+      add_ylabel: Number of Observations
+      add_grid: null
+      add_legend:
+        loc: upper left
+      layers:
+      - type: LinePlot
+        x:
+          variable: experiment_time_series::MetaData::Dates
+        y:
+          variable: experiment_time_series::ombgPassedQc::${variable}_count
+        markersize: 5
+        color: black
+        label: Background obs count
+      - type: LinePlot
+        x:
+          variable: experiment_time_series::MetaData::Dates
+        y:
+          variable: experiment_time_series::omanPassedQc::${variable}_count
+        markersize: 5
+        color: red
+        label: Analysis obs count
+
+  - batch figure:
+      variables: *variables
+    figure:
+      layout:
+      - 1
+      - 1
+      title: Std Error | ARGO (In-situ) | ${variable_title}
+      output name: time_series/insitu_profile_argo/${variable}/jedi_timeseries_std_insitu_profile_argo_${variable}.png
+    plots:
+    - add_xlabel: Datetime
+      add_ylabel: Std in Obs Space
+      add_grid: null
+      add_legend:
+        loc: upper left
+      layers:
+      - type: LinePlot
+        x:
+          variable: experiment_time_series::MetaData::Dates
+        y:
+          variable: experiment_time_series::ombgPassedQc::${variable}_std
+        markersize: 5
+        color: black
+        label: Std Error Observation - Background (ombg)
+      - type: LinePlot
+        x:
+          variable: experiment_time_series::MetaData::Dates
+        y:
+          variable: experiment_time_series::omanPassedQc::${variable}_std
+        markersize: 5
+        color: red
+        label: Std Error Observation - Analysis (oman)
