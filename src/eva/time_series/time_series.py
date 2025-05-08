@@ -51,12 +51,12 @@ def collapse_collection_to_time_series(logger, ind, date, time_series_config, da
 
     # Check if we're using the new format (separate groups and variables)
     using_new_format = 'groups' in time_series_config and 'variables' in time_series_config
-    
+
     if using_new_format:
         # Get groups and variables
         groups = time_series_config['groups']
         variables = time_series_config['variables']
-        
+
         # Generate all combinations of groups and variables
         var_to_ts = []
         for group in groups:
@@ -83,7 +83,8 @@ def collapse_collection_to_time_series(logger, ind, date, time_series_config, da
     if var_to_ts != ['all'] and dataset_tmp is not None and hasattr(dataset_tmp, 'data_vars'):
         # This assumes variables in dataset include group prefix
         variables_to_keep = var_to_ts
-        variables_to_remove = [var for var in list(dataset_tmp.data_vars) if var not in variables_to_keep]
+        variables_to_remove = [var for var in list(dataset_tmp.data_vars)
+                               if var not in variables_to_keep]
         dataset_tmp = dataset_tmp.drop_vars(variables_to_remove)
 
     # Create an empty dataset to hold the aggregated data
