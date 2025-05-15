@@ -11,5 +11,5 @@ nbconvert>=6.5.4
 bokeh<3.6.0,>=3.5.0
 geopandas>=0.13.2
 geoviews>=1.10.0
-nbsite
+nbsite=0.8.0
 git+https://github.com/NOAA-EMC/emcpy.git@92aa62f34a1f413d8cb1646bca0e81f267b61365#egg=emcpy
