@@ -163,14 +163,12 @@ class IodaStats(EvaDatasetBase):
         groups = get(dataset_config, self.logger, 'groups')
 
         for filename in filenames:
-    
+
             # Get file header (Gives info on dims and data variables)
             ds_header = open_dataset(filename)
 
             # Read header part of the file to get coordinates
             ds_groups = Dataset()
-
-            print(ds_header.keys())
 
             # Save sensor_channels for later
             add_channels = False
@@ -188,9 +186,7 @@ class IodaStats(EvaDatasetBase):
                 domain = ds_header['statisticDomain']
                 add_domain = True
 
-            # Merge in the header and close
-            # ds_groups = ds_groups.merge(ds_header)
-            ds_header.close()    
+            ds_header.close()
 
             # Set the channels based on user selection and add channels variable
             ds_groups = subset_channels(ds_groups, channels)
@@ -274,7 +270,8 @@ class IodaStats(EvaDatasetBase):
                 ds.close()
 
             # Add the dataset_config to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds_groups, 'analysisCycle')
+            data_collections.create_or_add_to_collection(collection_name, ds_groups,
+                                                         'analysisCycle')
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
