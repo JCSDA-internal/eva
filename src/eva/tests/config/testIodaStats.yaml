@@ -1,0 +1,47 @@
+datasets:
+  - name: experiment
+    type: IodaStats
+    filenames:
+    - ${data_input_path}/ioda_stats_amsua_n19_2025030600z.nc
+    - ${data_input_path}/ioda_stats_amsua_n19_2025030606z.nc
+    - ${data_input_path}/ioda_stats_amsua_n19_2025030612z.nc
+    - ${data_input_path}/ioda_stats_amsua_n19_2025030618z.nc
+    channels: 1
+    groups:
+    - name: byDomains/ObsValue/brightnessTemperature
+      variables:
+      - mean
+      - count
+      - RMS
+    variables:
+     - validTime
+
+graphics:
+
+  plotting_backend: Emcpy
+  figure_list:
+
+  # Ioda Stats Time Series
+
+  # Mean Brightness Temperature
+  - figure:
+      layout: [1,1]
+      title: 'AMSUA N19 Brightness Temperature Time Series - Mean'
+      output name: time_series/amsua_n19/brightnessTemperature_mean/time_series_test.png
+    plots:
+      - add_xlabel: 'Datetime'
+        add_ylabel: 'Brightness Temperature (Mean)'
+        add_grid:
+        add_legend:
+          loc: 'upper left'
+        layers:
+        - type: LinePlot
+          x:
+            variable: experiment::MetaData::validTime
+          y:
+            variable: experiment::byDomains_ObsValue_brightnessTemperature::mean
+            slices: '[:,0,0]'
+          channel: 1
+          markersize: 5
+          color: 'black'
+          label: 'Mean Brightness Temperature'
