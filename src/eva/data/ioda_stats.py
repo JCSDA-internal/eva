@@ -9,13 +9,14 @@
 # --------------------------------------------------------------------------------------------------
 
 import os
-from xarray import Dataset, open_dataset
+from xarray import Dataset, DataArray, open_dataset
 
 from eva.data.eva_dataset_base import EvaDatasetBase
 from eva.utilities.config import get
 from eva.utilities.utils import parse_channel_list
 
 import netCDF4 as nc
+import numpy as np
 
 # --------------------------------------------------------------------------------------------------
 
@@ -161,29 +162,35 @@ class IodaStats(EvaDatasetBase):
         # -------------------------
         groups = get(dataset_config, self.logger, 'groups')
 
-        # Loop over filenames
-        # -------------------
-        total_loc = 0
-
         for filename in filenames:
-
-            # Assert that file exists
-            if not os.path.exists(filename):
-                self.logger.info(f'Warning:  In IodaObsSpace file \'{filename}\' ' +
-                                 'does not exist, skipping')
-                continue
-
-            # Get file header
+    
+            # Get file header (Gives info on dims and data variables)
             ds_header = open_dataset(filename)
 
             # Read header part of the file to get coordinates
             ds_groups = Dataset()
 
+            print(ds_header.keys())
+
             # Save sensor_channels for later
             add_channels = False
-            if 'Channel' in ds_header.keys():
+            if 'Channels' in ds_header.keys():
                 sensor_channels = ds_header['Channel']
                 add_channels = True
+
+            add_validTime = False
+            if 'validTime' in ds_header.keys():
+                validTime = ds_header['validTime']
+                add_validTime = True
+
+            add_domain = False
+            if 'statisticDomain' in ds_header.keys():
+                domain = ds_header['statisticDomain']
+                add_domain = True
+
+            # Merge in the header and close
+            # ds_groups = ds_groups.merge(ds_header)
+            ds_header.close()    
 
             # Set the channels based on user selection and add channels variable
             ds_groups = subset_channels(ds_groups, channels)
@@ -247,6 +254,10 @@ class IodaStats(EvaDatasetBase):
                     # being applied to them)
                     ds['MetaData::channelNumber'] = sensor_channels
 
+                if add_validTime:
+                    ds['analysisCycle'] = validTime
+                    ds['MetaData::validTime'] = validTime
+
                 # Set channels
                 ds = subset_channels(ds, channels)
 
@@ -263,7 +274,7 @@ class IodaStats(EvaDatasetBase):
                 ds.close()
 
             # Add the dataset_config to the collections
-            data_collections.create_or_add_to_collection(collection_name, ds_groups, 'Location')
+            data_collections.create_or_add_to_collection(collection_name, ds_groups, 'analysisCycle')
 
         # Nan out unphysical values
         data_collections.nan_float_values_outside_threshold(threshold)
