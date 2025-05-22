@@ -2,6 +2,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import numpy as np
+import pandas as pd
 
 from abc import ABC, abstractmethod
 
@@ -84,16 +85,13 @@ class Scatter(ABC):
 
         # Remove NaN values to enable regression
         # --------------------------------------
-        if 'do_linear_regression' in self.config:
-            if self.config['do_linear_regression']:
+        mask = pd.notna(xdata)
+        self.xdata = xdata[mask]
+        self.ydata = ydata[mask]
 
-                mask = ~np.isnan(xdata)
-                self.xdata = xdata[mask]
-                self.ydata = ydata[mask]
-
-                mask = ~np.isnan(ydata)
-                self.xdata = xdata[mask]
-                self.ydata = ydata[mask]
+        mask = pd.notna(self.ydata)
+        self.xdata = self.xdata[mask]
+        self.ydata = self.ydata[mask]
 
     @abstractmethod
     def configure_plot(self):
