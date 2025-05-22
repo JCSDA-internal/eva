@@ -96,20 +96,8 @@ class LinePlot(ABC):
         ydata = slice_var_from_str(self.config['y'], ydata, self.logger)
 
         # line plot data should be flattened
-        xdata = xdata.flatten()
-        ydata = ydata.flatten()
-
-        # Remove NaN values to enable regression
-        # --------------------------------------
-        mask = ~np.isnan(xdata)
-        xdata = xdata[mask]
-        ydata = ydata[mask]
-
-        mask = ~np.isnan(ydata)
-        self.xdata = xdata[mask]
-        self.ydata = ydata[mask]
-
-# --------------------------------------------------------------------------------------------------
+        self.xdata = xdata.flatten()
+        self.ydata = ydata.flatten()
 
     @abstractmethod
     def configure_plot(self):
