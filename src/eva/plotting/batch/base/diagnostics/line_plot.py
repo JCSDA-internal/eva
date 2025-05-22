@@ -99,7 +99,7 @@ class LinePlot(ABC):
         # line plot data should be flattened
         self.xdata = xdata.flatten()
         self.ydata = ydata.flatten()
-        
+
         # Remove NaN values to enable regression
         # --------------------------------------
         mask = pd.notna(xdata)
