@@ -35,10 +35,11 @@ def data_driver(dataset_config, data_collections, timing, logger):
 
     # Extract name for this diagnostic data type
     eva_data_class_name = dataset_config['type']
-    
+
     # Check and handle filenames_template
     if "filenames_template" in dataset_config:
-        dataset_config['filenames'] = generate_filenames_from_template(dataset_config['filenames_template'], logger)
+        dataset_config['filenames'] = generate_filenames_from_template(dataset_config['filenames_template'],
+                                                                       logger)
         del dataset_config['filenames_template']
 
     # Create the data object

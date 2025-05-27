@@ -515,7 +515,7 @@ def generate_filenames_from_template(config, logger=None):
             "/data/file_2024010112.nc"
         ]
     """
-    
+
     # Assert that all required keys are present, otherwise abort
     required_keys = ["template", "start", "end", "interval_hours", "datetime_format"]
     missing_keys = [key for key in required_keys if key not in config]
