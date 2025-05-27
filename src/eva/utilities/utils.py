@@ -9,6 +9,7 @@
 import re
 import string
 import yaml
+from datetime import datetime, timedelta
 
 from eva.utilities.logger import Logger
 
@@ -474,3 +475,70 @@ def is_number(s):
         return False
 
 # --------------------------------------------------------------------------------------------------
+
+
+def generate_filenames_from_template(config, logger=None):
+
+    """
+    Generate a list of filenames based on a time-based template.
+
+    This function constructs a list of file paths by interpolating datetime strings
+    into a filename template at a specified interval between a start and end time.
+    It requires all necessary parameters to be present in the 'template_block' dictionary.
+
+    Parameters:
+        config (dict): A dictionary containing the following keys:
+            - template (str): A filename template string with a '{datetime}' placeholder.
+            - start (str): The start time as a string in the specified datetime_format.
+            - end (str): The end time as a string in the specified datetime_format.
+            - interval_hours (int): The time interval (in hours) between filenames.
+            - datetime_format (str): The format string to interpret the datetime inputs.
+
+        logger (Logger, optional): The logger object for logging messages. Defaults to None.
+
+    Returns:
+        list: A list of fully formatted filenames with datetimes interpolated at the given interval.
+
+    Example:
+        If template_block = {
+            "template": "/data/file_{datetime}.nc",
+            "start": "2024010100",
+            "end": "2024010112",
+            "interval_hours": 6,
+            "datetime_format": "%Y%m%d%H"
+        }
+
+        The returned list would be:
+        [
+            "/data/file_2024010100.nc",
+            "/data/file_2024010106.nc",
+            "/data/file_2024010112.nc"
+        ]
+    """
+    
+    # Assert that all required keys are present, otherwise abort
+    required_keys = ["template", "start", "end", "interval_hours", "datetime_format"]
+    missing_keys = [key for key in required_keys if key not in config]
+
+    if missing_keys:
+        message = (
+            f"Missing required key(s) in filenames_template: {', '.join(missing_keys)}. "
+            f"Required keys are: {', '.join(required_keys)}"
+        )
+        if logger:
+            logger.abort(message)
+        else:
+            raise ValueError(message)
+
+    start = datetime.strptime(str(config["start"]), config["datetime_format"])
+    end = datetime.strptime(str(config["end"]), config["datetime_format"])
+    interval = timedelta(hours=config["interval_hours"])
+    template_str = config["template"]
+
+    filenames = []
+    current = start
+    while current <= end:
+        filenames.append(template_str.format(datetime=current.strftime(config["datetime_format"])))
+        current += interval
+
+    return filenames
