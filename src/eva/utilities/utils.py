@@ -484,7 +484,7 @@ def generate_filenames_from_template(config, logger=None):
 
     This function constructs a list of file paths by interpolating datetime strings
     into a filename template at a specified interval between a start and end time.
-    It requires all necessary parameters to be present in the 'template_block' dictionary.
+    It requires all necessary parameters to be present in the 'config' dictionary.
 
     Parameters:
         config (dict): A dictionary containing the following keys:
