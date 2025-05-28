@@ -228,6 +228,9 @@ class DataCollections:
                     self.logger.abort(f'In get_variable_data_array channels is provided but ' +
                                       f'Channel is not a dimension in Dataset')
 
+                if 'Channel' not in data_array.dims:
+                    return data_array
+
                 # Make sure it is a list
                 channels_sel = []
                 channels_sel.append(channels)
