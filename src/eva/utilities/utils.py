@@ -9,6 +9,7 @@
 import re
 import string
 import yaml
+from datetime import datetime, timedelta
 
 from eva.utilities.logger import Logger
 
@@ -474,3 +475,85 @@ def is_number(s):
         return False
 
 # --------------------------------------------------------------------------------------------------
+
+
+def generate_filenames_from_template(config, logger=None):
+
+    """
+    Generate a list of filenames using either curly-brace or strftime-style datetime formatting.
+
+    This function constructs a list of file paths by interpolating datetime strings
+    into a filename template.
+
+    Parameters:
+        config (dict): A dictionary containing:
+            - template (str): A strftime-style template string, e.g., "/data/gdas.%Y%m%d/%H/..."
+            - start (str): Start time string in ISO format.
+            - end (str): End time string in ISO format.
+            - interval_hours (int): Interval (in hours) between timestamps.
+
+        logger (Logger, optional): The logger object for logging messages. Defaults to None.
+
+    Returns:
+        list: A list of fully formatted filenames.
+
+    Example:
+        Case 1:
+        {
+            "template": "/data/file_%Y%m%d%H.nc",
+            "start": "2025-01-01T00:00:00Z",
+            "end": "2025-01-01T12:00:00Z",
+            "interval_hours": 6
+        }
+
+        ➜ ["/data/file_2024010100.nc", "/data/file_2024010106.nc", "/data/file_2024010112.nc"]
+
+        Case 2:
+        {
+            "template": "gdas.%Y%m%d/%H/atmos/gdas.t%Hz.atmanl.nc",
+            "start": "2025-01-01T00:00:00Z",
+            "end": "2025-01-01T12:00:00Z",
+            "interval_hours": 6
+        }
+
+        ➜ ["gdas.20240101/00/atmos/gdas.t00z.atmanl.nc", ...]
+    """
+
+    # Assert that all required keys are present, otherwise abort
+    required_keys = ["template", "start", "end", "interval_hours"]
+    missing_keys = [key for key in required_keys if key not in config]
+
+    if missing_keys:
+        message = (
+            f"Missing required key(s) in filenames_template: {', '.join(missing_keys)}. "
+            f"Required keys are: {', '.join(required_keys)}"
+        )
+        if logger:
+            logger.abort(message)
+        else:
+            raise ValueError(message)
+
+    # Assert start and end time are in ISO format
+    try:
+        start = datetime.fromisoformat(config["start"])
+        end = datetime.fromisoformat(config["end"])
+    except ValueError as e:
+        message = (
+            f"Datetime format: {e}. "
+            "Use format like 'YYYY-MM-DDTHH:MM:SSZ'"
+        )
+        if logger:
+            logger.abort(message)
+        else:
+            raise ValueError(message)
+
+    template = config["template"]
+    interval = timedelta(hours=config["interval_hours"])
+
+    current = start
+    filenames = []
+    while current <= end:
+        filenames.append(current.strftime(template))
+        current += interval
+
+    return filenames
