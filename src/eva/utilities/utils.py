@@ -540,7 +540,7 @@ def generate_filenames_from_template(config, logger=None):
     except ValueError as e:
         message = (
             f"Datetime format: {e}. "
-            "Use format like 'YYYY-MM-DDTHH:MM:SS'"
+            "Use format like 'YYYY-MM-DDTHH:MM:SSZ'"
         )
         if logger:
             logger.abort(message)
