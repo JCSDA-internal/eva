@@ -14,8 +14,8 @@ datasets:
       - ${data_input_path}/time.hirs4_metop-a.ctl
     filenames_template:
         template: ${data_input_path}/time.hirs4_metop-a.%Y%m%d%H.ieee_d
-        start: "2015-05-14T18:00:00"
-        end: "2015-05-15T18:00:00"
+        start: "2015-05-14T18:00:00Z"
+        end: "2015-05-15T18:00:00Z"
         interval_hours: 6
 
     channels: &channels 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
