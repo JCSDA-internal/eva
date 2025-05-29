@@ -483,15 +483,13 @@ def generate_filenames_from_template(config, logger=None):
     Generate a list of filenames using either curly-brace or strftime-style datetime formatting.
 
     This function constructs a list of file paths by interpolating datetime strings
-    into a filename template using one of two styles:
-    - Curly-brace format: e.g., 'file_{datetime}.nc'
-    - strftime-style format: e.g., 'file.%Y%m%d%H.nc'
+    into a filename template.
 
     Parameters:
         config (dict): A dictionary containing:
             - template (str): A strftime-style template string, e.g., "/data/gdas.%Y%m%d/%H/..."
-            - start (str): Start time string in "%Y%m%d%H" format.
-            - end (str): End time string in "%Y%m%d%H" format.
+            - start (str): Start time string in ISO format.
+            - end (str): End time string in ISO format.
             - interval_hours (int): Interval (in hours) between timestamps.
 
         logger (Logger, optional): The logger object for logging messages. Defaults to None.
@@ -503,9 +501,9 @@ def generate_filenames_from_template(config, logger=None):
         Case 1:
         {
             "template": "/data/file_%Y%m%d%H.nc",
-            "start": "2024010100",
-            "end": "2024010112",
-            "interval_hours": 6,
+            "start": "2025-01-01T00:00:00Z",
+            "end": "2025-01-01T12:00:00Z",
+            "interval_hours": 6
         }
 
         ➜ ["/data/file_2024010100.nc", "/data/file_2024010106.nc", "/data/file_2024010112.nc"]
@@ -513,26 +511,13 @@ def generate_filenames_from_template(config, logger=None):
         Case 2:
         {
             "template": "gdas.%Y%m%d/%H/atmos/gdas.t%Hz.atmanl.nc",
-            "start": "2024010100",
-            "end": "2024010112",
-            "interval_hours": 6,
-            "datetime_format": "%Y%m%d%H"
+            "start": "2025-01-01T00:00:00Z",
+            "end": "2025-01-01T12:00:00Z",
+            "interval_hours": 6
         }
 
         ➜ ["gdas.20240101/00/atmos/gdas.t00z.atmanl.nc", ...]
     """
-    def assert_datetime_format(date_str, fmt="%Y%m%d%H", label="date"):
-        try:
-            parsed = datetime.strptime(date_str, fmt)
-            if parsed.strftime(fmt) != date_str:
-                raise ValueError
-        except ValueError:
-            message = f"Invalid format for '{label}': '{date_str}'. Expected format: '{fmt}'"
-            if logger:
-                logger.abort(message)
-            else:
-                raise ValueError(message)
-        return parsed
 
     # Assert that all required keys are present, otherwise abort
     required_keys = ["template", "start", "end", "interval_hours"]
@@ -548,18 +533,25 @@ def generate_filenames_from_template(config, logger=None):
         else:
             raise ValueError(message)
 
+    # Assert start and end time are in ISO format
+    try:
+        start = datetime.fromisoformat(config["start"])
+        end = datetime.fromisoformat(config["end"])
+    except ValueError as e:
+        message = (
+            f"Datetime format: {e}. "
+            "Use format like 'YYYY-MM-DDTHH:MM:SS'"
+        )
+        if logger:
+            logger.abort(message)
+        else:
+            raise ValueError(message)
+
     template = config["template"]
-    start_str = config["start"]
-    end_str = config["end"]
     interval = timedelta(hours=config["interval_hours"])
 
-    # Validate datetime formats
-    start = assert_datetime_format(start_str, "%Y%m%d%H", "start")
-    end = assert_datetime_format(end_str, "%Y%m%d%H", "end")
-
-    # Generate filenames
-    filenames = []
     current = start
+    filenames = []
     while current <= end:
         filenames.append(current.strftime(template))
         current += interval
