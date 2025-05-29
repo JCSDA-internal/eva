@@ -483,14 +483,9 @@ def generate_filenames_from_template(config, logger=None):
     Generate a list of filenames using either curly-brace or strftime-style datetime formatting.
 
     This function constructs a list of file paths by interpolating datetime strings
-<<<<<<< HEAD
     into a filename template using one of two styles:
     - Curly-brace format: e.g., 'file_{datetime}.nc'
     - strftime-style format: e.g., 'file.%Y%m%d%H.nc'
-=======
-    into a filename template at a specified interval between a start and end time.
-    It requires all necessary parameters to be present in the 'config' dictionary.
->>>>>>> f5b0d1bf4b8e2ca56fc8426271b74b3c66e82d78
 
     Parameters:
         config (dict): A dictionary containing:
@@ -553,7 +548,6 @@ def generate_filenames_from_template(config, logger=None):
         else:
             raise ValueError(message)
 
-    
     template = config["template"]
     start_str = config["start"]
     end_str = config["end"]
