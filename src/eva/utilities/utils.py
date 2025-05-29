@@ -480,44 +480,62 @@ def is_number(s):
 def generate_filenames_from_template(config, logger=None):
 
     """
-    Generate a list of filenames based on a time-based template.
+    Generate a list of filenames using either curly-brace or strftime-style datetime formatting.
 
     This function constructs a list of file paths by interpolating datetime strings
-    into a filename template at a specified interval between a start and end time.
-    It requires all necessary parameters to be present in the 'template_block' dictionary.
+    into a filename template using one of two styles:
+    - Curly-brace format: e.g., 'file_{datetime}.nc'
+    - strftime-style format: e.g., 'file.%Y%m%d%H.nc'
 
     Parameters:
-        config (dict): A dictionary containing the following keys:
-            - template (str): A filename template string with a '{datetime}' placeholder.
-            - start (str): The start time as a string in the specified datetime_format.
-            - end (str): The end time as a string in the specified datetime_format.
-            - interval_hours (int): The time interval (in hours) between filenames.
-            - datetime_format (str): The format string to interpret the datetime inputs.
+        config (dict): A dictionary containing:
+            - template (str): A strftime-style template string, e.g., "/data/gdas.%Y%m%d/%H/..."
+            - start (str): Start time string in "%Y%m%d%H" format.
+            - end (str): End time string in "%Y%m%d%H" format.
+            - interval_hours (int): Interval (in hours) between timestamps.
 
         logger (Logger, optional): The logger object for logging messages. Defaults to None.
 
     Returns:
-        list: A list of fully formatted filenames with datetimes interpolated at the given interval.
+        list: A list of fully formatted filenames.
 
     Example:
-        If template_block = {
-            "template": "/data/file_{datetime}.nc",
+        Case 1:
+        {
+            "template": "/data/file_%Y%m%d%H.nc",
+            "start": "2024010100",
+            "end": "2024010112",
+            "interval_hours": 6,
+        }
+
+        ➜ ["/data/file_2024010100.nc", "/data/file_2024010106.nc", "/data/file_2024010112.nc"]
+
+        Case 2:
+        {
+            "template": "gdas.%Y%m%d/%H/atmos/gdas.t%Hz.atmanl.nc",
             "start": "2024010100",
             "end": "2024010112",
             "interval_hours": 6,
             "datetime_format": "%Y%m%d%H"
         }
 
-        The returned list would be:
-        [
-            "/data/file_2024010100.nc",
-            "/data/file_2024010106.nc",
-            "/data/file_2024010112.nc"
-        ]
+        ➜ ["gdas.20240101/00/atmos/gdas.t00z.atmanl.nc", ...]
     """
+    def assert_datetime_format(date_str, fmt="%Y%m%d%H", label="date"):
+        try:
+            parsed = datetime.strptime(date_str, fmt)
+            if parsed.strftime(fmt) != date_str:
+                raise ValueError
+        except ValueError:
+            message = f"Invalid format for '{label}': '{date_str}'. Expected format: '{fmt}'"
+            if logger:
+                logger.abort(message)
+            else:
+                raise ValueError(message)
+        return parsed
 
     # Assert that all required keys are present, otherwise abort
-    required_keys = ["template", "start", "end", "interval_hours", "datetime_format"]
+    required_keys = ["template", "start", "end", "interval_hours"]
     missing_keys = [key for key in required_keys if key not in config]
 
     if missing_keys:
@@ -530,15 +548,21 @@ def generate_filenames_from_template(config, logger=None):
         else:
             raise ValueError(message)
 
-    start = datetime.strptime(str(config["start"]), config["datetime_format"])
-    end = datetime.strptime(str(config["end"]), config["datetime_format"])
+    
+    template = config["template"]
+    start_str = config["start"]
+    end_str = config["end"]
     interval = timedelta(hours=config["interval_hours"])
-    template_str = config["template"]
 
+    # Validate datetime formats
+    start = assert_datetime_format(start_str, "%Y%m%d%H", "start")
+    end = assert_datetime_format(end_str, "%Y%m%d%H", "end")
+
+    # Generate filenames
     filenames = []
     current = start
     while current <= end:
-        filenames.append(template_str.format(datetime=current.strftime(config["datetime_format"])))
+        filenames.append(current.strftime(template))
         current += interval
 
     return filenames
