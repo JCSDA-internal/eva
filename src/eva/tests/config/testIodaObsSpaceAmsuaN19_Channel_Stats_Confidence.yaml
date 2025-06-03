@@ -77,7 +77,7 @@ transforms:
 - transform: arithmetic
   new name: experiment::ObsValueMinusHofxMin::brightnessTemperature
   equals: experiment::ObsValueMinusHofxMean::brightnessTemperature-experiment::ObsValueMinusHofxError::brightnessTemperature
- 
+
 # Apply confidence interval to get upper limit control
 - transform: arithmetic
   new name: control::ObsValueMinusHofxMax::brightnessTemperature
@@ -147,6 +147,7 @@ graphics:
         markersize: 5
         color: orange
         alpha: 0.5
+      - type: LinePlot
         linestyle: dashed
         label: 
         y:
@@ -156,8 +157,9 @@ graphics:
         markersize: 5
         color: deepskyblue
         alpha: 0.5
-        linestyle: dashed 
-        label: 
+        linestyle: dashed
+        label:
+      - type: LinePlot 
         y:
           variable: control::MetaData::channelNumber
         x:
@@ -165,6 +167,7 @@ graphics:
         markersize: 5
         color: deepskyblue
         label: Control
+      - type: LinePlot
         y:
           variable: control::MetaData::channelNumber
         x:

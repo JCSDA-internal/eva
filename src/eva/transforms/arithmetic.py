@@ -19,7 +19,7 @@ from eva.transforms.transform_utils import replace_cgv
 from eva.utilities.utils import remove_list_duplicates
 from eva.utilities.utils import remove_empty_from_list_of_strings
 
-defined_functions = ['log','sqrt','mean','scipy_f_ppf','scipy_t_ppf','abs']
+defined_functions = ['log', 'sqrt', 'mean', 'scipy_f_ppf', 'scipy_t_ppf', :2'abs']
 
 # --------------------------------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ def arithmetic(config, data_collections):
                 regex_string = r'\(|\)|-|\*|\+|\/|,'
                 # add defined functions the user may apply
                 for fname in defined_functions:
-                    regex_string += '|{}'.format(fname) 
+                    regex_string += '|{}'.format(fname)
                 expression_elements = re.split(regex_string, expression)
 
                 # Remove empty elements and duplicates from expression elements
