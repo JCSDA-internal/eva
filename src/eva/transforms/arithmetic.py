@@ -19,7 +19,7 @@ from eva.transforms.transform_utils import replace_cgv
 from eva.utilities.utils import remove_list_duplicates
 from eva.utilities.utils import remove_empty_from_list_of_strings
 
-defined_functions = ['log', 'sqrt', 'mean', 'scipy_f_ppf', 'scipy_t_ppf', :2'abs']
+defined_functions = ['log', 'sqrt', 'mean', 'scipy_f_ppf', 'scipy_t_ppf', 'abs']
 
 # --------------------------------------------------------------------------------------------------
 
