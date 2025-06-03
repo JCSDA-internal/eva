@@ -1,0 +1,222 @@
+suppress_collection_display: false
+datasets:
+- name: control
+  type: IodaObsSpace
+  filenames:
+  - ${data_input_path}/ctrl_amsua_n19.20230726T030000Z.nc4
+  channels: 3,8
+  groups:
+  - name: ObsValue
+    variables:
+    - brightnessTemperature
+  - name: GsiHofXBc
+  - name: hofx0
+  - name: MetaData
+  - name: oman
+- name: experiment
+  type: IodaObsSpace
+  filenames:
+  - ${data_input_path}/exp_amsua_n19.20230726T030000Z.nc4
+  channels: 3,8
+  groups:
+  - name: ObsValue
+    variables:
+    - brightnessTemperature
+  - name: GsiHofXBc
+  - name: hofx0
+  - name: MetaData
+  - name: oman
+transforms:
+- transform: arithmetic
+  new name: control::ObsValueMinusHofx::brightnessTemperature
+  equals: control::ObsValue::brightnessTemperature-control::hofx0::brightnessTemperature
+- transform: arithmetic
+  new name: experiment::ObsValueMinusHofx::brightnessTemperature
+  equals: experiment::ObsValue::brightnessTemperature-experiment::hofx0::brightnessTemperature
+
+# get channel stats for OmB experiment
+- transform: channel_stats
+  channel_dimension_name: Location
+  statistic list:
+  - Mean
+  - Count
+  - Std
+  variable_name: experiment::ObsValueMinusHofx::${variable}
+  for:
+    variable:
+    - brightnessTemperature
+
+# get channel stats for OmB control
+- transform: channel_stats
+  channel_dimension_name: Location
+  statistic list:
+  - Mean
+  - Count
+  - Std
+  variable_name: control::ObsValueMinusHofx::${variable}
+  for:
+    variable:
+    - brightnessTemperature
+
+# Get experiment confidence interval
+- transform: arithmetic
+  new name: experiment::ObsValueMinusHofxError::brightnessTemperature
+  equals: experiment::ObsValueMinusHofxStd::brightnessTemperature/sqrt(experiment::ObsValueMinusHofxCount::brightnessTemperature)*scipy_t_ppf(1-0.05/2,experiment::ObsValueMinusHofxCount::brightnessTemperature)
+
+# Get control confidence interval
+- transform: arithmetic
+  new name: control::ObsValueMinusHofxError::brightnessTemperature
+  equals: control::ObsValueMinusHofxStd::brightnessTemperature/sqrt(control::ObsValueMinusHofxCount::brightnessTemperature)*scipy_t_ppf(1-0.05/2,control::ObsValueMinusHofxCount::brightnessTemperature)
+
+# Apply confidence interval to get upper limit experiment
+- transform: arithmetic
+  new name: experiment::ObsValueMinusHofxMax::brightnessTemperature
+  equals: experiment::ObsValueMinusHofxMean::brightnessTemperature+experiment::ObsValueMinusHofxError::brightnessTemperature
+
+# Apply confidence interval to get lower limit experiment
+- transform: arithmetic
+  new name: experiment::ObsValueMinusHofxMin::brightnessTemperature
+  equals: experiment::ObsValueMinusHofxMean::brightnessTemperature-experiment::ObsValueMinusHofxError::brightnessTemperature
+ 
+# Apply confidence interval to get upper limit control
+- transform: arithmetic
+  new name: control::ObsValueMinusHofxMax::brightnessTemperature
+  equals: control::ObsValueMinusHofxMean::brightnessTemperature+control::ObsValueMinusHofxError::brightnessTemperature
+
+# Apply confidence interval to get lower limit control
+- transform: arithmetic
+  new name: control::ObsValueMinusHofxMin::brightnessTemperature
+  equals: control::ObsValueMinusHofxMean::brightnessTemperature-control::ObsValueMinusHofxError::brightnessTemperature
+- transform: arithmetic
+
+# calculate ftest ratio confidence interval lower limit
+  new name: rat::ftestLower::brightnessTemperature
+  equals: (experiment::ObsValueMinusHofxStd::brightnessTemperature**2/control::ObsValueMinusHofxStd::brightnessTemperature**2)*scipy_f_ppf(1-0.05/2,experiment::ObsValueMinusHofxCount::brightnessTemperature-1,control::ObsValueMinusHofxCount::brightnessTemperature-1)
+
+# calculate ftest ratio confidence interval upper limit
+- transform: arithmetic
+  new name: rat::ftestUpper::brightnessTemperature
+  equals: (experiment::ObsValueMinusHofxStd::brightnessTemperature**2/control::ObsValueMinusHofxStd::brightnessTemperature**2)*scipy_f_ppf(0.05/2,experiment::ObsValueMinusHofxCount::brightnessTemperature,control::ObsValueMinusHofxCount::brightnessTemperature)
+
+# calculate ftest ratio confidence interval lower limit
+- transform: arithmetic
+  new name: rat::rat::brightnessTemperature
+  equals: experiment::ObsValueMinusHofxStd::brightnessTemperature**2/control::ObsValueMinusHofxStd::brightnessTemperature**2
+
+graphics:
+  plotting_backend: Emcpy
+  figure_list:
+  - figure:
+      layout:
+      - 1
+      - 1
+      title: 'AMSU-A Channel summary w/ confidence Intervals'
+      output name: hofx_vs_channel/amsua_n19/brightness_temperature/amsu-a_channel_summary_mean_w_ci.png
+    plots:
+    - add_xlabel: Observation - Background [K]
+      add_ylabel: Channel
+      set_yticks: [3,8]
+      add_grid: null
+      invert_yaxis: null
+      add_legend:
+        loc: 'upper left'
+      layers:
+      - type: LinePlot
+        y:
+          variable: experiment::MetaData::channelNumber
+        x:
+          variable: experiment::ObsValueMinusHofxMin::brightnessTemperature
+        markersize: 5
+        color: orange
+        alpha: 0.5
+        linestyle: dashed
+        label: 
+      - type: LinePlot
+        y:
+          variable: experiment::MetaData::channelNumber
+        x:
+          variable: experiment::ObsValueMinusHofxMean::brightnessTemperature
+        markersize: 5
+        color: orange
+        label: Experiment
+      - type: LinePlot
+        y:
+          variable: experiment::MetaData::channelNumber
+        x:
+          variable: experiment::ObsValueMinusHofxMax::brightnessTemperature
+        markersize: 5
+        color: orange
+        alpha: 0.5
+        linestyle: dashed
+        label: 
+        y:
+          variable: control::MetaData::channelNumber
+        x:
+          variable: control::ObsValueMinusHofxMin::brightnessTemperature
+        markersize: 5
+        color: deepskyblue
+        alpha: 0.5
+        linestyle: dashed 
+        label: 
+        y:
+          variable: control::MetaData::channelNumber
+        x:
+          variable: control::ObsValueMinusHofxMean::brightnessTemperature
+        markersize: 5
+        color: deepskyblue
+        label: Control
+        y:
+          variable: control::MetaData::channelNumber
+        x:
+          variable: control::ObsValueMinusHofxMax::brightnessTemperature
+        markersize: 5
+        color: deepskyblue
+        alpha: 0.5
+        linestyle: dashed
+        label: 
+
+  - figure:
+      layout:
+      - 1
+      - 1
+      title: 'Ratio of Variance O-B Experiment/Control'
+      output name: hofx_vs_channel/amsua_n19/brightness_temperature/amsu-a_channel_summary_variance_ratio_w_ci.png
+    plots:
+    - add_xlabel: Ratio variance (O-B) Experiment/Control
+      add_ylabel: Channel
+      set_yticks: [3,8]
+      add_grid: null
+      invert_yaxis: null
+      add_legend:
+        loc: 'upper left'
+      layers:
+      - type: LinePlot
+        y:
+          variable: experiment::MetaData::channelNumber
+        x: 
+          variable: rat::ftestLower::brightnessTemperature
+        markersize: 5
+        color: orange
+        alpha: 0.5
+        linestyle: dashed
+        label: 
+      - type: LinePlot
+        y:
+          variable: experiment::MetaData::channelNumber
+        x:
+          variable: rat::rat::brightnessTemperature
+        markersize: 5
+        color: orange
+        alpha: 0.5
+        label: variance(Experiment)/variance(Control)
+      - type: LinePlot
+        y:
+          variable: experiment::MetaData::channelNumber
+        x:
+          variable: rat::ftestUpper::brightnessTemperature
+        markersize: 5
+        color: orange
+        alpha: 0.5
+        linestyle: dashed
+        label: 
+
