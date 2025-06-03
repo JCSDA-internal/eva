@@ -28,7 +28,7 @@ def scipy_f_ppf(q, df1, df2):
     """
     Wraps xarray around scipy to give scipy.stat.f.ppf
     to get critical value for f test
-    q - confidence interval (1-alpha/2) where alpha is the significance level, with confidence 
+    q - confidence interval (1-alpha/2) where alpha is the significance level, with confidence
        level being complement (e.g., 1-0.05/2 for a 95% confidence interval)
     df1 - degree of freedom for 1st distribution (count-1)
     df2 - degree of freedome for 2nd distribution (count-1)
@@ -44,7 +44,7 @@ def scipy_t_ppf(q, df):
     Wraps xarray around scipy to give scipy.stat.t.ppf
     to get critical value for t test
     q - confidence interval (1-alpha/2 for 2 sided/way, 1-alpha for one sided/way where alpha is
-        significance level (e.g., for 95% confidence interval 1-0.05/2 for two sided/way, or 
+        significance level (e.g., for 95% confidence interval 1-0.05/2 for two sided/way, or
         1-0.05 for one sided/way
     df - degree of freedom (count - 1)
     """
@@ -135,7 +135,7 @@ def arithmetic(config, data_collections):
 
                 # Remove white space
                 expression = ''.join(expression.split())
-              
+
                 # Split math equation
                 regex_string = r'\(|\)|-|\*|\+|\/|,'
                 # add defined functions the user may apply
