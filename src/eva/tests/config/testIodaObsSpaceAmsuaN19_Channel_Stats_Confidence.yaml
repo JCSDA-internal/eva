@@ -130,7 +130,7 @@ graphics:
         color: orange
         alpha: 0.5
         linestyle: dashed
-        label: 
+        label:
       - type: LinePlot
         y:
           variable: experiment::MetaData::channelNumber
@@ -147,9 +147,9 @@ graphics:
         markersize: 5
         color: orange
         alpha: 0.5
-      - type: LinePlot
         linestyle: dashed
-        label: 
+        label:
+      - type: LinePlot
         y:
           variable: control::MetaData::channelNumber
         x:
@@ -159,7 +159,7 @@ graphics:
         alpha: 0.5
         linestyle: dashed
         label:
-      - type: LinePlot 
+      - type: LinePlot
         y:
           variable: control::MetaData::channelNumber
         x:
@@ -176,7 +176,7 @@ graphics:
         color: deepskyblue
         alpha: 0.5
         linestyle: dashed
-        label: 
+        label:
 
   - figure:
       layout:
@@ -196,13 +196,13 @@ graphics:
       - type: LinePlot
         y:
           variable: experiment::MetaData::channelNumber
-        x: 
+        x:
           variable: rat::ftestLower::brightnessTemperature
         markersize: 5
         color: orange
         alpha: 0.5
         linestyle: dashed
-        label: 
+        label:
       - type: LinePlot
         y:
           variable: experiment::MetaData::channelNumber
@@ -221,5 +221,5 @@ graphics:
         color: orange
         alpha: 0.5
         linestyle: dashed
-        label: 
+        label:
 
