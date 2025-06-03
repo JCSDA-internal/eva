@@ -8,19 +8,47 @@
 
 
 # --------------------------------------------------------------------------------------------------
-
-
-from math import sqrt
-from numpy import log
 import re
-from statistics import mean
-
+import scipy
+import xarray as xr
+from numpy import log, sqrt, mean, abs
 from eva.utilities.config import get
 from eva.utilities.logger import Logger
 from eva.transforms.transform_utils import parse_for_dict, split_collectiongroupvariable
 from eva.transforms.transform_utils import replace_cgv
 from eva.utilities.utils import remove_list_duplicates
 from eva.utilities.utils import remove_empty_from_list_of_strings
+
+defined_functions = ['log', 'sqrt', 'mean', 'scipy_f_ppf', 'scipy_t_ppf', 'abs']
+
+# --------------------------------------------------------------------------------------------------
+
+
+def scipy_f_ppf(q, df1, df2):
+    """
+    Wraps xarray around scipy to give scipy.stat.f.ppf
+    to get critical value for f test
+    q - confidence interval (1-alpha/2) where alpha is the significance level, with confidence
+       level being complement (e.g., 1-0.05/2 for a 95% confidence interval)
+    df1 - degree of freedom for 1st distribution (count-1)
+    df2 - degree of freedome for 2nd distribution (count-1)
+    """
+    return xr.apply_ufunc(scipy.stats.f.ppf, q, df1, df2)
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+def scipy_t_ppf(q, df):
+    """
+    Wraps xarray around scipy to give scipy.stat.t.ppf
+    to get critical value for t test
+    q - confidence interval (1-alpha/2 for 2 sided/way, 1-alpha for one sided/way where alpha is
+        significance level (e.g., for 95% confidence interval 1-0.05/2 for two sided/way, or
+        1-0.05 for one sided/way
+    df - degree of freedom (count - 1)
+    """
+    return xr.apply_ufunc(scipy.stats.t.ppf, q, df)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -109,7 +137,11 @@ def arithmetic(config, data_collections):
                 expression = ''.join(expression.split())
 
                 # Split math equation
-                expression_elements = re.split(r'\(|\)|-|\*|\+|\/|log', expression)
+                regex_string = r'\(|\)|-|\*|\+|\/|,'
+                # add defined functions the user may apply
+                for fname in defined_functions:
+                    regex_string += '|{}'.format(fname)
+                expression_elements = re.split(regex_string, expression)
 
                 # Remove empty elements and duplicates from expression elements
                 expression_elements = remove_empty_from_list_of_strings(expression_elements)
@@ -132,7 +164,6 @@ def arithmetic(config, data_collections):
 
                 # Evaluate the expression
                 new_variable = eval(str(expression))
-
                 # Add the new field to the data collections
                 cgv = split_collectiongroupvariable(logger, new_name)
                 data_collections.add_variable_to_collection(cgv[0], cgv[1], cgv[2], new_variable)
