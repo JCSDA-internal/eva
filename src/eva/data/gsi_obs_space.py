@@ -113,7 +113,7 @@ def satellite_dataset(ds, group_vars):
         'nobs': (('nobs'), np.arange(0, iters)),
     }
     data_vars = {}
-    keep_v  = ['Observation_Class',
+    keep_v =  ['Observation_Class',
                'Water_Fraction',
                'Land_Fraction',
                'Ice_Fraction',
@@ -154,51 +154,50 @@ def satellite_dataset(ds, group_vars):
                'Soil_Type',
                'Sfc_Wind_Direction']
 
-
     reshape_v = ['Latitude',
-                'Longitude',
-                'Elevation',
-                'Foundation_Temperature',
-                'Ice_Temperature',
-                'Land_Temperature',
-                'Obs_Time',
-                'Sfc_Wind_Speed',
-                'Snow_Depth',
-                'Snow_Temperature',
-                'dTb_dTs',
-                'Channel_Index',
-                'Observation',
-                'Obs_Minus_Forecast_adjusted',
-                'Obs_Minus_Forecast_unadjusted',
-                'Forecast_adjusted_clear',
-                'Forecast_unadjusted',
-                'Forecast_unadjusted_clear',
-                'Sol_Zenith_Angle',
-                'Sol_Azimuth_Angle',
-                'Sat_Azimuth_Angle',
-                'Sun_Glint_Angle',
-                'Scan_Position',
-                'Scan_Angle',
-                'Sat_Zenith_Angle',
-                'BC_Scan_Angle',
-                'BC_Cloud_Liquid_Water',
-                'BC_Cosine_Latitude_times_Node',
-                'BC_Sine_Latitude',
-                'Forecast_adjusted',
-                'Bias_Correction',
-                'Bias_Correction_Constant',
-                'Bias_Correction_ScanAngle',
-                'Inverse_Observation_Error',
-                'Input_Observation_Error',
-                'QC_Flag',
-                'Emissivity',
-                'Weighted_Lapse_Rate',
-                'dTb_dTs',
-                'BC_Constant',
-                'BC_Lapse_Rate_Squared',
-                'BC_Lapse_Rate',
-                'BC_Emissivity',
-                'BC_Fixed_Scan_Position']
+                 'Longitude',
+                 'Elevation',
+                 'Foundation_Temperature',
+                 'Ice_Temperature',
+                 'Land_Temperature',
+                 'Obs_Time',
+                 'Sfc_Wind_Speed',
+                 'Snow_Depth',
+                 'Snow_Temperature',
+                 'dTb_dTs',
+                 'Channel_Index',
+                 'Observation',
+                 'Obs_Minus_Forecast_adjusted',
+                 'Obs_Minus_Forecast_unadjusted',
+                 'Forecast_adjusted_clear',
+                 'Forecast_unadjusted',
+                 'Forecast_unadjusted_clear',
+                 'Sol_Zenith_Angle',
+                 'Sol_Azimuth_Angle',
+                 'Sat_Azimuth_Angle',
+                 'Sun_Glint_Angle',
+                 'Scan_Position',
+                 'Scan_Angle',
+                 'Sat_Zenith_Angle',
+                 'BC_Scan_Angle',
+                 'BC_Cloud_Liquid_Water',
+                 'BC_Cosine_Latitude_times_Node',
+                 'BC_Sine_Latitude',
+                 'Forecast_adjusted',
+                 'Bias_Correction',
+                 'Bias_Correction_Constant',
+                 'Bias_Correction_ScanAngle',
+                 'Inverse_Observation_Error',
+                 'Input_Observation_Error',
+                 'QC_Flag',
+                 'Emissivity',
+                 'Weighted_Lapse_Rate',
+                 'dTb_dTs',
+                 'BC_Constant',
+                 'BC_Lapse_Rate_Squared',
+                 'BC_Lapse_Rate',
+                 'BC_Emissivity',
+                 'BC_Fixed_Scan_Position']
     # Loop through each variable
     required_variables = group_vars[:]
     required_variables.append('sensor_chan')
@@ -232,17 +231,17 @@ def satellite_dataset(ds, group_vars):
 
         #  reshape to be a 2d array
         elif var in reshape_v:
-            data_vars[var] = (('nobs', 'nchans'), ds[var].data.reshape(iters,nchans))
+            data_vars[var] = (('nobs', 'nchans'), ds[var].data.reshape(iters, nchans))
 
         # Only as a last resort check data for repeats to determine reshape for unknown data
-        # not a particularly safe method if you have nchan values that repeat in a fluke dataset, 
+        # not a particularly safe method if you have nchan values that repeat in a fluke dataset,
         # but the dimensions are (nprofile, nchan) you're going to get this wrong
         else:
-            is_1d = (ds[var].isel(nobs=slice(0,nchans)) == ds[var].isel(nobs=0)).all()
+            is_1d = (ds[var].isel(nobs=slice(0, nchans)) == ds[var].isel(nobs=0)).all()
             if(is_1d):
-                data_vars[var] = (('nobs'), ds[var].thin(nobs=nchans).data)
+                data_vars[var] = (('nobs'), ds[var].thin(nobs = nchans).data)
             else:
-                data_vars[var] = (('nobs', 'nchans'), ds[var].data.reshape(iters,nchans))
+                data_vars[var] = (('nobs', 'nchans'), ds[var].data.reshape(iters, nchans))
     # create dataset_config
     new_ds = Dataset(data_vars=data_vars,
                      coords=coords,
