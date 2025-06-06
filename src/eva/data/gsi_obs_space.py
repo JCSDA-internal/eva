@@ -20,25 +20,6 @@ from eva.utilities.utils import parse_channel_list
 # --------------------------------------------------------------------------------------------------
 
 
-def all_equal(iterable):
-
-    """
-    Check if all elements in an iterable are equal.
-
-    Args:
-        iterable: An iterable object to check.
-
-    Returns:
-        bool: True if all elements are equal, False otherwise.
-    """
-
-    g = groupby(iterable)
-    return next(g, True) and not next(g, False)
-
-
-# --------------------------------------------------------------------------------------------------
-
-
 def uv(group_vars):
 
     """
@@ -112,30 +93,119 @@ def subset_channels(ds, channels, logger, add_channels_variable=False):
 # --------------------------------------------------------------------------------------------------
 
 
-def satellite_dataset(ds):
+def satellite_dataset(ds, group_vars):
 
     """
     Build a new dataset to reshape satellite data.
 
     Args:
         ds (Dataset): The input xarray Dataset.
-
+        group_vars: all or use selected group_vars
     Returns:
         Dataset: Reshaped xarray Dataset.
     """
 
-    nchans = ds.dims['nchans']
-    iters = int(ds.dims['nobs']/nchans)
+    nchans = ds.sizes['nchans']
+    iters = int(ds.sizes['nobs']/nchans)
 
     coords = {
         'nchans': (('nchans'), ds['sensor_chan'].data),
         'nobs': (('nobs'), np.arange(0, iters)),
     }
-
     data_vars = {}
-    # Loop through each variable
-    for var in ds.variables:
+    keep_v  = ['Observation_Class',
+               'Water_Fraction',
+               'Land_Fraction',
+               'Ice_Fraction',
+               'Snow_Fraction',
+               'Water_Temperature',
+               'Soil_Temperature',
+               'Soil_Moisture',
+               'Land_Type_Index',
+               'sstcu',
+               'sstph',
+               'sstnv',
+               'dta',
+               'dqa',
+               'dtp_avh',
+               'tsavg5',
+               'Vegetation_Fraction',
+               'tpwc_amsua',
+               'tpwc',
+               'tpwc_guess',
+               'clw_guess_retrieval',
+               'clwp_amsua',
+               'scat_amsua',
+               'Cloud_Frac',
+               'CTP',
+               'CLW',
+               'TPWC',
+               'clw_obs',
+               'clw_guess',
+               'ciw_guess',
+               'rain_guess',
+               'snow_guess',
+               'tropopause_pressure',
+               'SST_Warm_layer_dt',
+               'SST_Cool_layer_tdrop',
+               'SST_dTz_dTfound',
+               'Vegetation_Type',
+               'Lai',
+               'Soil_Type',
+               'Sfc_Wind_Direction']
 
+
+    reshape_v = ['Latitude',
+                'Longitude',
+                'Elevation',
+                'Foundation_Temperature',
+                'Ice_Temperature',
+                'Land_Temperature',
+                'Obs_Time',
+                'Sfc_Wind_Speed',
+                'Snow_Depth',
+                'Snow_Temperature',
+                'dTb_dTs',
+                'Channel_Index',
+                'Observation',
+                'Obs_Minus_Forecast_adjusted',
+                'Obs_Minus_Forecast_unadjusted',
+                'Forecast_adjusted_clear',
+                'Forecast_unadjusted',
+                'Forecast_unadjusted_clear',
+                'Sol_Zenith_Angle',
+                'Sol_Azimuth_Angle',
+                'Sat_Azimuth_Angle',
+                'Sun_Glint_Angle',
+                'Scan_Position',
+                'Scan_Angle',
+                'Sat_Zenith_Angle',
+                'BC_Scan_Angle',
+                'BC_Cloud_Liquid_Water',
+                'BC_Cosine_Latitude_times_Node',
+                'BC_Sine_Latitude',
+                'Forecast_adjusted',
+                'Bias_Correction',
+                'Bias_Correction_Constant',
+                'Bias_Correction_ScanAngle',
+                'Inverse_Observation_Error',
+                'Input_Observation_Error',
+                'QC_Flag',
+                'Emissivity',
+                'Weighted_Lapse_Rate',
+                'dTb_dTs',
+                'BC_Constant',
+                'BC_Lapse_Rate_Squared',
+                'BC_Lapse_Rate',
+                'BC_Emissivity',
+                'BC_Fixed_Scan_Position']
+    # Loop through each variable
+    required_variables = group_vars[:]
+    required_variables.append('sensor_chan')
+    for var in ds.variables:
+        # Ignore everything that the user didn't ask for
+        if var not in required_variables:
+            continue
         # Ignore geovals data
         if var in ['air_temperature', 'air_pressure', 'air_pressure_levels',
                    'atmosphere_absorber_01', 'atmosphere_absorber_02', 'atmosphere_absorber_03']:
@@ -156,20 +226,23 @@ def satellite_dataset(ds):
                 data_vars[out_var] = (('nobs', 'nchans'), data[:, :, ipred])
 
         # Deals with how to handle nobs data
+        # If values are repeating over nchan iterations (known previously on safe), keep as nobs
+        elif var in keep_v:
+            data_vars[var] = (('nobs'), ds[var].thin(nobs=nchans).data)
+
+        #  reshape to be a 2d array
+        elif var in reshape_v:
+            data_vars[var] = (('nobs', 'nchans'), ds[var].data.reshape(iters,nchans))
+
+        # Only as a last resort check data for repeats to determine reshape for unknown data
+        # not a particularly safe method if you have nchan values that repeat in a fluke dataset, 
+        # but the dimensions are (nprofile, nchan) you're going to get this wrong
         else:
-            # Check if values repeat over nchans
-            condition = all_equal(ds[var].data[0:nchans])
-
-            # If values are repeating over nchan iterations, keep as nobs
-            if condition:
-                data = ds[var].data[0::nchans]
-                data_vars[var] = (('nobs'), data)
-
-            # Else, reshape to be a 2d array
+            is_1d = (ds[var].isel(nobs=slice(0,nchans)) == ds[var].isel(nobs=0)).all()
+            if(is_1d):
+                data_vars[var] = (('nobs'), ds[var].thin(nobs=nchans).data)
             else:
-                data = np.reshape(ds[var].data, (iters, nchans))
-                data_vars[var] = (('nobs', 'nchans'), data)
-
+                data_vars[var] = (('nobs', 'nchans'), ds[var].data.reshape(iters,nchans))
     # create dataset_config
     new_ds = Dataset(data_vars=data_vars,
                      coords=coords,
@@ -251,9 +324,8 @@ class GsiObsSpace(EvaDatasetBase):
 
                 # Reshape variables if satellite diag
                 if 'nchans' in ds.dims:
-                    ds = satellite_dataset(ds)
+                    ds = satellite_dataset(ds, group_vars)
                     ds = subset_channels(ds, channels, self.logger)
-
                 # Adjust variable names if uv
                 if 'variable' in locals():
                     if variable == 'uv':
