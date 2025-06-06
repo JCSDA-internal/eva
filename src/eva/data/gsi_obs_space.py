@@ -237,9 +237,9 @@ def satellite_dataset(ds, group_vars):
         # not a particularly safe method if you have nchan values that repeat in a fluke dataset,
         # but the dimensions are (nprofile, nchan) you're going to get this wrong
         else:
-            is_1d = (ds[var].isel(nobs= slice(0, nchans)) == ds[var].isel(nobs=0)).all()
-            if(is_1d):
-                data_vars[var] = (('nobs'), ds[var].thin(nobs= nchans).data)
+            is_1d = (ds[var].isel(nobs=slice(0, nchans)) == ds[var].isel(nobs=0)).all()
+            if (is_1d):
+                data_vars[var] = (('nobs'), ds[var].thin(nobs=nchans).data)
             else:
                 data_vars[var] = (('nobs', 'nchans'), ds[var].data.reshape(iters, nchans))
     # create dataset_config
