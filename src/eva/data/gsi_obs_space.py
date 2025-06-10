@@ -93,7 +93,7 @@ def subset_channels(ds, channels, logger, add_channels_variable=False):
 # --------------------------------------------------------------------------------------------------
 
 
-def satellite_dataset(ds, group_vars):
+def satellite_dataset(ds, group_vars, force_reshape_all):
 
     """
     Build a new dataset to reshape satellite data.
@@ -101,6 +101,8 @@ def satellite_dataset(ds, group_vars):
     Args:
         ds (Dataset): The input xarray Dataset.
         group_vars: all or use selected group_vars
+        force_reshape_all: bool that allows user to force all variables to be reshaped
+                           vs. checking whether to thin or reshape
     Returns:
         Dataset: Reshaped xarray Dataset.
     """
@@ -113,94 +115,37 @@ def satellite_dataset(ds, group_vars):
         'nobs': (('nobs'), np.arange(0, iters)),
     }
     data_vars = {}
-    keep_v = ['Observation_Class',
-              'Water_Fraction',
-              'Land_Fraction',
-              'Ice_Fraction',
-              'Snow_Fraction',
-              'Water_Temperature',
-              'Soil_Temperature',
-              'Soil_Moisture',
-              'Land_Type_Index',
-              'sstcu',
-              'sstph',
-              'sstnv',
-              'dta',
-              'dqa',
-              'dtp_avh',
-              'tsavg5',
-              'Vegetation_Fraction',
-              'tpwc_amsua',
-              'tpwc',
-              'tpwc_guess',
-              'clw_guess_retrieval',
-              'clwp_amsua',
-              'scat_amsua',
-              'Cloud_Frac',
-              'CTP',
-              'CLW',
-              'TPWC',
-              'clw_obs',
-              'clw_guess',
-              'ciw_guess',
-              'rain_guess',
-              'snow_guess',
-              'tropopause_pressure',
-              'SST_Warm_layer_dt',
-              'SST_Cool_layer_tdrop',
-              'SST_dTz_dTfound',
-              'Vegetation_Type',
-              'Lai',
-              'Soil_Type',
-              'Sfc_Wind_Direction']
 
-    reshape_v = ['Latitude',
-                 'Longitude',
-                 'Elevation',
-                 'Foundation_Temperature',
-                 'Ice_Temperature',
-                 'Land_Temperature',
-                 'Obs_Time',
-                 'Sfc_Wind_Speed',
-                 'Snow_Depth',
-                 'Snow_Temperature',
-                 'dTb_dTs',
-                 'Channel_Index',
+    required_variables = group_vars[:]
+    if ('sensor_chan' not in required_variables):
+        required_variables.append('sensor_chan')
+
+    lat_lon = ['Latitude', 'Longitude']
+    # these inherently have a spectral dimension.
+    always_2d = ['QC_Flag',
                  'Observation',
                  'Obs_Minus_Forecast_adjusted',
                  'Obs_Minus_Forecast_unadjusted',
                  'Forecast_adjusted_clear',
-                 'Forecast_unadjusted',
                  'Forecast_unadjusted_clear',
-                 'Sol_Zenith_Angle',
-                 'Sol_Azimuth_Angle',
-                 'Sat_Azimuth_Angle',
-                 'Sun_Glint_Angle',
-                 'Scan_Position',
-                 'Scan_Angle',
-                 'Sat_Zenith_Angle',
+                 'Forecast_adjusted',
+                 'Forecast_unadjusted',
+                 'Emissivity',
                  'BC_Scan_Angle',
                  'BC_Cloud_Liquid_Water',
                  'BC_Cosine_Latitude_times_Node',
                  'BC_Sine_Latitude',
-                 'Forecast_adjusted',
                  'Bias_Correction',
                  'Bias_Correction_Constant',
                  'Bias_Correction_ScanAngle',
                  'Inverse_Observation_Error',
                  'Input_Observation_Error',
-                 'QC_Flag',
-                 'Emissivity',
-                 'Weighted_Lapse_Rate',
-                 'dTb_dTs',
                  'BC_Constant',
                  'BC_Lapse_Rate_Squared',
                  'BC_Lapse_Rate',
                  'BC_Emissivity',
                  'BC_Fixed_Scan_Position']
     # Loop through each variable
-    required_variables = group_vars[:]
-    required_variables.append('sensor_chan')
     for var in ds.variables:
         # Ignore everything that the user didn't ask for
         if var not in required_variables:
@@ -224,18 +169,21 @@ def satellite_dataset(ds, group_vars):
                 out_var = var+pred
                 data_vars[out_var] = (('nobs', 'nchans'), data[:, :, ipred])
 
-        # Deals with how to handle nobs data
-        # If values are repeating over nchan iterations (known previously on safe), keep as nobs
-        elif var in keep_v:
-            data_vars[var] = (('nobs'), ds[var].thin(nobs=nchans).data)
-
-        #  reshape to be a 2d array
-        elif var in reshape_v:
+        # Force all variables 2d except lat/lon (optional), or if it inherently has
+        # spectral dependence. Don't touch lat/lon because if they're 2d it makes it
+        # harder to make map. You'd need to do a per channel `accept_where` which
+        # would be cumbersome for hyperspectral, and annoying for any microwave that
+        # isn't AMSU.
+        #
+        # Recommend `gsi_obs_space_reshape_all` for any ancillary data for microwave sensors,
+        # because footprint size is used and calculated on a per channel basis (e.g., Land_Fraction,
+        # Water_Fraction, etc become inherently spectral).
+        elif (force_reshape_all and (var not in lat_lon)) or (var in always_2d):
             data_vars[var] = (('nobs', 'nchans'), ds[var].data.reshape(iters, nchans))
 
-        # Only as a last resort check data for repeats to determine reshape for unknown data
-        # not a particularly safe method if you have nchan values that repeat in a fluke dataset,
-        # but the dimensions are (nprofile, nchan) you're going to get this wrong
+        # either thin or reshape based on whether or not all repeat values for the first
+        # slice of nchan out of the array. Always use for lat/lon because it will thin
+        # for most sensors except AMSU, which makes it easier to plot a map.
         else:
             is_1d = (ds[var].isel(nobs=slice(0, nchans)) == ds[var].isel(nobs=0)).all()
             if (is_1d):
@@ -299,7 +247,10 @@ class GsiObsSpace(EvaDatasetBase):
         # Get the groups to be read
         # -------------------------
         groups = get(dataset_config, self.logger, 'groups')
-
+        if ('gsi_obs_space_reshape_all' in dataset_config.keys()):
+            force_reshape_all = bool(get(dataset_config, self.logger, 'gsi_obs_space_reshape_all'))
+        else:
+            force_reshape_all = False
         # Loop over filenames
         # -------------------
         for filename in filenames:
@@ -323,7 +274,7 @@ class GsiObsSpace(EvaDatasetBase):
 
                 # Reshape variables if satellite diag
                 if 'nchans' in ds.dims:
-                    ds = satellite_dataset(ds, group_vars)
+                    ds = satellite_dataset(ds, group_vars, force_reshape_all)
                     ds = subset_channels(ds, channels, self.logger)
                 # Adjust variable names if uv
                 if 'variable' in locals():
