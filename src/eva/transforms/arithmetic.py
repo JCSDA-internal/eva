@@ -140,7 +140,7 @@ def arithmetic(config, data_collections):
                 regex_string = r'\(|\)|-|\*|\+|\/|,'
                 # add defined functions the user may apply
                 for fname in defined_functions:
-                    regex_string += '|{}'.format(fname)
+                    regex_string += r'|\b{}\b'.format(fname)
                 expression_elements = re.split(regex_string, expression)
 
                 # Remove empty elements and duplicates from expression elements
