@@ -83,7 +83,7 @@ class Scatter(ABC):
         cfg = dict(getattr(self, "config", {}) or {})
         drop_nan = bool(cfg.pop("drop_nan", False))
         self.config = cfg
-        
+
         if drop_nan:
             y_is_finite = np.isfinite(y_flat)
             y_plot = y_flat[y_is_finite]
@@ -94,7 +94,7 @@ class Scatter(ABC):
         else:
             y_plot = y_flat
             x_plot = x_flat
-        
+
         self.xdata = x_plot
         self.ydata = y_plot
 

@@ -100,12 +100,12 @@ class LinePlot(ABC):
         # Flatten, build y with NaNs preserved (as you already added)
         x_flat = np.ravel(xdata)
         y_flat = ma.array(ydata).filled(np.nan).ravel()
-        
+
         # Read and remove the config knob so it won't be forwarded to plt.plot
         cfg = dict(getattr(self, "config", {}) or {})
         drop_nan = bool(cfg.pop("drop_nan", False))
         self.config = cfg
-        
+
         if drop_nan:
             y_is_finite = np.isfinite(y_flat)
             y_plot = y_flat[y_is_finite]
@@ -116,7 +116,7 @@ class LinePlot(ABC):
         else:
             y_plot = y_flat
             x_plot = x_flat
-        
+
         self.xdata = x_plot
         self.ydata = y_plot
 

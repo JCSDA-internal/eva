@@ -2,6 +2,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import numpy as np
+import numpy.ma as ma
 
 from abc import ABC, abstractmethod
 
@@ -74,15 +75,15 @@ class Density(ABC):
 
         # Density data should be flattened
         data = np.ravel(np.asanyarray(data))
-        
+
         # If upstream gave us a masked array, turn masked to NaN for uniform handling
         if ma.isMaskedArray(data):
             data = data.filled(np.nan)
-        
+
         # Optional knob: by default density plots *drop* NaNs (keeps current behavior)
         # Set `drop_nan: false` in the layer config if you want to preserve length (masked in place)
         drop_nan = bool(self.config.get('drop_nan', True))
-        
+
         if drop_nan:
             # keep only finite values
             self.data = data[np.isfinite(data)]

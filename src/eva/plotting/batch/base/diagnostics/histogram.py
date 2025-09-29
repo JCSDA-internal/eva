@@ -2,6 +2,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import numpy as np
+import numpy.ma as ma
 
 from abc import ABC, abstractmethod
 
