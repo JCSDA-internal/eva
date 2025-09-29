@@ -87,9 +87,9 @@ class ContourPlot(ABC):
         zdata = slice_var_from_str(self.config['z'], zdata, self.logger)
 
         # contour data should be flattened
-        xdata = xdata.flatten()
-        ydata = ydata.flatten()
-        zdata = zdata.flatten()
+        self.xdata = xdata.flatten()
+        self.ydata = ydata.flatten()
+        self.zdata = zdata.flatten()
 
     @abstractmethod
     def configure_plot(self):

@@ -2,6 +2,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import numpy as np
+import numpy.ma as ma
 import pandas as pd
 
 from abc import ABC, abstractmethod
@@ -96,19 +97,28 @@ class LinePlot(ABC):
         xdata = slice_var_from_str(self.config['x'], xdata, self.logger)
         ydata = slice_var_from_str(self.config['y'], ydata, self.logger)
 
-        # line plot data should be flattened
-        self.xdata = xdata.flatten()
-        self.ydata = ydata.flatten()
-
-        # Remove NaN values to enable regression
-        # --------------------------------------
-        mask = pd.notna(xdata)
-        self.xdata = xdata[mask]
-        self.ydata = ydata[mask]
-
-        mask = pd.notna(self.ydata)
-        self.xdata = self.xdata[mask]
-        self.ydata = self.ydata[mask]
+        # Flatten, build y with NaNs preserved (as you already added)
+        x_flat = np.ravel(xdata)
+        y_flat = ma.array(ydata).filled(np.nan).ravel()
+        
+        # Read and remove the config knob so it won't be forwarded to plt.plot
+        cfg = dict(getattr(self, "config", {}) or {})
+        drop_nan = bool(cfg.pop("drop_nan", False))
+        self.config = cfg
+        
+        if drop_nan:
+            y_is_finite = np.isfinite(y_flat)
+            y_plot = y_flat[y_is_finite]
+            try:
+                x_plot = x_flat[y_is_finite]
+            except Exception:
+                x_plot = np.array(x_flat, dtype=object)[y_is_finite]
+        else:
+            y_plot = y_flat
+            x_plot = x_flat
+        
+        self.xdata = x_plot
+        self.ydata = y_plot
 
     @abstractmethod
     def configure_plot(self):
