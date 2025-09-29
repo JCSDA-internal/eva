@@ -2,7 +2,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import numpy as np
-import pandas as pd
+import numpy.ma as ma
 
 from abc import ABC, abstractmethod
 
@@ -72,31 +72,35 @@ class Scatter(ABC):
             channel = self.config.get('channel')
 
         xdata = self.dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2], channel)
-        xdata1 = self.dataobj.get_variable_data(var0_cgv[0], var0_cgv[1], var0_cgv[2])
         ydata = self.dataobj.get_variable_data(var1_cgv[0], var1_cgv[1], var1_cgv[2], channel)
 
-        # see if we need to slice data
+        # Optional slicing
         xdata = slice_var_from_str(self.config['x'], xdata, self.logger)
         ydata = slice_var_from_str(self.config['y'], ydata, self.logger)
 
-        # Read and remove the config knob so it won't be forwarded to plt.plot
-        cfg = dict(getattr(self, "config", {}) or {})
-        drop_nan = bool(cfg.pop("drop_nan", False))
+        # Flatten and normalize (turn masked to NaN for uniform handling)
+        x = np.ravel(np.asanyarray(xdata))
+        y = np.ravel(np.asanyarray(ydata))
+        if ma.isMaskedArray(x):
+            x = x.filled(np.nan)
+        if ma.isMaskedArray(y):
+            y = y.filled(np.nan)
+
+        # Read & remove knob so it won't propagate to matplotlib kwargs
+        cfg = dict(self.config)
+        drop_nan = bool(cfg.pop('drop_nan', True))  # default True for scatter
         self.config = cfg
 
         if drop_nan:
-            y_is_finite = np.isfinite(y_flat)
-            y_plot = y_flat[y_is_finite]
-            try:
-                x_plot = x_flat[y_is_finite]
-            except Exception:
-                x_plot = np.array(x_flat, dtype=object)[y_is_finite]
+            # Keep only pairs where both x and y are finite
+            mask = np.isfinite(x) & np.isfinite(y)
+            self.xdata = x[mask]
+            self.ydata = y[mask]
         else:
-            y_plot = y_flat
-            x_plot = x_flat
-
-        self.xdata = x_plot
-        self.ydata = y_plot
+            # Preserve length; mask invalid pairs in-place (some backends honor masked arrays)
+            invalid = ~(np.isfinite(x) & np.isfinite(y))
+            self.xdata = ma.array(x, mask=invalid)
+            self.ydata = ma.array(y, mask=invalid)
 
     @abstractmethod
     def configure_plot(self):
