@@ -2,6 +2,7 @@ from eva.eva_path import return_eva_path
 from eva.utilities.config import get
 from eva.utilities.utils import get_schema, update_object, slice_var_from_str
 import numpy as np
+import numpy.ma as ma
 
 from abc import ABC, abstractmethod
 
@@ -72,12 +73,25 @@ class Histogram(ABC):
         # See if we need to slice data
         data = slice_var_from_str(self.config['data'], data, self.logger)
 
-        # Histogram data should be flattened
-        data = data.flatten()
+        # Flatten
+        arr = np.ravel(np.asanyarray(data))
 
-        # Missing data should also be removed
-        mask = ~np.isnan(data)
-        self.data = data[mask]
+        # If masked, convert masked entries to NaN for uniform handling
+        if ma.isMaskedArray(arr):
+            arr = arr.filled(np.nan)
+
+        # Read & strip the knob so it never leaks to backends
+        cfg = dict(self.config)
+        drop_nan = bool(cfg.get('drop_nan', True))
+        cfg.pop('drop_nan', None)
+        self.config = cfg
+
+        if drop_nan:
+            # Typical histogram path: use only finite values
+            self.data = arr[np.isfinite(arr)]
+        else:
+            # Preserve length and mask invalids in place (backend must accept masked arrays)
+            self.data = ma.masked_invalid(arr)
 
 # --------------------------------------------------------------------------------------------------
 
