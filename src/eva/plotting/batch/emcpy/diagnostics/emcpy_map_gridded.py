@@ -27,7 +27,7 @@ class EmcpyMapGridded(MapGridded):
         """
         lat = np.asarray(latvar)
         lon = np.asarray(lonvar)
-        A   = np.asarray(datavar)
+        A = np.asarray(datavar)
 
         # --- CASE 1: 3-D curvilinear (lon, lat, tile) → choose one tile to get 2-D ---
         if lat.ndim == 3 and lon.ndim == 3 and lat.shape == lon.shape:
@@ -72,7 +72,8 @@ class EmcpyMapGridded(MapGridded):
                 if A2.T.shape == lat2d.shape:
                     A2 = A2.T
                 else:
-                    raise ValueError(f"Data shape {A2.shape} incompatible with tile lat/lon {lat2d.shape}")
+                    raise ValueError(f"Data shape {A2.shape} incompatible "
+                                     f"with tile lat/lon {lat2d.shape}")
 
             return lat2d, lon2d, A2
 
@@ -96,7 +97,12 @@ class EmcpyMapGridded(MapGridded):
                 lat_axis = next((i for i, s in enumerate(shape) if s == lat1d.size), None)
                 lon_axis = next((i for i, s in enumerate(shape) if s == lon1d.size), None)
                 if lat_axis is not None and lon_axis is not None:
-                    order = [lat_axis, lon_axis] + [i for i in range(3) if i not in (lat_axis, lon_axis)]
+                    axes = (lat_axis, lon_axis)
+                    extra = [
+                        i for i in range(A2.ndim)
+                        if i not in axes
+                    ]
+                    order = [*axes, *extra]
                     A2 = np.transpose(A2, order)
                     lev_idx = int(self.config.get("level_index", 0))
                     if A2.ndim == 3:
@@ -112,7 +118,8 @@ class EmcpyMapGridded(MapGridded):
                     A2 = A2.T
                 else:
                     raise ValueError(
-                        f"Data shape {A2.shape} incompatible with lat {lat1d.size} / lon {lon1d.size}"
+                        f"Data shape {A2.shape} incompatible with "
+                        f"lat {lat1d.size} / lon {lon1d.size}"
                     )
 
             LAT2D, LON2D = np.meshgrid(lat1d, lon1d, indexing="ij")
