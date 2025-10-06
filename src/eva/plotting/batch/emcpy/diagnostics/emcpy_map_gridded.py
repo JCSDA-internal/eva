@@ -44,9 +44,27 @@ class EmcpyMapGridded(MapGridded):
             A2 = A
             if A2.ndim >= 3:
                 # find axis whose size == tile_count
-                tile_axis = next((i for i, s in enumerate(A2.shape) if s == tile_count), None)
-                if tile_axis is not None:
-                    A2 = np.take(A2, tile_idx, axis=tile_axis)
+                # find all axes whose size == tile_count
+                tile_axes = [i for i, s in enumerate(A2.shape) if s == tile_count]
+                tile_axis_config = self.config.get("tile_axis_index", None)
+                if tile_axis_config is not None:
+                    tile_axis = int(tile_axis_config)
+                    if tile_axis < 0 or tile_axis >= A2.ndim or A2.shape[tile_axis] != tile_count:
+                        raise ValueError(
+                            f"Configured tile_axis_index {tile_axis} is invalid for data "
+                            f"shape {A2.shape} and tile_count {tile_count}"
+                        )
+                else:
+                    if len(tile_axes) == 1:
+                        tile_axis = tile_axes[0]
+                    elif len(tile_axes) == 0:
+                        tile_axis = None
+                    else:
+                        raise ValueError(
+                            f"Ambiguous tile axis: multiple axes {tile_axes} in data shape "
+                            f"{A2.shape} have size equal to tile_count ({tile_count}). "
+                            "Please specify 'tile_axis_index' in the config."
+                        )
 
             # if any extra leading level/ensemble dim remains, pick first or configured
             if A2.ndim == 3:
@@ -92,11 +110,28 @@ class EmcpyMapGridded(MapGridded):
             lon1d = lon.squeeze()
             A2 = A
             if A2.ndim == 3:
-                # identify lat/lon axes by matching sizes and pick level_index
+                # identify lat/lon axes robustly, avoiding ambiguity
                 shape = A2.shape
-                lat_axis = next((i for i, s in enumerate(shape) if s == lat1d.size), None)
-                lon_axis = next((i for i, s in enumerate(shape) if s == lon1d.size), None)
+                # Try to get axis indices from config first
+                lat_axis = self.config.get("lat_axis", None)
+                lon_axis = self.config.get("lon_axis", None)
                 if lat_axis is not None and lon_axis is not None:
+                    lat_axis = int(lat_axis)
+                    lon_axis = int(lon_axis)
+                else:
+                    # Find all axes matching lat/lon sizes
+                    lat_axes = [i for i, s in enumerate(shape) if s == lat1d.size]
+                    lon_axes = [i for i, s in enumerate(shape) if s == lon1d.size]
+                    if len(lat_axes) != 1 or len(lon_axes) != 1:
+                        raise ValueError(
+                            f"Ambiguous axis identification: "
+                            f"Found lat_axes={lat_axes} for size {lat1d.size}, "
+                            f"lon_axes={lon_axes} for size {lon1d.size}. "
+                            "Please specify 'lat_axis' and 'lon_axis' in config."
+                        )
+                    lat_axis = lat_axes[0]
+                    lon_axis = lon_axes[0]
+                if lat_axis != lon_axis:
                     axes = (lat_axis, lon_axis)
                     extra = [
                         i for i in range(A2.ndim)
