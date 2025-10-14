@@ -10,7 +10,7 @@ pandas
 numpy
 
 # Additional packages
-git+https://github.com/NOAA-EMC/emcpy.git@92aa62f34a1f413d8cb1646bca0e81f267b61365#egg=emcpy
+git+https://github.com/NOAA-EMC/emcpy.git@7794574611e760475d61eb5d9458af2d3d2191d8#egg=emcpy
 scikit-learn
 seaborn
 hvplot
