@@ -17,6 +17,7 @@ from eva.utilities.utils import parse_channel_list
 
 import netCDF4 as nc
 import numpy as np
+import pandas as pd
 
 # --------------------------------------------------------------------------------------------------
 
@@ -68,6 +69,34 @@ def subset_channels(ds, channels):
             ds = ds.sel(Channel=channels)
 
     return ds
+
+# --------------------------------------------------------------------------------------------------
+# Valid time helper
+
+def _validtime_iso_to_datetime64ns(values, units=None):
+    """
+    Convert ISO-8601 strings (or byte-strings) such as "YYYY-MM-DDTHH:MM:SSZ"
+    to numpy datetime64[ns] in UTC and tz-naive form (friendly for Matplotlib).
+
+    Parameters
+    ----------
+    values : array-like
+        String/bytes/object array of ISO-8601 timestamps.
+
+    Returns
+    -------
+    numpy.ndarray
+        Array of dtype datetime64[ns] with original shape.
+    """
+    a = np.asarray(values)
+    # bytes -> unicode first
+    if a.dtype.kind == "S":
+        a = a.astype("U")
+    # only convert strings/objects; otherwise return as-is
+    if a.dtype.kind in {"U", "O"}:
+        ts = pd.to_datetime(a.ravel(), utc=True, errors="coerce").tz_convert(None)
+        return ts.to_numpy(dtype="datetime64[ns]").reshape(a.shape)
+    return values
 
 
 # --------------------------------------------------------------------------------------------------
@@ -186,6 +215,15 @@ class IodaStats(EvaDatasetBase):
                 domain = ds_header['statisticDomain']
                 add_domain = True
 
+            # Normalize validTime from ISO8601 strings to datetime64[ns]
+            if add_validTime:
+                vt_vals = _validtime_iso_to_datetime64ns(validTime.values)
+                validTime = DataArray(
+                    vt_vals,
+                    dims=validTime.dims,
+                    attrs={**getattr(validTime, "attrs", {}), "axis_type": "time"}
+                )
+
             ds_header.close()
 
             # Set the channels based on user selection and add channels variable
@@ -251,7 +289,9 @@ class IodaStats(EvaDatasetBase):
                     ds['MetaData::channelNumber'] = sensor_channels
 
                 if add_validTime:
-                    ds['analysisCycle'] = validTime
+                    # Expose normalized time as a coordinate for concat,
+                    # and as a data variable for plotting/backends.
+                    ds = ds.assign_coords(analysisCycle=validTime)
                     ds['MetaData::validTime'] = validTime
 
                 # Set channels
