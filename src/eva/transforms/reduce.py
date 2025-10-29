@@ -47,7 +47,7 @@ from eva.transforms.transform_utils import split_collectiongroupvariable
 
 
 def _mask_fill(da: xr.DataArray) -> xr.DataArray:
-    """Mask the dataset's _FillValue (if present) to NaN."""
+    """Mask the DataArray's _FillValue (if present) to NaN."""
     if da is None:
         return da
     fv = da.attrs.get("_FillValue", None)
