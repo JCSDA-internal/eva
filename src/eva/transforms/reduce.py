@@ -142,6 +142,6 @@ def reduce(config: dict, data_collections) -> None:
 
     logger.info(
         f"ReduceTransform: wrote '{new_name}' "
-        f"(op={op}, dims={dims if op!='identity' else 'n/a'}, skipna={skipna}, "
+        f"(op={op}, dims={dims if op !='identity' else 'n/a'}, skipna={skipna}, "
         f"squeeze_binsZ={squeeze_bins}, mask_fill={mask_fill})"
     )
