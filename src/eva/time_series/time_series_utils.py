@@ -3,7 +3,7 @@ import numpy as np
 import xarray as xr
 from eva.data.data_driver import data_driver
 from eva.data.data_collections import DataCollections
-
+from eva.utilities.utils import generate_filenames_from_template
 
 filename_retrieval = {
     "GsiObsSpace": lambda dataset_config: dataset_config["filenames"],
@@ -14,6 +14,12 @@ filename_retrieval = {
 
 def get_filenames(dataset_config, logger):
     """ Retrieve filenames using given type  """
+
+    if "filenames_template" in dataset_config:
+        dataset_config['filenames'] = generate_filenames_from_template(
+            dataset_config['filenames_template'], logger)
+        del dataset_config['filenames_template']
+
 
     dataset_type = dataset_config["type"]
     logger.assert_abort(dataset_type in filename_retrieval,
