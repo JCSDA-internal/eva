@@ -17,7 +17,7 @@ datasets:
   - name: MetaData
   - name: oman
 - name: experiment
-  filenames_template: 
+  filenames_template:
     template: ${data_input_path}/exp_amsua_n19.%Y%m%dT%H0000Z.nc4
     start: '2023-07-26T03:00:00'
     end: '2023-07-26T09:00:00'
