@@ -2,21 +2,11 @@ suppress_collection_display: false
 datasets:
 - name: control
   type: IodaObsSpace
-  filenames:
-  - ${data_input_path}/ctrl_amsua_n19.20230726T030000Z.nc4
-  channels: 3,8
-  groups:
-  - name: ObsValue
-    variables:
-    - brightnessTemperature
-  - name: GsiHofXBc
-  - name: hofx0
-  - name: MetaData
-  - name: oman
-- name: control
-  type: IodaObsSpace
-  filenames:
-  - ${data_input_path}/ctrl_amsua_n19.20230726T090000Z.nc4
+  filenames_template:
+    template: ${data_input_path}/ctrl_amsua_n19.%Y%m%dT%H0000Z.nc4
+    start: '2023-07-26T03:00:00'
+    end: '2023-07-26T09:00:00'
+    interval_hours: 6
   channels: 3,8
   groups:
   - name: ObsValue
@@ -27,22 +17,12 @@ datasets:
   - name: MetaData
   - name: oman
 - name: experiment
+  filenames_template:
+    template: ${data_input_path}/exp_amsua_n19.%Y%m%dT%H0000Z.nc4
+    start: '2023-07-26T03:00:00'
+    end: '2023-07-26T09:00:00'
+    interval_hours: 6
   type: IodaObsSpace
-  filenames:
-  - ${data_input_path}/exp_amsua_n19.20230726T030000Z.nc4
-  channels: 3,8
-  groups:
-  - name: ObsValue
-    variables:
-    - brightnessTemperature
-  - name: GsiHofXBc
-  - name: hofx0
-  - name: MetaData
-  - name: oman
-- name: experiment
-  type: IodaObsSpace
-  filenames:
-  - ${data_input_path}/exp_amsua_n19.20230726T090000Z.nc4
   channels: 3,8
   groups:
   - name: ObsValue
