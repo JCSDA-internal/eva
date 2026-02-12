@@ -20,7 +20,6 @@ def get_filenames(dataset_config, logger):
             dataset_config['filenames_template'], logger)
         del dataset_config['filenames_template']
 
-
     dataset_type = dataset_config["type"]
     logger.assert_abort(dataset_type in filename_retrieval,
                         f'Unknown dataset_type {dataset_type}')
