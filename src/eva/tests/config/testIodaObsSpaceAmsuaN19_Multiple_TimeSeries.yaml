@@ -71,7 +71,7 @@ graphics:
       - 1
       - 1
       title: Mean OmB | AMSU-A NOAA-19 | Ch 3 | ObsValueMinusHofx::brightnessTemperature
-      output name: time_series/amsua_n19/brightnessTemperature_mean/3/time_series_compare_omb_template.png
+      output name: time_series/amsua_n19/brightnessTemperature_mean/3/time_series_compare_omb.png
     plots:
     - add_xlabel: Datetime
       add_ylabel: JEDI h(x)
