@@ -215,6 +215,9 @@ class DataCollections:
             self.logger.abort('In get_variable_data: time_series collection must ' +
                               'have name containing \'time_series\'')
 
+        if collection_name not in self._collections:
+            return None
+
         group_variable_name = group_name + '::' + variable_name
         data_array = self._collections[collection_name][group_variable_name]
 
@@ -299,6 +302,7 @@ class DataCollections:
         if self.time_series and 'time_series' not in collection_name:
             self.logger.abort('In get_variable_data: time_series collection must ' +
                               'have name containing \'time_series\'')
+
 
         variable_array = self.get_variable_data_array(collection_name, group_name, variable_name,
                                                       channels, levels, datatypes)
@@ -449,14 +453,14 @@ class DataCollections:
                         str(data_var_value.dtype)[0:7].ljust(7) + ')' + minmaxrms_string
                 self.logger.info(full_str)
 
-        # Add the raw xarray display of the collection for more information about coords/dims
-        self.logger.info(' ')
-        self.logger.info('/'*80)
-        self.logger.info(' ')
-        self.logger.info(f'Raw xarray display of the {fcol.underline + collection + fcol.end} ' +
-                         'collection:')
-        self.logger.info(' ')
-        self.logger.info(str(self._collections[collection]))
-        self.logger.info('-'*80)
+            # Add the raw xarray display of the collection for more information about coords/dims
+            self.logger.info(' ')
+            self.logger.info('/'*80)
+            self.logger.info(' ')
+            self.logger.info(f'Raw xarray display of the {fcol.underline + collection + fcol.end} ' +
+                             'collection:')
+            self.logger.info(' ')
+            self.logger.info(str(self._collections[collection]))
+            self.logger.info('-'*80)
 
     # ----------------------------------------------------------------------------------------------
