@@ -269,10 +269,13 @@ def eva(eva_config, eva_logger=None):
 
     # Generate figure(s)
     # ------------------
-    logger.info(f'Running figure driver')
-    timing.start('FigureDriverExecute')
-    figure_driver(eva_dict, data_collections, timing, logger)
-    timing.stop('FigureDriverExecute')
+    if data_collections._collections:
+        logger.info(f'Running figure driver')
+        timing.start('FigureDriverExecute')
+        figure_driver(eva_dict, data_collections, timing, logger)
+        timing.stop('FigureDriverExecute')
+    else:
+        logger.info('No data collections available, skipping figure driver.')
 
     timing.finalize()
 
