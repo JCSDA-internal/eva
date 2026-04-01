@@ -210,8 +210,8 @@ class JediLog(EvaDatasetBase):
 
         # Check that some minimizer chunks were found
         if total_iter == 0:
-            self.logger.warning('The number of iterations found in the log is zero. Skipping ' +
-                                'convergence parsing.')
+            self.logger.info('Warning: The number of iterations found in the log is zero. ' +
+                             'Skipping convergence parsing.')
             return xr.Dataset()
 
         # Create list of variables that need to be built
