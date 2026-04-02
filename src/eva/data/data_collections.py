@@ -303,7 +303,6 @@ class DataCollections:
             self.logger.abort('In get_variable_data: time_series collection must ' +
                               'have name containing \'time_series\'')
 
-
         variable_array = self.get_variable_data_array(collection_name, group_name, variable_name,
                                                       channels, levels, datatypes)
 
@@ -457,8 +456,8 @@ class DataCollections:
             self.logger.info(' ')
             self.logger.info('/'*80)
             self.logger.info(' ')
-            self.logger.info(f'Raw xarray display of the {fcol.underline + collection + fcol.end} ' +
-                             'collection:')
+            self.logger.info(f"Raw xarray display of the" 
+                  f"{fcol.underline}{collection}{fcol.end} collection:")
             self.logger.info(' ')
             self.logger.info(str(self._collections[collection]))
             self.logger.info('-'*80)
