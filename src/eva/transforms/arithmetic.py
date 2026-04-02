@@ -156,11 +156,20 @@ def arithmetic(config, data_collections):
                         cgv = split_collectiongroupvariable(logger, expression_variables[n])
                         exp_var_data = data_collections.get_variable_data_array(cgv[0], cgv[1],
                                                                                 cgv[2])
+                        if exp_var_data is None:
+                            logger.info(f'Warning: collection \'{cgv[0]}\' not found, ' +
+                                        f'skipping expression \'{expression}\'.')
+                            vars = None
+                            break
                         vars.append(exp_var_data)
                         # Replace the name in the expression
                         expression = expression.replace(expression_variables[n],
                                                         'vars['+str(var_counter)+']')
                         var_counter = var_counter + 1
+
+                # Skip if any variable was missing (collection not found)
+                if vars is None:
+                    continue
 
                 # Evaluate the expression
                 new_variable = eval(str(expression))

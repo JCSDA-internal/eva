@@ -117,8 +117,9 @@ class JediLog(EvaDatasetBase):
         for metric in data_to_parse:
             if metric == 'convergence' and data_to_parse[metric]:
                 convergence_ds = self.parse_convergence()
-                # Add to the Eva dataset
-                data_collections.create_or_add_to_collection(collection_name, convergence_ds)
+                # Add to the Eva dataset (skip if empty, e.g. zero iterations)
+                if convergence_ds.data_vars:
+                    data_collections.create_or_add_to_collection(collection_name, convergence_ds)
 
     # ----------------------------------------------------------------------------------------------
 
@@ -209,8 +210,9 @@ class JediLog(EvaDatasetBase):
 
         # Check that some minimizer chunks were found
         if total_iter == 0:
-            self.logger.abort('The number of iterations found in the log is zero. Check the ' +
-                              'parsing of the log is correct.')
+            self.logger.info('Warning: The number of iterations found in the log is zero. ' +
+                             'Skipping convergence parsing.')
+            return xr.Dataset()
 
         # Create list of variables that need to be built
         var_names = []
