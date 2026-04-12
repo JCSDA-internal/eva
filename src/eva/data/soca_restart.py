@@ -74,8 +74,9 @@ class SocaRestart(EvaDatasetBase):
         # -------------------------
         soca_vars = get(dataset_config, self.logger, 'variables', default=[])
         coord_vars = get(dataset_config, self.logger, 'coordinate variables', default=None)
+        opt_vars = get(dataset_config, self.logger, 'optional variables', default=None)
 
-        # Read orographic fields first
+        # Read grid fields first
         # -------------------------
         var_dict = {}
         group_name = 'SOCAgrid'
@@ -89,6 +90,17 @@ class SocaRestart(EvaDatasetBase):
         for var in soca_vars:
             dims, data = read_soca(soca_filenames, var, self.logger)
             var_dict[group_name + '::' + var] = (dims, data)
+
+        # Create opt_vars if requested
+        # -------------------------
+        if opt_vars is not None:
+            for var in opt_vars:
+                if var == 'depth':
+                    dims, data = create_depth_variable(soca_filenames, self.logger)
+                    var_dict[group_name + '::' + var] = (dims, data)
+                else:
+                    self.logger.abort(f"{var} is not a valid optional variable. Valid optional "
+                                     f"variables are: depth")
 
         # Create dataset_config from data dictionary
         # -------------------------
@@ -149,13 +161,53 @@ def read_soca(file, variable, logger):
 
     with Dataset(file, mode='r') as f:
         try:
-            dims = ["lon", "lat"]
+            dims = ["lat", "lon"]
             if len(f.variables[variable].dimensions) > 3:
-                dims = ["lev", "lon", "lat"]
+                dims = ["lev", "lat", "lon"]
             var = np.squeeze(f.variables[variable][:])
         except KeyError:
             logger.abort(f"{variable} is not a valid variable. \nExiting ...")
 
     return dims, var
+
+# --------------------------------------------------------------------------------------------------
+
+def create_depth_variable(file, logger):
+    """
+    Create the time dependent depth variable by cumulatively summing the `h` variable over the `zl`
+    dimension.
+
+    Args:
+        file (str): Path to the SOCA file.
+        logger (Logger): Logger for logging messages.
+
+    Returns:
+        tuple: A tuple containing dimensions (list) and data (numpy.ndarray) for the depth variable.
+    """
+
+    with Dataset(file, mode='r') as f:
+        h_dims = f.variables['h'].dimensions
+        h_data = f.variables['h'][:]
+
+    # Ensure `h` has the expected dimensions, which should be (time, zl, yh, xh)
+    if len(h_dims) != 4 or list(h_dims) != ['time', 'zl', 'yh', 'xh']:
+        logger.abort(f"The `h` variable does not have the expected dimensions or "
+                     f"shape: {h_dims}. Expected (time, zl, yh, xh).")
+
+    # Handle the `time` dimension
+    if h_data.shape[0] > 1:
+        logger.info(f"The `h` variable has a time dimension of size {h_data.shape[0]}. "
+                    f"Using the first time step for depth calculation.")
+        h_data = h_data[0, ...]
+    else:
+        h_data = np.squeeze(h_data, axis=0)
+
+    # Compute the cumulative sum over the `zl` dimension
+    depth_data = np.cumsum(h_data, axis=0)
+
+    # Define the dimensions for the depth variable
+    depth_dims = ['lev', 'lat', 'lon']
+
+    return depth_dims, depth_data
 
 # --------------------------------------------------------------------------------------------------
